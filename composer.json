@@ -3,6 +3,8 @@
     "type": "symfony-bundle",
     "description": "Simple workflow bundle for Symfony2",
     "keywords": ["workflow"],
+    "license": "MIT",
+    "homepage": "http://github.com/jeremyFreeAgent/WorkflowBundle",
     "authors": [
         {
             "name": "Jérémy Romey",
