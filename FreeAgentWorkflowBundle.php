@@ -1,6 +1,6 @@
 <?php
 
-namespace FreeAgent\Bundle\WorkflowBundle;
+namespace FreeAgent\WorkflowBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 

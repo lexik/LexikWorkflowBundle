@@ -1,6 +1,6 @@
 <?php
 
-namespace FreeAgent\Bundle\WorkflowBundle\DependencyInjection;
+namespace FreeAgent\WorkflowBundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
@@ -47,8 +47,8 @@ class Configuration implements ConfigurationInterface
                             ->end()
                         ->end()
                     ->end()
+                ->end()
             ->end()
-        ->end()
         ;
 
         return $treeBuilder;

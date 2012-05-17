@@ -1,18 +1,155 @@
 <?php
 
-namespace FreeAgent\Bundle\WorkflowBundle\Tests\Manager;
+namespace FreeAgent\WorkflowBundle\Tests\Manager;
 
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\DependencyInjection\Container;
+use FreeAgent\WorkflowBundle\Manager\Manager;
+use FreeAgent\WorkflowBundle\Model\ModelInterface;
+use FreeAgent\WorkflowBundle\Action\ActionInterface;
+use FreeAgent\WorkflowBundle\Validator\ValidatorInterface;
 
-use FreeAgent\Bundle\WorkflowBundle\Model\Example as ModelExample;
+class ModelExample implements ModelInterface
+{
+    private $workflow_step_name;
+    private $workflow_name = 'example';
 
-class ManagerTest extends WebTestCase
+    public function getWorkflowName()
+    {
+        return $this->workflow_name;
+    }
+
+    public function setWorkflowName($workflowName)
+    {
+        return $this->workflow_name = $workflowName;
+    }
+
+    public function setWorkflowStepName($stepName)
+    {
+        $this->workflow_step_name = $stepName;
+    }
+
+    public function getWorkflowStepName()
+    {
+        return $this->workflow_step_name;
+    }
+}
+
+class ActionExample implements ActionInterface
+{
+    public function run($model)
+    {
+        return true;
+    }
+}
+
+class ValidatorExample implements ValidatorInterface
+{
+    public function validate($model)
+    {
+        return true;
+    }
+}
+
+class ManagerForTest extends Manager
+{
+    public function configureWorkflow($workflowName)
+    {
+        $this->workflow = array(
+            'default_step' => 'draft',
+            'steps' => array(
+                'draft' => array(
+                    'label' => 'Draft',
+                    'actions' => array(
+                        'free_agent_workflow.action.example',
+                    ),
+                    'validators' => array(
+                        'free_agent_workflow.validator.example',
+                        'free_agent_workflow.validator.example',
+                    ),
+                    'possible_next_steps' => array(
+                        'removed',
+                        'validated',
+                    ),
+                ),
+                'removed' => array(
+                    'label' => 'Removed',
+                    'actions' => array(
+                        'free_agent_workflow.action.example',
+                    ),
+                    'validators' => array(
+                        'free_agent_workflow.validator.example',
+                        'free_agent_workflow.validator.example',
+                    ),
+                    'possible_next_steps' => array(
+                        'draft',
+                    ),
+                ),
+                'validated' => array(
+                    'label' => 'Validated',
+                    'actions' => array(
+                        'free_agent_workflow.action.example',
+                    ),
+                    'validators' => array(
+                        'free_agent_workflow.validator.example',
+                    ),
+                    'possible_next_steps' => array(
+                        'published',
+                        'removed',
+                        'draft',
+                    ),
+                ),
+                'published' => array(
+                    'label' => 'Published',
+                    'actions' => array(
+                        'free_agent_workflow.action.example',
+                    ),
+                    'validators' => array(
+                        'free_agent_workflow.validator.example',
+                        'free_agent_workflow.validator.example',
+                    ),
+                    'possible_next_steps' => array(
+                        'unpublished',
+                        'removed',
+                        'draft',
+                    ),
+                ),
+                'unpublished' => array(
+                    'label' => 'Unpublished',
+                    'actions' => array(
+                        'free_agent_workflow.action.example',
+                    ),
+                    'validators' => array(
+                        'free_agent_workflow.validator.example',
+                        'free_agent_workflow.validator.example',
+                    ),
+                    'possible_next_steps' => array(
+                        'published',
+                        'removed',
+                        'draft',
+                    ),
+                ),
+            ),
+        );
+
+        return $this->getWorkflow();
+    }
+
+    public function getValidator($validator)
+    {
+        return new ValidatorExample();
+    }
+
+    public function getAction($action)
+    {
+        return new ActionExample();
+    }
+}
+
+class ManagerTest extends \PHPUnit_Framework_TestCase
 {
     private function getManager()
     {
-        $client = static::createClient();
-
-        $manager = $client->getContainer()->get('free_agent_workflow.manager');
+        $manager = new ManagerForTest(new Container());
 
         $model = new ModelExample();
 

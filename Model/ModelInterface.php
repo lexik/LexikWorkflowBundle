@@ -1,6 +1,6 @@
 <?php
 
-namespace FreeAgent\Bundle\WorkflowBundle\Model;
+namespace FreeAgent\WorkflowBundle\Model;
 
 interface ModelInterface
 {

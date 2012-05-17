@@ -5,10 +5,10 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <parameters>
-        <parameter key="free_agent_workflow.manager.class">FreeAgent\Bundle\WorkflowBundle\Manager\Manager</parameter>
-        <parameter key="free_agent_workflow.workflow.exemple.class">FreeAgent\Bundle\WorkflowBundle\Workflow\Example</parameter>
-        <parameter key="free_agent_workflow.validator.exemple.class">FreeAgent\Bundle\WorkflowBundle\Validator\Example</parameter>
-        <parameter key="free_agent_workflow.action.exemple.class">FreeAgent\Bundle\WorkflowBundle\Action\Example</parameter>
+        <parameter key="free_agent_workflow.manager.class">FreeAgent\WorkflowBundle\Manager\Manager</parameter>
+        <parameter key="free_agent_workflow.workflow.exemple.class">FreeAgent\WorkflowBundle\Workflow\Example</parameter>
+        <parameter key="free_agent_workflow.validator.exemple.class">FreeAgent\WorkflowBundle\Validator\Example</parameter>
+        <parameter key="free_agent_workflow.action.exemple.class">FreeAgent\WorkflowBundle\Action\Example</parameter>
     </parameters>
 
     <services>

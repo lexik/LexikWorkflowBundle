@@ -1,6 +1,6 @@
 <?php
 
-namespace FreeAgent\Bundle\WorkflowBundle\Validator;
+namespace FreeAgent\WorkflowBundle\Validator;
 
 interface ValidatorInterface
 {

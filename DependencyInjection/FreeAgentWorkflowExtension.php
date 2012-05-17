@@ -1,6 +1,6 @@
 <?php
 
-namespace FreeAgent\Bundle\WorkflowBundle\DependencyInjection;
+namespace FreeAgent\WorkflowBundle\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\FileLocator;

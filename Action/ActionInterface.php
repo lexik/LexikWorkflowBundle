@@ -1,6 +1,6 @@
 <?php
 
-namespace FreeAgent\Bundle\WorkflowBundle\Action;
+namespace FreeAgent\WorkflowBundle\Action;
 
 interface ActionInterface
 {

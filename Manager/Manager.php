@@ -1,17 +1,18 @@
 <?php
 
-namespace FreeAgent\Bundle\WorkflowBundle\Manager;
+namespace FreeAgent\WorkflowBundle\Manager;
 
 use Symfony\Component\DependencyInjection\Container;
-use FreeAgent\Bundle\WorkflowBundle\Model\ModelInterface;
+use FreeAgent\WorkflowBundle\Model\ModelInterface;
 
 class Manager
 {
-    private $model;
-    private $workflow;
-    private $steps   = array();
-    private $actions = array();
-    private $container;
+    protected $model;
+    protected $workflow;
+    protected $steps   = array();
+    protected $actions = array();
+    protected $container;
+    protected $canReachStep = array();
 
     /**
      * [__construct description]
@@ -129,6 +130,8 @@ class Manager
 
             $this->runStepActions($stepName);
 
+            $this->canReachStep = array();
+
             return true;
         }
 
@@ -142,36 +145,43 @@ class Manager
      */
     public function canReachStep($stepName)
     {
-        if ($stepName != $this->getCurrentStepName())
-        {
-            $step        = $this->getStep($stepName);
-            $currentStep = $this->getCurrentStep();
+        if (!array_key_exists($stepName, $this->canReachStep)) {
 
-            if (!array_key_exists('possible_next_steps', $currentStep)) {
+            $this->canReachStep[$stepName] = false;
 
-                return false;
-            }
+            if ($stepName != $this->getCurrentStepName())
+            {
+                $step        = $this->getStep($stepName);
+                $currentStep = $this->getCurrentStep();
 
-            if (in_array($stepName, $currentStep['possible_next_steps'])) {
+                if (array_key_exists('possible_next_steps', $currentStep)) {
+                    if (in_array($stepName, $currentStep['possible_next_steps'])) {
 
-                if (!array_key_exists('validators', $step)) {
-                    return true;
-                } else {
-                    foreach ($step['validators'] as $validator) {
-                        $validator = $this->container->get($validator);
+                        if (!array_key_exists('validators', $step)) {
+                            $this->canReachStep[$stepName] = true;
+                        } else {
+                            foreach ($step['validators'] as $validator) {
+                                $validator = $this->getValidator($validator);
 
-                        if (false == $validator->validate($this->getModel())) {
-
-                            return false;
+                                $this->canReachStep[$stepName] = false == $validator->validate($this->getModel()) ? false : true;
+                            }
                         }
-
-                        return true;
                     }
                 }
             }
         }
 
-        return false;
+        return $this->canReachStep[$stepName];
+    }
+
+    public function getValidator($validator)
+    {
+        return $this->container->get($validator);
+    }
+
+    public function getAction($action)
+    {
+        return $this->container->get($action);
     }
 
     /**
@@ -184,7 +194,7 @@ class Manager
         if (array_key_exists('actions', $currentStep)) {
 
             foreach ($step['actions'] as $action) {
-                $action = $this->container->get($action);
+                $action = $this->getAction($action);
 
                 if (false == $action->run($this->getModel())) {
 
