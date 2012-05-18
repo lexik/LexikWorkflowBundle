@@ -95,4 +95,16 @@ free_agent_workflow:
                     possible_next_steps:
                         - removed
 ```
+### Actions & Validations
 You need also to set up your **Actions** and **Validations** services.
+
+Usage
+-----
+```
+$manager = $this->getContainer('free_agent_workflow.workflow.manager');
+$manager->setModel($model);
+if ($manager->canReachStep('draft')) {
+    $manager->reachStep('draft');
+    $model = $manager->getModel();
+}
+```
