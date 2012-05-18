@@ -6,7 +6,7 @@ use Symfony\Component\DependencyInjection\Container;
 use FreeAgent\WorkflowBundle\Manager\Manager;
 use FreeAgent\WorkflowBundle\Model\ModelInterface;
 use FreeAgent\WorkflowBundle\Action\ActionInterface;
-use FreeAgent\WorkflowBundle\Validator\ValidatorInterface;
+use FreeAgent\WorkflowBundle\Validation\ValidationInterface;
 
 class ModelExample implements ModelInterface
 {
@@ -42,7 +42,7 @@ class ActionExample implements ActionInterface
     }
 }
 
-class ValidatorExample implements ValidatorInterface
+class ValidationExample implements ValidationInterface
 {
     public function validate($model)
     {
@@ -62,9 +62,9 @@ class ManagerForTest extends Manager
                     'actions' => array(
                         'free_agent_workflow.action.example',
                     ),
-                    'validators' => array(
-                        'free_agent_workflow.validator.example',
-                        'free_agent_workflow.validator.example',
+                    'validations' => array(
+                        'free_agent_workflow.validation.example',
+                        'free_agent_workflow.validation.example',
                     ),
                     'possible_next_steps' => array(
                         'removed',
@@ -76,9 +76,9 @@ class ManagerForTest extends Manager
                     'actions' => array(
                         'free_agent_workflow.action.example',
                     ),
-                    'validators' => array(
-                        'free_agent_workflow.validator.example',
-                        'free_agent_workflow.validator.example',
+                    'validations' => array(
+                        'free_agent_workflow.validation.example',
+                        'free_agent_workflow.validation.example',
                     ),
                     'possible_next_steps' => array(
                         'draft',
@@ -89,8 +89,8 @@ class ManagerForTest extends Manager
                     'actions' => array(
                         'free_agent_workflow.action.example',
                     ),
-                    'validators' => array(
-                        'free_agent_workflow.validator.example',
+                    'validations' => array(
+                        'free_agent_workflow.validation.example',
                     ),
                     'possible_next_steps' => array(
                         'published',
@@ -103,9 +103,9 @@ class ManagerForTest extends Manager
                     'actions' => array(
                         'free_agent_workflow.action.example',
                     ),
-                    'validators' => array(
-                        'free_agent_workflow.validator.example',
-                        'free_agent_workflow.validator.example',
+                    'validations' => array(
+                        'free_agent_workflow.validation.example',
+                        'free_agent_workflow.validation.example',
                     ),
                     'possible_next_steps' => array(
                         'unpublished',
@@ -118,9 +118,9 @@ class ManagerForTest extends Manager
                     'actions' => array(
                         'free_agent_workflow.action.example',
                     ),
-                    'validators' => array(
-                        'free_agent_workflow.validator.example',
-                        'free_agent_workflow.validator.example',
+                    'validations' => array(
+                        'free_agent_workflow.validation.example',
+                        'free_agent_workflow.validation.example',
                     ),
                     'possible_next_steps' => array(
                         'published',
@@ -134,9 +134,9 @@ class ManagerForTest extends Manager
         return $this->getWorkflow();
     }
 
-    public function getValidator($validator)
+    public function getValidation($validation)
     {
-        return new ValidatorExample();
+        return new ValidationExample();
     }
 
     public function getAction($action)

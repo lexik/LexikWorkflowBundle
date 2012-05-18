@@ -9,8 +9,7 @@ class Manager
 {
     protected $model;
     protected $workflow;
-    protected $steps   = array();
-    protected $actions = array();
+    protected $steps = array();
     protected $container;
     protected $canReachStep = array();
 
@@ -157,13 +156,13 @@ class Manager
                 if (array_key_exists('possible_next_steps', $currentStep)) {
                     if (in_array($stepName, $currentStep['possible_next_steps'])) {
 
-                        if (!array_key_exists('validators', $step)) {
+                        if (!array_key_exists('validations', $step)) {
                             $this->canReachStep[$stepName] = true;
                         } else {
-                            foreach ($step['validators'] as $validator) {
-                                $validator = $this->getValidator($validator);
+                            foreach ($step['validations'] as $validation) {
+                                $validation = $this->getValidation($validation);
 
-                                $this->canReachStep[$stepName] = false == $validator->validate($this->getModel()) ? false : true;
+                                $this->canReachStep[$stepName] = false == $validation->validate($this->getModel()) ? false : true;
                             }
                         }
                     }
@@ -174,9 +173,9 @@ class Manager
         return $this->canReachStep[$stepName];
     }
 
-    public function getValidator($validator)
+    public function getValidation($validation)
     {
-        return $this->container->get($validator);
+        return $this->container->get($validation);
     }
 
     public function getAction($action)
