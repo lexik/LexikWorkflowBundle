@@ -4,7 +4,7 @@
     "description": "Simple workflow bundle for Symfony2",
     "keywords": ["workflow"],
     "license": "MIT",
-    "homepage": "http://github.com/jeremyFreeAgent/WorkflowBundle",
+    "homepage": "http://github.com/jeremyFreeAgent/FreeAgentWorkflowBundle",
     "authors": [
         {
             "name": "Jérémy Romey",
