@@ -118,14 +118,16 @@ class Manager
 
     /**
      * [reachStep description]
-     * @param  string $stepName The name of the step to reach.
-     * @return boolean           [description]
+     * @param  string $stepName    The name of the step to reach.
+     * @param  string $stepComment The comment link to the reach.
+     * @return boolean             Return true on success false on failure.
      */
-    public function reachStep($stepName)
+    public function reachStep($stepName, $stepComment = '')
     {
         if ($this->canReachStep($stepName)){
 
             $this->getModel()->setWorkflowStepName($stepName);
+            $this->getModel()->setWorkflowStepComment(trim($stepComment));
 
             $this->runStepActions($stepName);
 

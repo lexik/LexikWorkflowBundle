@@ -10,8 +10,9 @@ use FreeAgent\WorkflowBundle\Validation\ValidationInterface;
 
 class ModelExample implements ModelInterface
 {
-    private $workflow_step_name;
     private $workflow_name = 'example';
+    private $workflow_step_name;
+    private $workflow_step_comment;
 
     public function getWorkflowName()
     {
@@ -31,6 +32,16 @@ class ModelExample implements ModelInterface
     public function getWorkflowStepName()
     {
         return $this->workflow_step_name;
+    }
+
+    public function setWorkflowStepComment($stepComment)
+    {
+        $this->workflow_step_comment = $stepComment;
+    }
+
+    public function getWorkflowStepComment()
+    {
+        return $this->workflow_step_comment;
     }
 }
 

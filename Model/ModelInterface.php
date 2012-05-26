@@ -8,4 +8,6 @@ interface ModelInterface
     public function setWorkflowName($workflowName);
     public function setWorkflowStepName($stepName);
     public function getWorkflowStepName();
+    public function setWorkflowStepComment($stepComment);
+    public function getWorkflowStepComment();
 }
