@@ -197,19 +197,19 @@ class Manager
      */
     public function runStepActions()
     {
-        $currentStep = $this->getCurrentStepName();
+        $currentStep = $this->getCurrentStep();
         if (array_key_exists('actions', $currentStep)) {
 
-            foreach ($step['actions'] as $action) {
+            foreach ($currentStep['actions'] as $action) {
                 $action = $this->getAction($action);
 
                 if (false == $action->run($this->getModel())) {
 
                     return false;
                 }
-
-                return true;
             }
         }
+
+        return true;
     }
 }
