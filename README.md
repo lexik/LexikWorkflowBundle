@@ -26,7 +26,7 @@ Set up
 ### Create your **Workflow** configuration
 In your ***config.yml*** :
 
-```
+```yaml
 free_agent_workflow:
     workflows:
         example:
@@ -100,7 +100,8 @@ You need also to set up your **Actions** and **Validations** services.
 
 Usage
 -----
-```
+```php
+<?php
 $manager = $this->getContainer('free_agent_workflow.workflow.manager');
 $manager->setModel($model);
 if ($manager->canReachStep('draft')) {
