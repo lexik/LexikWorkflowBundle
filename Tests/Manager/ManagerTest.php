@@ -8,51 +8,57 @@ use FreeAgent\WorkflowBundle\Model\ModelInterface;
 use FreeAgent\WorkflowBundle\Action\ActionInterface;
 use FreeAgent\WorkflowBundle\Validation\ValidationInterface;
 
+/**
+ * ModelExample
+ *
+ * @uses ModelInterface
+ * @author Jeremy romey <jeremy@free-agent.fr>
+ */
 class ModelExample implements ModelInterface
 {
-    private $workflow_name = 'example';
-    private $workflow_step_name;
-    private $workflow_step_comment;
-    private $workflow_step_at;
+    private $workflowName = 'example';
+    private $workflowStepName;
+    private $workflowStepComment;
+    private $workflowStepAt;
 
     public function getWorkflowName()
     {
-        return $this->workflow_name;
+        return $this->workflowName;
     }
 
     public function setWorkflowName($workflowName)
     {
-        return $this->workflow_name = $workflowName;
+        return $this->workflowName = $workflowName;
     }
 
     public function setWorkflowStepName($stepName)
     {
-        $this->workflow_step_name = $stepName;
+        $this->workflowStepName = $stepName;
     }
 
     public function getWorkflowStepName()
     {
-        return $this->workflow_step_name;
+        return $this->workflowStepName;
     }
 
     public function setWorkflowStepComment($stepComment)
     {
-        $this->workflow_step_comment = $stepComment;
+        $this->workflowStepComment = $stepComment;
     }
 
     public function getWorkflowStepComment()
     {
-        return $this->workflow_step_comment;
+        return $this->workflowStepComment;
     }
 
     public function setWorkflowStepAt($stepAt)
     {
-        $this->workflow_step_at = $stepAt;
+        $this->workflowStepAt = $stepAt;
     }
 
     public function getWorkflowStepAt()
     {
-        return $this->workflow_step_at;
+        return $this->workflowStepAt;
     }
 }
 
