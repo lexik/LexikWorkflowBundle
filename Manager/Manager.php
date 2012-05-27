@@ -9,6 +9,7 @@ class Manager
 {
     protected $model;
     protected $workflow;
+    protected $workflowName;
     protected $steps = array();
     protected $container;
     protected $canReachStep = array();
@@ -38,10 +39,12 @@ class Manager
      */
     public function configureWorkflow($workflowName)
     {
-        $this->workflow = $this->container->getParameter('free_agent_workflow.workflows.'.$workflowName, null);
+        $this->workflowName = $workflowName;
+
+        $this->workflow = $this->container->getParameter('free_agent_workflow.workflows.'.$this->workflowName, null);
 
         if (is_null($this->workflow)) {
-            throw new \Exception('The workflow "'.$workflowName.'" does not exist');
+            throw new \Exception('The workflow "'.$this->workflowName.'" does not exist');
         }
 
         return $this->getWorkflow();
@@ -92,7 +95,7 @@ class Manager
     public function getStep($stepName)
     {
         if (!array_key_exists($stepName, $this->workflow['steps'])) {
-            throw new \Exception('Step with name "'.$stepName.'" is not in "'.get_class($this).'" workflow');
+            throw new \Exception('Step with name "'.$stepName.'" is not in "'.$this->workflowName.'" workflow');
         }
 
         return $this->workflow['steps'][$stepName];
