@@ -113,6 +113,10 @@ class Manager
      */
     public function getCurrentStepName()
     {
+        if ('' == $this->getModel()->getWorkflowStepName() || is_null($this->getModel()->getWorkflowStepName())) {
+            $this->getModel()->setWorkflowStepName($this->getDefaultStepName());
+        }
+
         return $this->getModel()->getWorkflowStepName();
     }
 
