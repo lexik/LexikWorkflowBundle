@@ -10,6 +10,6 @@ interface ModelInterface
     public function getWorkflowStepName();
     public function setWorkflowStepComment($stepComment);
     public function getWorkflowStepComment();
-    public function setWorkflowStepAt($stepAt = time());
+    public function setWorkflowStepAt($stepAt);
     public function getWorkflowStepAt();
 }
