@@ -104,7 +104,7 @@ Usage
 $manager = $this->getContainer('free_agent_workflow.workflow.manager');
 $manager->setModel($model);
 if ($manager->canReachStep('draft')) {
-    $manager->reachStep('draft');
+    $manager->reachStep('draft', 'This is my draft', time());
     $model = $manager->getModel();
 }
 ```

@@ -13,6 +13,7 @@ class ModelExample implements ModelInterface
     private $workflow_name = 'example';
     private $workflow_step_name;
     private $workflow_step_comment;
+    private $workflow_step_at;
 
     public function getWorkflowName()
     {
@@ -42,6 +43,16 @@ class ModelExample implements ModelInterface
     public function getWorkflowStepComment()
     {
         return $this->workflow_step_comment;
+    }
+
+    public function setWorkflowStepAt($stepAt)
+    {
+        $this->workflow_step_at = $stepAt;
+    }
+
+    public function getWorkflowStepAt()
+    {
+        return $this->workflow_step_at;
     }
 }
 
