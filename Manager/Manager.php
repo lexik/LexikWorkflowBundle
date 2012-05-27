@@ -123,13 +123,13 @@ class Manager
      * @param  string $stepAt      The date of the reach.
      * @return boolean             Return true on success false on failure.
      */
-    public function reachStep($stepName, $stepComment = '', $stepAt = time())
+    public function reachStep($stepName, $stepComment = '', $stepAt = null)
     {
         if ($this->canReachStep($stepName)){
 
             $this->getModel()->setWorkflowStepName($stepName);
             $this->getModel()->setWorkflowStepComment(trim($stepComment));
-            $this->getModel()->setWorkflowStepAt($stepAt);
+            $this->getModel()->setWorkflowStepAt(is_null($stepAt) ? time() : $stepAt);
 
             $this->runStepActions($stepName);
 
