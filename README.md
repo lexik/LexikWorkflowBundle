@@ -107,5 +107,7 @@ $manager->setModel($model);
 if ($manager->canReachStep('draft')) {
     $manager->reachStep('draft', 'This is my draft', time());
     $model = $manager->getModel();
+} else {
+    $errors = $manager->getValidationErrors('draft');
 }
 ```

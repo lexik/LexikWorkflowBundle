@@ -13,6 +13,7 @@ class Manager
     protected $steps = array();
     protected $container;
     protected $canReachStep = array();
+    protected $validationErrors = array();
 
     /**
      * [__construct description]
@@ -35,7 +36,7 @@ class Manager
     /**
      * [configureWorkflow description]
      * @param  string $workflowName The workflow name.
-     * @return array  The workflow.
+     * @return array The workflow.
      */
     public function configureWorkflow($workflowName)
     {
@@ -90,7 +91,7 @@ class Manager
     /**
      * [getStep description]
      * @param  string $stepName The name of the step.
-     * @return array  The step.
+     * @return array           The step.
      */
     public function getStep($stepName)
     {
@@ -125,14 +126,14 @@ class Manager
 
     /**
      * [reachStep description]
-     * @param  string  $stepName    The name of the step to reach.
-     * @param  string  $stepComment The comment link to the reach.
-     * @param  string  $stepAt      The date of the reach.
-     * @return boolean Return true on success false on failure.
+     * @param  string $stepName    The name of the step to reach.
+     * @param  string $stepComment The comment link to the reach.
+     * @param  string $stepAt      The date of the reach.
+     * @return boolean             Return true on success false on failure.
      */
     public function reachStep($stepName, $stepComment = '', $stepAt = null)
     {
-        if ($this->canReachStep($stepName)) {
+        if ($this->canReachStep($stepName)){
 
             $this->getModel()->setWorkflowStepName($stepName);
             $this->getModel()->setWorkflowStepComment(trim($stepComment));
@@ -151,13 +152,14 @@ class Manager
     /**
      * [canReachStep description]
      * @param  string $stepName The name of the step to reach.
-     * @return [type] [description]
+     * @return [type]           [description]
      */
     public function canReachStep($stepName)
     {
         if (!array_key_exists($stepName, $this->canReachStep)) {
 
             $this->canReachStep[$stepName] = false;
+            $this->validationErrors[$stepName] = array();
 
             if ($stepName != $this->getCurrentStepName()) {
                 $step        = $this->getStep($stepName);
@@ -172,7 +174,13 @@ class Manager
                             foreach ($step['validations'] as $validation) {
                                 $validation = $this->getValidation($validation);
 
-                                $this->canReachStep[$stepName] = false == $validation->validate($this->getModel()) ? false : true;
+                                try {
+                                    $validation->validate($this->getModel());
+                                    $this->canReachStep[$stepName] = true;
+                                } catch (\Exception $e) {
+                                    $this->validationErrors[$stepName][] = $e->getMessage();
+                                    $this->canReachStep[$stepName] = false;
+                                }
                             }
                         }
                     }
@@ -181,6 +189,11 @@ class Manager
         }
 
         return $this->canReachStep[$stepName];
+    }
+
+    public function getValidationErrors($stepName)
+    {
+        return (array_key_exists($stepName, $this->validationErrors)) ? $this->validationErrors[$stepName] : array();
     }
 
     public function getValidation($validation)

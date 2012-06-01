@@ -36,7 +36,7 @@ class Configuration implements ConfigurationInterface
                                         ->arrayNode('actions')
                                             ->prototype('scalar')->end()
                                         ->end()
-                                        ->arrayNode('validators')
+                                        ->arrayNode('validations')
                                             ->prototype('scalar')->end()
                                         ->end()
                                         ->arrayNode('possible_next_steps')
