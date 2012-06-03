@@ -60,3 +60,4 @@ class Collection implements \Countable, \IteratorAggregate, \ArrayAccess
     {
         return $this->initialCount;
     }
+}
