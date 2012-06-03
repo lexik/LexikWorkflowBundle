@@ -4,16 +4,19 @@ namespace FreeAgent\WorkflowBundle\Manager;
 
 use Symfony\Component\DependencyInjection\Container;
 use FreeAgent\WorkflowBundle\Model\ModelInterface;
+use FreeAgent\WorkflowBundle\Step\Collection as StepCollection;
+use FreeAgent\WorkflowBundle\Step\Step;
 
 class Manager
 {
     protected $model;
     protected $workflow;
     protected $workflowName;
-    protected $steps = array();
     protected $container;
     protected $canReachStep = array();
     protected $validationErrors = array();
+    protected $defaultStep;
+    protected $steps;
 
     /**
      * [__construct description]
@@ -22,6 +25,7 @@ class Manager
     public function __construct(Container $container)
     {
         $this->container = $container;
+        $this->steps = new StepCollection();
     }
 
     /**
@@ -30,7 +34,7 @@ class Manager
      */
     public function getDefaultStepName()
     {
-        return $this->workflow['default_step'];
+        return $this->defaultStep;
     }
 
     /**
@@ -48,16 +52,18 @@ class Manager
             throw new \Exception('The workflow "'.$this->workflowName.'" does not exist');
         }
 
-        return $this->getWorkflow();
-    }
+        $defaultStep = $this->workflow['default_step'];
+        if (!array_key_exists($defaultStep, $this->workflow['steps'])) {
+            throw new \Exception('The default step of "'.$this->workflowName.'" does not exist');
+        }
 
-    /**
-     * [getWorkflow description]
-     * @return array The workflow.
-     */
-    public function getWorkflow()
-    {
-        return $this->workflow;
+        foreach ($this->workflow['steps'] as $stepName => $stepConfiguration) {
+            $this->steps->add($stepName, new Step($stepName, $stepConfiguration));
+        }
+
+        $this->defaultStep = new Step($defaultStep, $this->workflow['steps'][$defaultStep]);
+
+        return $this->getSteps();
     }
 
     /**
@@ -81,11 +87,11 @@ class Manager
 
     /**
      * [getSteps description]
-     * @return array The steps of the workflow.
+     * @return StepCollection The workflow steps.
      */
     public function getSteps()
     {
-        return $this->workflow['steps'];
+        return $this->steps;
     }
 
     /**
@@ -95,11 +101,11 @@ class Manager
      */
     public function getStep($stepName)
     {
-        if (!array_key_exists($stepName, $this->workflow['steps'])) {
+        if (!$this->getSteps()->offsetExists($stepName)) {
             throw new \Exception('Step with name "'.$stepName.'" is not in "'.$this->workflowName.'" workflow');
         }
 
-        return $this->workflow['steps'][$stepName];
+        return $this->getSteps()->offsetGet($stepName);
     }
 
     /**
@@ -165,22 +171,20 @@ class Manager
                 $step        = $this->getStep($stepName);
                 $currentStep = $this->getCurrentStep();
 
-                if (array_key_exists('possible_next_steps', $currentStep)) {
-                    if (in_array($stepName, $currentStep['possible_next_steps'])) {
+                if ($step->hasPossibleNextStep($stepName)) {
 
-                        if (!array_key_exists('validations', $step)) {
-                            $this->canReachStep[$stepName] = true;
-                        } else {
-                            foreach ($step['validations'] as $validation) {
-                                $validation = $this->getValidation($validation);
+                    if (!$step->hasValidations()) {
+                        $this->canReachStep[$stepName] = true;
+                    } else {
+                        foreach ($step->getValidations() as $validation) {
+                            $validation = $this->getValidation($validation);
 
-                                try {
-                                    $validation->validate($this->getModel());
-                                    $this->canReachStep[$stepName] = true;
-                                } catch (\Exception $e) {
-                                    $this->validationErrors[$stepName][] = $e->getMessage();
-                                    $this->canReachStep[$stepName] = false;
-                                }
+                            try {
+                                $validation->validate($this->getModel());
+                                $this->canReachStep[$stepName] = true;
+                            } catch (\Exception $e) {
+                                $this->validationErrors[$stepName][] = $e->getMessage();
+                                $this->canReachStep[$stepName] = false;
                             }
                         }
                     }
@@ -212,16 +216,14 @@ class Manager
      */
     public function runStepActions()
     {
-        $currentStep = $this->getCurrentStep();
-        if (array_key_exists('actions', $currentStep)) {
+        $step = $this->getCurrentStep();
 
-            foreach ($currentStep['actions'] as $action) {
-                $action = $this->getAction($action);
+        foreach ($step->getActions() as $action) {
+            $action = $this->getAction($action);
 
-                if (false == $action->run($this->getModel())) {
+            if (false == $action->run($this->getModel())) {
 
-                    return false;
-                }
+                return false;
             }
         }
 
