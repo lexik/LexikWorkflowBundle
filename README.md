@@ -102,7 +102,7 @@ Usage
 -----
 ```php
 <?php
-$manager = $this->getContainer('free_agent_workflow.workflow.manager');
+$manager = $this->getContainer()->get('free_agent_workflow.workflow.manager');
 $manager->setModel($model);
 if ($manager->canReachStep('draft')) {
     $manager->reachStep('draft', 'This is my draft', time());
