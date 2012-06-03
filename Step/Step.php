@@ -12,12 +12,12 @@ class Step
     public function __construct($name, $configuration = array())
     {
         $this->name = $name;
-        $this->actions = array_key_exists('actions', $configuration) ? $configuration['actions'] = array();
-        $this->validations = array_key_exists('validations', $configuration) ? $configuration['validations'] = array();
-        $this->possible_next_steps = array_key_exists('possible_next_steps', $configuration) ? $configuration['possible_next_steps'] = array();
+        $this->actions = array_key_exists('actions', $configuration) ? $configuration['actions'] : array();
+        $this->validations = array_key_exists('validations', $configuration) ? $configuration['validations'] : array();
+        $this->possible_next_steps = array_key_exists('possible_next_steps', $configuration) ? $configuration['possible_next_steps'] : array();
     }
 
-    public function getName($name)
+    public function getName()
     {
         return $this->name;
     }
@@ -39,16 +39,16 @@ class Step
 
     public function hasValidations()
     {
-        return !empty($this->getValidations());
+        return !empty($this->validations);
     }
 
     public function hasActions()
     {
-        return !empty($this->getActions());
+        return !empty($this->actions);
     }
 
     public function hasPossibleNextStep($stepName)
     {
-        return array_key_exists($stepName, $this->getPossibleNextSteps());
+        return in_array($stepName, $this->getPossibleNextSteps());
     }
 }

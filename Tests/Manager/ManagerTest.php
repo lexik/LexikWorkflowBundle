@@ -7,6 +7,7 @@ use FreeAgent\WorkflowBundle\Manager\Manager;
 use FreeAgent\WorkflowBundle\Model\ModelInterface;
 use FreeAgent\WorkflowBundle\Action\ActionInterface;
 use FreeAgent\WorkflowBundle\Validation\ValidationInterface;
+use FreeAgent\WorkflowBundle\Step\Step;
 
 /**
  * ModelExample
@@ -82,6 +83,8 @@ class ManagerForTest extends Manager
 {
     public function configureWorkflow($workflowName)
     {
+        $this->workflowName = $workflowName;
+
         $this->workflow = array(
             'default_step' => 'draft',
             'steps' => array(
@@ -159,7 +162,20 @@ class ManagerForTest extends Manager
             ),
         );
 
-        return $this->getWorkflow();
+        $defaultStep = $this->workflow['default_step'];
+        if (!array_key_exists($defaultStep, $this->workflow['steps'])) {
+            throw new \Exception('The default step of "'.$this->workflowName.'" does not exist');
+        }
+
+        foreach ($this->workflow['steps'] as $stepName => $stepConfiguration) {
+            $this->steps->offsetSet($stepName, new Step($stepName, $stepConfiguration));
+        }
+
+        $this->defaultStep = new Step($defaultStep, $this->workflow['steps'][$defaultStep]);
+
+        return $this->getSteps();
+
+        return $this->getSteps();
     }
 
     public function getValidation($validation)

@@ -34,7 +34,7 @@ class Manager
      */
     public function getDefaultStepName()
     {
-        return $this->defaultStep;
+        return $this->defaultStep->getName();
     }
 
     /**
@@ -58,7 +58,7 @@ class Manager
         }
 
         foreach ($this->workflow['steps'] as $stepName => $stepConfiguration) {
-            $this->steps->add($stepName, new Step($stepName, $stepConfiguration));
+            $this->steps->offsetSet($stepName, new Step($stepName, $stepConfiguration));
         }
 
         $this->defaultStep = new Step($defaultStep, $this->workflow['steps'][$defaultStep]);
@@ -168,23 +168,23 @@ class Manager
             $this->validationErrors[$stepName] = array();
 
             if ($stepName != $this->getCurrentStepName()) {
-                $step        = $this->getStep($stepName);
+                $stepToReach = $this->getStep($stepName);
                 $currentStep = $this->getCurrentStep();
 
-                if ($step->hasPossibleNextStep($stepName)) {
+                if ($currentStep->hasPossibleNextStep($stepToReach->getName())) {
 
-                    if (!$step->hasValidations()) {
-                        $this->canReachStep[$stepName] = true;
+                    if (!$stepToReach->hasValidations()) {
+                        $this->canReachStep[$stepToReach->getName()] = true;
                     } else {
-                        foreach ($step->getValidations() as $validation) {
+                        foreach ($stepToReach->getValidations() as $validation) {
                             $validation = $this->getValidation($validation);
 
                             try {
                                 $validation->validate($this->getModel());
-                                $this->canReachStep[$stepName] = true;
+                                $this->canReachStep[$stepToReach->getName()] = true;
                             } catch (\Exception $e) {
-                                $this->validationErrors[$stepName][] = $e->getMessage();
-                                $this->canReachStep[$stepName] = false;
+                                $this->validationErrors[$stepToReach->getName()][] = $e->getMessage();
+                                $this->canReachStep[$stepToReach->getName()] = false;
                             }
                         }
                     }
