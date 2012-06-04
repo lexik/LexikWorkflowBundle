@@ -6,6 +6,8 @@ use Symfony\Component\DependencyInjection\Container;
 use FreeAgent\WorkflowBundle\Model\ModelInterface;
 use FreeAgent\WorkflowBundle\Step\Collection as StepCollection;
 use FreeAgent\WorkflowBundle\Step\Step;
+use FreeAgent\WorkflowBundle\Exception\ValidationException;
+use FreeAgent\WorkflowBundle\Exception\WorkflowException;
 
 class Manager
 {
@@ -49,12 +51,12 @@ class Manager
         $this->workflow = $this->container->getParameter('free_agent_workflow.workflows.'.$this->workflowName, null);
 
         if (is_null($this->workflow)) {
-            throw new \Exception('The workflow "'.$this->workflowName.'" does not exist');
+            throw new WorkflowException('The workflow "'.$this->workflowName.'" does not exist');
         }
 
         $defaultStep = $this->workflow['default_step'];
         if (!array_key_exists($defaultStep, $this->workflow['steps'])) {
-            throw new \Exception('The default step of "'.$this->workflowName.'" does not exist');
+            throw new WorkflowException('The default step of "'.$this->workflowName.'" does not exist');
         }
 
         foreach ($this->workflow['steps'] as $stepName => $stepConfiguration) {
@@ -102,7 +104,7 @@ class Manager
     public function getStep($stepName)
     {
         if (!$this->getSteps()->offsetExists($stepName)) {
-            throw new \Exception('Step with name "'.$stepName.'" is not in "'.$this->workflowName.'" workflow');
+            throw new WorkflowException('Step with name "'.$stepName.'" is not in "'.$this->workflowName.'" workflow');
         }
 
         return $this->getSteps()->offsetGet($stepName);
@@ -182,7 +184,7 @@ class Manager
                             try {
                                 $validation->validate($this->getModel());
                                 $this->canReachStep[$stepToReach->getName()] = true;
-                            } catch (\Exception $e) {
+                            } catch (ValidationException $e) {
                                 $this->validationErrors[$stepToReach->getName()][] = $e->getMessage();
                                 $this->canReachStep[$stepToReach->getName()] = false;
                             }
