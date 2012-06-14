@@ -181,24 +181,10 @@ class Manager
 
                 if ($currentStep->hasPossibleNextStep($stepToReach->getName())) {
 
-                    // TODO : check this !
-                    // $preValidationSuccess = true;
-                    // if ($this->hasValidations()) {
-                    //     foreach ($this->getValidations() as $validation) {
-                    //         $validation = $this->getValidation($validation);
+                    $preValidationResult = $this->preValidation($stepToReach->getName());
 
-                    //         try {
-                    //             $validation->validate($this->getModel());
-                    //         } catch (ValidationException $e) {
-                    //             $this->validationErrors[$stepToReach->getName()][] = $e->getMessage();
-                    //             $preValidationSuccess = false;
-                    //         }
-                    //     }
-                    // }
-
-                    // if ($preValidationSuccess) {
+                    if ($preValidationResult) {
                         if (!$stepToReach->hasValidations()) {
-
                             $this->canReachStep[$stepToReach->getName()] = true;
                         } else {
                             foreach ($stepToReach->getValidations() as $validation) {
@@ -213,12 +199,31 @@ class Manager
                                 }
                             }
                         }
-                    // }
+                    }
                 }
             }
         }
 
         return $this->canReachStep[$stepName];
+    }
+
+    public function preValidation($stepName)
+    {
+        $preValidationResult = true;
+        if ($this->hasValidations()) {
+            foreach ($this->getValidations() as $validation) {
+                $validation = $this->getValidation($validation);
+
+                try {
+                    $validation->validate($this->getModel());
+                } catch (ValidationException $e) {
+                    $this->validationErrors[$stepName][] = $e->getMessage();
+                    $preValidationResult = false;
+                }
+            }
+        }
+
+        return $preValidationSuccess;
     }
 
     public function getValidationErrors($stepName)
@@ -229,6 +234,11 @@ class Manager
     public function getValidation($validation)
     {
         return $this->container->get($validation);
+    }
+
+    public function getValidations()
+    {
+        return $this->validations;
     }
 
     public function getAction($action)
