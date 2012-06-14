@@ -19,6 +19,8 @@ class Manager
     protected $validationErrors = array();
     protected $defaultStep;
     protected $steps;
+    protected $actions = array();
+    protected $validations = array();
 
     /**
      * [__construct description]
@@ -64,6 +66,8 @@ class Manager
         }
 
         $this->defaultStep = new Step($defaultStep, $this->workflow['steps'][$defaultStep]);
+        $this->actions     = array_key_exists('actions', $this->workflow) ? $this->workflow['actions'] : array();
+        $this->validations = array_key_exists('validations', $this->workflow) ? $this->workflow['validations'] : array();
 
         return $this->getSteps();
     }
@@ -141,7 +145,7 @@ class Manager
      */
     public function reachStep($stepName, $stepComment = '', $stepAt = null)
     {
-        if ($this->canReachStep($stepName)){
+        if ($this->canReachStep($stepName)) {
 
             $this->getModel()->setWorkflowStepName($stepName);
             $this->getModel()->setWorkflowStepComment(trim($stepComment));
@@ -150,6 +154,8 @@ class Manager
             $this->runStepActions($stepName);
 
             $this->canReachStep = array();
+
+            // TODO : Run global actions;
 
             return true;
         }
@@ -175,21 +181,39 @@ class Manager
 
                 if ($currentStep->hasPossibleNextStep($stepToReach->getName())) {
 
-                    if (!$stepToReach->hasValidations()) {
-                        $this->canReachStep[$stepToReach->getName()] = true;
-                    } else {
-                        foreach ($stepToReach->getValidations() as $validation) {
-                            $validation = $this->getValidation($validation);
+                    // TODO : check this !
+                    // $preValidationSuccess = true;
+                    // if ($this->hasValidations()) {
+                    //     foreach ($this->getValidations() as $validation) {
+                    //         $validation = $this->getValidation($validation);
 
-                            try {
-                                $validation->validate($this->getModel());
-                                $this->canReachStep[$stepToReach->getName()] = true;
-                            } catch (ValidationException $e) {
-                                $this->validationErrors[$stepToReach->getName()][] = $e->getMessage();
-                                $this->canReachStep[$stepToReach->getName()] = false;
+                    //         try {
+                    //             $validation->validate($this->getModel());
+                    //         } catch (ValidationException $e) {
+                    //             $this->validationErrors[$stepToReach->getName()][] = $e->getMessage();
+                    //             $preValidationSuccess = false;
+                    //         }
+                    //     }
+                    // }
+
+                    // if ($preValidationSuccess) {
+                        if (!$stepToReach->hasValidations()) {
+
+                            $this->canReachStep[$stepToReach->getName()] = true;
+                        } else {
+                            foreach ($stepToReach->getValidations() as $validation) {
+                                $validation = $this->getValidation($validation);
+
+                                try {
+                                    $validation->validate($this->getModel());
+                                    $this->canReachStep[$stepToReach->getName()] = true;
+                                } catch (ValidationException $e) {
+                                    $this->validationErrors[$stepToReach->getName()][] = $e->getMessage();
+                                    $this->canReachStep[$stepToReach->getName()] = false;
+                                }
                             }
                         }
-                    }
+                    // }
                 }
             }
         }

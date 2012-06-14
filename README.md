@@ -31,6 +31,13 @@ free_agent_workflow:
     workflows:
         example:
             default_step: draft
+            validations:
+                - free_agent_workflow.validation.pre_validation
+                - free_agent_workflow.validation.pre_validation
+            actions:
+                - free_agent_workflow.action.post_action
+                - free_agent_workflow.action.post_action
+                - free_agent_workflow.action.post_action
             steps:
                 draft:
                     label: Draft
