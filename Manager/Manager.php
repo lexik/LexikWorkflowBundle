@@ -152,10 +152,9 @@ class Manager
             $this->getModel()->setWorkflowStepAt(is_null($stepAt) ? time() : $stepAt);
 
             $this->runStepActions($stepName);
+            $this->runActions();
 
             $this->canReachStep = array();
-
-            // TODO : Run global actions;
 
             return true;
         }
@@ -223,7 +222,7 @@ class Manager
             }
         }
 
-        return $preValidationSuccess;
+        return $preValidationResult;
     }
 
     public function getValidationErrors($stepName)
@@ -241,9 +240,19 @@ class Manager
         return $this->validations;
     }
 
+    public function hasValidations()
+    {
+        return (!empty($this->validations));
+    }
+
     public function getAction($action)
     {
         return $this->container->get($action);
+    }
+
+    public function getActions()
+    {
+        return $this->actions;
     }
 
     /**
@@ -255,6 +264,20 @@ class Manager
         $step = $this->getCurrentStep();
 
         foreach ($step->getActions() as $action) {
+            $action = $this->getAction($action);
+
+            if (false == $action->run($this->getModel())) {
+
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public function runActions()
+    {
+        foreach ($this->getActions() as $action) {
             $action = $this->getAction($action);
 
             if (false == $action->run($this->getModel())) {

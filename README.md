@@ -118,3 +118,9 @@ if ($manager->canReachStep('draft')) {
     $errors = $manager->getValidationErrors('draft');
 }
 ```
+
+TODOs
+-----
+
+* Better code for Step
+* Better tests
