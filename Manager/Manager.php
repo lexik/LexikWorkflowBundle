@@ -19,6 +19,8 @@ class Manager
     protected $validationErrors = array();
     protected $defaultStep;
     protected $steps;
+    protected $actions = array();
+    protected $validations = array();
 
     /**
      * [__construct description]
@@ -64,6 +66,8 @@ class Manager
         }
 
         $this->defaultStep = new Step($defaultStep, $this->workflow['steps'][$defaultStep]);
+        $this->actions     = array_key_exists('actions', $this->workflow) ? $this->workflow['actions'] : array();
+        $this->validations = array_key_exists('validations', $this->workflow) ? $this->workflow['validations'] : array();
 
         return $this->getSteps();
     }
@@ -141,13 +145,14 @@ class Manager
      */
     public function reachStep($stepName, $stepComment = '', $stepAt = null)
     {
-        if ($this->canReachStep($stepName)){
+        if ($this->canReachStep($stepName)) {
 
             $this->getModel()->setWorkflowStepName($stepName);
             $this->getModel()->setWorkflowStepComment(trim($stepComment));
             $this->getModel()->setWorkflowStepAt(is_null($stepAt) ? time() : $stepAt);
 
             $this->runStepActions($stepName);
+            $this->runActions();
 
             $this->canReachStep = array();
 
@@ -175,18 +180,22 @@ class Manager
 
                 if ($currentStep->hasPossibleNextStep($stepToReach->getName())) {
 
-                    if (!$stepToReach->hasValidations()) {
-                        $this->canReachStep[$stepToReach->getName()] = true;
-                    } else {
-                        foreach ($stepToReach->getValidations() as $validation) {
-                            $validation = $this->getValidation($validation);
+                    $preValidationResult = $this->preValidation($stepToReach->getName());
 
-                            try {
-                                $validation->validate($this->getModel());
-                                $this->canReachStep[$stepToReach->getName()] = true;
-                            } catch (ValidationException $e) {
-                                $this->validationErrors[$stepToReach->getName()][] = $e->getMessage();
-                                $this->canReachStep[$stepToReach->getName()] = false;
+                    if ($preValidationResult) {
+                        if (!$stepToReach->hasValidations()) {
+                            $this->canReachStep[$stepToReach->getName()] = true;
+                        } else {
+                            foreach ($stepToReach->getValidations() as $validation) {
+                                $validation = $this->getValidation($validation);
+
+                                try {
+                                    $validation->validate($this->getModel());
+                                    $this->canReachStep[$stepToReach->getName()] = true;
+                                } catch (ValidationException $e) {
+                                    $this->validationErrors[$stepToReach->getName()][] = $e->getMessage();
+                                    $this->canReachStep[$stepToReach->getName()] = false;
+                                }
                             }
                         }
                     }
@@ -195,6 +204,25 @@ class Manager
         }
 
         return $this->canReachStep[$stepName];
+    }
+
+    public function preValidation($stepName)
+    {
+        $preValidationResult = true;
+        if ($this->hasValidations()) {
+            foreach ($this->getValidations() as $validation) {
+                $validation = $this->getValidation($validation);
+
+                try {
+                    $validation->validate($this->getModel());
+                } catch (ValidationException $e) {
+                    $this->validationErrors[$stepName][] = $e->getMessage();
+                    $preValidationResult = false;
+                }
+            }
+        }
+
+        return $preValidationResult;
     }
 
     public function getValidationErrors($stepName)
@@ -207,9 +235,24 @@ class Manager
         return $this->container->get($validation);
     }
 
+    public function getValidations()
+    {
+        return $this->validations;
+    }
+
+    public function hasValidations()
+    {
+        return (!empty($this->validations));
+    }
+
     public function getAction($action)
     {
         return $this->container->get($action);
+    }
+
+    public function getActions()
+    {
+        return $this->actions;
     }
 
     /**
@@ -221,6 +264,20 @@ class Manager
         $step = $this->getCurrentStep();
 
         foreach ($step->getActions() as $action) {
+            $action = $this->getAction($action);
+
+            if (false == $action->run($this->getModel())) {
+
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public function runActions()
+    {
+        foreach ($this->getActions() as $action) {
             $action = $this->getAction($action);
 
             if (false == $action->run($this->getModel())) {
