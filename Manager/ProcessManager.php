@@ -12,13 +12,20 @@ class ProcessManager
     protected $processes;
 
     /**
+     * @var string
+     */
+    protected $processHandlerClass;
+
+    /**
      * Construct.
      *
-     * @param array $processes
+     * @param array  $processes
+     * @param string $processHandlerClass
      */
-    public function __construct(array $processes)
+    public function __construct(array $processes, $processHandlerClass)
     {
-        $this->processes = $processes;
+        $this->processes           = $processes;
+        $this->processHandlerClass = $processHandlerClass;
     }
 
     /**
@@ -36,5 +43,19 @@ class ProcessManager
         }
 
         return $this->processes[$name];
+    }
+
+    /**
+     * Create a new Process handler for the given process.
+     *
+     * @param string $processName
+     * @return \FreeAgent\WorkflowBundle\Manager\ProcessHandlerInterface
+     */
+    public function createProcessHandler($processName)
+    {
+        $class = $this->processHandlerClass;
+        $handler = new $class($this->getProcess($processName));
+
+        return $handler;
     }
 }

@@ -25,8 +25,8 @@ class Configuration implements ConfigurationInterface
         $rootNode
             ->addDefaultsIfNotSet()
             ->children()
-                ->scalarNode('step_handler_class')
-                    ->defaultValue('FreeAgent\WorkflowBundle\Handler\StepHandler')
+                ->scalarNode('process_handler_class')
+                    ->defaultValue('FreeAgent\WorkflowBundle\Handler\ProcessHandler')
                 ->end()
 
                 ->arrayNode('processes')

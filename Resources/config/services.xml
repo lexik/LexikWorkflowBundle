@@ -16,6 +16,7 @@
         
         <service id="free_agent_workflow.process_manager" class="%free_agent_workflow.process_manager.class%">
             <argument type="collection" />
+            <argument>%free_agent_workflow.process_handler_class%</argument>
         </service>
     </services>
     

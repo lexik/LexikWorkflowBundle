@@ -1,14 +1,10 @@
 <?php
 
-namespace FreeAgent\WorkflowBundle\Flow;
+namespace FreeAgent\WorkflowBundle\Handler;
 
 use FreeAgent\WorkflowBundle\Model\ModelInterface;
 
-/**
- * Define all required method a Process muste have.
- *
- */
-interface ProcessInterface
+interface ProcessHandlerInterface
 {
     /**
      * Start the current process for the given model.

@@ -2,7 +2,7 @@
 
 namespace FreeAgent\WorkflowBundle\Flow;
 
-class Step implements NodeInterface, StepInterface
+class Step implements NodeInterface
 {
     /**
      * @var string

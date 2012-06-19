@@ -29,7 +29,7 @@ class FreeAgentWorkflowExtension extends Extension
         $loader = new Loader\XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.xml');
 
-        $container->setParameter('free_agent_workflow.step_handler_class', $config['step_handler_class']);
+        $container->setParameter('free_agent_workflow.process_handler_class', $config['process_handler_class']);
 
         foreach ($config['processes'] as $processName => $processConfig) {
             $stepReferences = array();
@@ -58,16 +58,15 @@ class FreeAgentWorkflowExtension extends Extension
                 $stepReference = sprintf('free_agent_workflow.process.%s.step.%s', $processName, $stepName);
                 $container->setDefinition($stepReference, $definition);
 
-                $stepReferences = new Reference($stepReference);
+                $stepReferences[$stepName] = new Reference($stepReference);
             }
 
             // process service
-            $container->setDefinition(sprintf('free_agent_workflow.process.%s', $processName), new Definition('FreeAgent\WorkflowBundle\Step\Process', array(
+            $container->setDefinition(sprintf('free_agent_workflow.process.%s', $processName), new Definition('FreeAgent\WorkflowBundle\Flow\Process', array(
                 $processName,
                 $stepReferences,
                 $processConfig['start'],
                 $processConfig['end'],
-                new Parameter('free_agent_workflow.step_handler_class'),
             )));
         }
     }

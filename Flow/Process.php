@@ -2,9 +2,11 @@
 
 namespace FreeAgent\WorkflowBundle\Flow;
 
+use Doctrine\Common\Collections\ArrayCollection;
+
 use FreeAgent\WorkflowBundle\Model\ModelInterface;
 
-class Process implements NodeInterface, ProcessInterface
+class Process implements NodeInterface
 {
     /**
      * @var string
@@ -22,9 +24,9 @@ class Process implements NodeInterface, ProcessInterface
     protected $endSteps;
 
     /**
-     * @var FreeAgent\WorkflowBundle\Handler\StepHandler
+     * @var Doctrine\Common\Collections\ArrayCollection
      */
-    protected $stepHandler;
+    protected $steps;
 
     /**
      * Construct.
@@ -32,12 +34,12 @@ class Process implements NodeInterface, ProcessInterface
      * @param string $name
      * @param string $steps
      */
-    public function __construct($name, array $steps, $startStep, $endSteps, $stepHandlerClass)
+    public function __construct($name, array $steps, $startStep, $endSteps)
     {
         $this->name = $name;
+        $this->steps = new ArrayCollection($steps);
         $this->startStep = $startStep;
         $this->endSteps = $endSteps;
-        $this->stepHandler = new $stepHandlerClass($this->steps);
     }
 
     /**
@@ -50,16 +52,6 @@ class Process implements NodeInterface, ProcessInterface
         return $this->name;
     }
 
-    public function start(ModelInterface $model)
-    {
-        return $this->reachStep($model, $this->startStep);
-    }
-
-    public function reachStep(ModelInterface $model, $stepName)
-    {
-        throw new \RuntimeException('TODO :p');
-    }
-
     /**
      * Returns a step by its name.
      *
@@ -68,6 +60,6 @@ class Process implements NodeInterface, ProcessInterface
      */
     public function getStep($stepName)
     {
-        throw new \RuntimeException('TODO :p');
+        return $this->steps->get($stepName);
     }
 }
