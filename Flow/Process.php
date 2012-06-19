@@ -2,7 +2,9 @@
 
 namespace FreeAgent\WorkflowBundle\Flow;
 
-class Process implements NodeInterface
+use FreeAgent\WorkflowBundle\Model\ModelInterface;
+
+class Process implements NodeInterface, ProcessInterface
 {
     /**
      * @var string
@@ -20,7 +22,7 @@ class Process implements NodeInterface
      * @param string $name
      * @param string $steps
      */
-    public function __construct($name, $steps)
+    public function __construct($name, array $steps)
     {
         $this->name = $name;
         $this->steps = $steps;
@@ -34,5 +36,15 @@ class Process implements NodeInterface
     public function getName()
     {
         return $this->name;
+    }
+
+    public function start(ModelInterface $model)
+    {
+        throw new \RuntimeException('TODO :p');
+    }
+
+    public function reachStep(ModelInterface $model, $step)
+    {
+        throw new \RuntimeException('TODO :p');
     }
 }

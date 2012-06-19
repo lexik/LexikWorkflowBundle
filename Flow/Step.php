@@ -2,7 +2,7 @@
 
 namespace FreeAgent\WorkflowBundle\Flow;
 
-class Step implements NodeInterface
+class Step implements NodeInterface, StepInterface
 {
     /**
      * @var string
@@ -75,31 +75,62 @@ class Step implements NodeInterface
         return $this->label;
     }
 
+    /**
+     * Returns all actions to execute one the step is reached.
+     *
+     * @return array
+     */
     public function getActions()
     {
         return $this->actions;
     }
 
+    /**
+     * Return all validations to execute the check the step is reachable.
+     *
+     * @return array
+     */
     public function getValidations()
     {
         return $this->validations;
     }
 
+    /**
+     * Returns all next steps.
+     *
+     * @return array
+     */
     public function getNextSteps()
     {
         return $this->nextSteps;
     }
 
+    /**
+     * Returns true if the step requires some validations to be reached.
+     *
+     * @return boolean
+     */
     public function hasValidations()
     {
         return !empty($this->validations);
     }
 
+    /**
+     * Returns true if the step has some actions to execute once it reached.
+     *
+     * @return boolean
+     */
     public function hasActions()
     {
         return !empty($this->actions);
     }
 
+    /**
+     * Returns true if the given step name is one of the next steps.
+     *
+     * @param string $stepName
+     * @return boolean
+     */
     public function hasNextStep($stepName)
     {
         return in_array($stepName, $this->getNextSteps());
