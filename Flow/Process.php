@@ -4,6 +4,8 @@ namespace FreeAgent\WorkflowBundle\Flow;
 
 use FreeAgent\WorkflowBundle\Model\ModelInterface;
 
+use Doctrine\Common\Collections\ArrayCollection;
+
 class Process implements NodeInterface, ProcessInterface
 {
     /**
@@ -12,7 +14,7 @@ class Process implements NodeInterface, ProcessInterface
     protected $name;
 
     /**
-     * @var array
+     * @var ArrayCollection
      */
     protected $steps;
 
@@ -20,12 +22,12 @@ class Process implements NodeInterface, ProcessInterface
      * Construct.
      *
      * @param string $name
-     * @param string $steps
+     * @param array $steps
      */
     public function __construct($name, array $steps)
     {
-        $this->name = $name;
-        $this->steps = $steps;
+        $this->name  = $name;
+        $this->steps = new ArrayCollection($steps);
     }
 
     /**
@@ -36,6 +38,16 @@ class Process implements NodeInterface, ProcessInterface
     public function getName()
     {
         return $this->name;
+    }
+
+    /**
+     * Get process steps
+     *
+     * @return ArrayCollection
+     */
+    public function getSteps()
+    {
+        return $this->steps;
     }
 
     public function start(ModelInterface $model)

@@ -54,11 +54,11 @@ class FreeAgentWorkflowExtension extends Extension
                 $stepReference = sprintf('free_agent_workflow.process.%s.step.%s', $processName, $stepName);
                 $container->setDefinition($stepReference, $definition);
 
-                $stepReferences = new Reference($stepReference);
+                $stepReferences[$stepName] = new Reference($stepReference);
             }
 
             // process service
-            $container->setDefinition(sprintf('free_agent_workflow.process.%s', $processName), new Definition('FreeAgent\WorkflowBundle\Step\Process', array(
+            $container->setDefinition(sprintf('free_agent_workflow.process.%s', $processName), new Definition('FreeAgent\WorkflowBundle\Flow\Process', array(
                 $processName,
                 $stepReferences,
                 $processConfig['start'],
