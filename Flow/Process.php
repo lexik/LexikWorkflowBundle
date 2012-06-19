@@ -62,4 +62,14 @@ class Process implements NodeInterface
     {
         return $this->steps->get($stepName);
     }
+
+    /**
+     * Returns the first step.
+     *
+     * @return FreeAgent\WorkflowBundle\Flow\Step
+     */
+    public function getStartStep()
+    {
+        return $this->startStep;
+    }
 }

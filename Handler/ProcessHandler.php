@@ -25,11 +25,17 @@ class ProcessHandler implements ProcessHandlerInterface
         $this->process = $process;
     }
 
+    /**
+     * @see FreeAgent\WorkflowBundle\Handler.ProcessHandlerInterface::start()
+     */
     public function start(ModelInterface $model)
     {
         throw new \RuntimeException('TODO :p');
     }
 
+    /**
+     * @see FreeAgent\WorkflowBundle\Handler.ProcessHandlerInterface::reachStep()
+     */
     public function reachStep(ModelInterface $model, $stepName)
     {
         throw new \RuntimeException('TODO :p');
