@@ -14,7 +14,7 @@ class Process implements NodeInterface
     protected $name;
 
     /**
-     * @var Doctrine\Common\Collections\ArrayCollection
+     * @var ArrayCollection
      */
     protected $steps;
 
@@ -32,7 +32,9 @@ class Process implements NodeInterface
      * Construct.
      *
      * @param string $name
-     * @param string $steps
+     * @param array  $steps
+     * @param string $startStep
+     * @param array  $endSteps
      */
     public function __construct($name, array $steps, $startStep, $endSteps)
     {
@@ -43,7 +45,7 @@ class Process implements NodeInterface
     }
 
     /**
-     * Get process name
+     * Get process name.
      *
      * @return string
      */
@@ -53,9 +55,20 @@ class Process implements NodeInterface
     }
 
     /**
+     * Get process steps.
+     *
+     * @return ArrayCollection
+     */
+    public function getSteps()
+    {
+        return $this->steps;
+    }
+
+    /**
      * Returns a step by its name.
      *
      * @param string $stepName
+     *
      * @return FreeAgent\WorkflowBundle\Flow\Step
      */
     public function getStep($stepName)
