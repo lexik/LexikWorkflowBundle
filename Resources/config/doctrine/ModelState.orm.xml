@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
+                                      http://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+
+    <entity name="FreeAgent\WorkflowBundle\Entity\ModelState" table="free_agent_workflow_model_state">
+
+        <unique-constraints>
+            <unique-constraint name="hash_idx" columns="hash" />
+        </unique-constraints>
+
+        <lifecycle-callbacks>
+            <lifecycle-callback type="prePersist" method="prePersist" />
+        </lifecycle-callbacks>
+        
+        <id name="id" type="integer" column="id">
+            <generator strategy="AUTO"/>
+        </id>
+        
+        <field name="hash" column="hash" type="string" length="255" />
+        
+        <field name="processName" column="process_name" type="string" length="255" />
+        
+        <field name="stepName" column="step_name" type="string" length="255" />
+        
+        <field name="reachedAt" column="reached_at" type="datetime" />
+        
+        <field name="data" column="data" type="string" />
+        
+    </entity>
+</doctrine-mapping>
