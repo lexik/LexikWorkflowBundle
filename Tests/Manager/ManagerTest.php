@@ -7,7 +7,7 @@ use FreeAgent\WorkflowBundle\Manager\Manager;
 use FreeAgent\WorkflowBundle\Model\ModelInterface;
 use FreeAgent\WorkflowBundle\Action\ActionInterface;
 use FreeAgent\WorkflowBundle\Validation\ValidationInterface;
-use FreeAgent\WorkflowBundle\Step\Step;
+use FreeAgent\WorkflowBundle\Flow\Step;
 
 /**
  * ModelExample

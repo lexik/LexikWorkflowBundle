@@ -1,6 +1,6 @@
 <?php
 
-namespace FreeAgent\WorkflowBundle\Step;
+namespace FreeAgent\WorkflowBundle\Flow;
 
 class Collection implements \Countable, \IteratorAggregate, \ArrayAccess
 {

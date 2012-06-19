@@ -4,8 +4,8 @@ namespace FreeAgent\WorkflowBundle\Manager;
 
 use Symfony\Component\DependencyInjection\Container;
 use FreeAgent\WorkflowBundle\Model\ModelInterface;
-use FreeAgent\WorkflowBundle\Step\Collection as StepCollection;
-use FreeAgent\WorkflowBundle\Step\Step;
+use FreeAgent\WorkflowBundle\Flow\Collection as StepCollection;
+use FreeAgent\WorkflowBundle\Flow\Step;
 use FreeAgent\WorkflowBundle\Exception\ValidationException;
 use FreeAgent\WorkflowBundle\Exception\WorkflowException;
 
