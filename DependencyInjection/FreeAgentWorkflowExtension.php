@@ -31,6 +31,7 @@ class FreeAgentWorkflowExtension extends Extension
 
         $container->setParameter('free_agent_workflow.process_handler_class', $config['process_handler_class']);
 
+        $processes = array();
         foreach ($config['processes'] as $processName => $processConfig) {
             $stepReferences = array();
 
@@ -53,7 +54,8 @@ class FreeAgentWorkflowExtension extends Extension
                     $stepConfig['actions'],
                     $stepConfig['roles'],
                 ));
-                $definition->setPublic(false);
+                $definition->setPublic(false)
+                           ->setTags(array(sprintf('free_agent_workflow.process.%s.step', $processName)));
 
                 $stepReference = sprintf('free_agent_workflow.process.%s.step.%s', $processName, $stepName);
                 $container->setDefinition($stepReference, $definition);
@@ -62,12 +64,24 @@ class FreeAgentWorkflowExtension extends Extension
             }
 
             // process service
-            $container->setDefinition(sprintf('free_agent_workflow.process.%s', $processName), new Definition('FreeAgent\WorkflowBundle\Flow\Process', array(
+            $definition = new Definition('FreeAgent\WorkflowBundle\Flow\Process', array(
                 $processName,
                 $stepReferences,
                 $processConfig['start'],
                 $processConfig['end'],
-            )));
+            ));
+            $definition->setPublic(false)
+                       ->addTag('free_agent_workflow.process', array('alias' => $processName));
+
+            $processReference = sprintf('free_agent_workflow.process.%s', $processName);
+            $container->setDefinition($processReference, $definition);
+
+            $processes[$processName] = new Reference($processReference);
+        }
+
+        // inject processes into ProcessManager (not possible from a CompilerPass because definitions are loaded from Extension class...)
+        if ($container->hasDefinition('free_agent_workflow.process_manager')) {
+            $container->findDefinition('free_agent_workflow.process_manager')->replaceArgument(0, $processes);
         }
     }
 }
