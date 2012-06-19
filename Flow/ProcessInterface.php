@@ -21,7 +21,7 @@ interface ProcessInterface
      * Tries to reach a step with the given model.
      *
      * @param ModelInterface $model
-     * @param string $step
+     * @param string $stepName
      */
-    public function reachStep(ModelInterface $model, $step);
+    public function reachStep(ModelInterface $model, $stepName);
 }

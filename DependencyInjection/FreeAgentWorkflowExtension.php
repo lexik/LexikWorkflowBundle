@@ -2,6 +2,8 @@
 
 namespace FreeAgent\WorkflowBundle\DependencyInjection;
 
+use Symfony\Component\DependencyInjection\Parameter;
+
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
@@ -26,6 +28,8 @@ class FreeAgentWorkflowExtension extends Extension
 
         $loader = new Loader\XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.xml');
+
+        $container->setParameter('free_agent_workflow.step_handler_class', $config['step_handler_class']);
 
         foreach ($config['processes'] as $processName => $processConfig) {
             $stepReferences = array();
@@ -63,6 +67,7 @@ class FreeAgentWorkflowExtension extends Extension
                 $stepReferences,
                 $processConfig['start'],
                 $processConfig['end'],
+                new Parameter('free_agent_workflow.step_handler_class'),
             )));
         }
     }

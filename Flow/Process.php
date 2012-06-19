@@ -12,9 +12,19 @@ class Process implements NodeInterface, ProcessInterface
     protected $name;
 
     /**
+     * @var string
+     */
+    protected $startStep;
+
+    /**
      * @var array
      */
-    protected $steps;
+    protected $endSteps;
+
+    /**
+     * @var FreeAgent\WorkflowBundle\Handler\StepHandler
+     */
+    protected $stepHandler;
 
     /**
      * Construct.
@@ -22,10 +32,12 @@ class Process implements NodeInterface, ProcessInterface
      * @param string $name
      * @param string $steps
      */
-    public function __construct($name, array $steps)
+    public function __construct($name, array $steps, $startStep, $endSteps, $stepHandlerClass)
     {
         $this->name = $name;
-        $this->steps = $steps;
+        $this->startStep = $startStep;
+        $this->endSteps = $endSteps;
+        $this->stepHandler = new $stepHandlerClass($this->steps);
     }
 
     /**
@@ -40,10 +52,21 @@ class Process implements NodeInterface, ProcessInterface
 
     public function start(ModelInterface $model)
     {
+        return $this->reachStep($model, $this->startStep);
+    }
+
+    public function reachStep(ModelInterface $model, $stepName)
+    {
         throw new \RuntimeException('TODO :p');
     }
 
-    public function reachStep(ModelInterface $model, $step)
+    /**
+     * Returns a step by its name.
+     *
+     * @param string $stepName
+     * @return FreeAgent\WorkflowBundle\Flow\Step
+     */
+    public function getStep($stepName)
     {
         throw new \RuntimeException('TODO :p');
     }

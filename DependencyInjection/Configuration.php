@@ -23,7 +23,12 @@ class Configuration implements ConfigurationInterface
         $flowTypes = array('step', 'process');
 
         $rootNode
+            ->addDefaultsIfNotSet()
             ->children()
+                ->scalarNode('step_handler_class')
+                    ->defaultValue('FreeAgent\WorkflowBundle\Handler\StepHandler')
+                ->end()
+
                 ->arrayNode('processes')
                     ->useAttributeAsKey('id')
                     ->prototype('array')
