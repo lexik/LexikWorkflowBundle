@@ -6,23 +6,11 @@
 
     <parameters>
         <parameter key="free_agent_workflow.manager.class">FreeAgent\WorkflowBundle\Manager\Manager</parameter>
-        <parameter key="free_agent_workflow.workflow.exemple.class">FreeAgent\WorkflowBundle\Workflow\Example</parameter>
-        <parameter key="free_agent_workflow.validator.exemple.class">FreeAgent\WorkflowBundle\Validator\Example</parameter>
-        <parameter key="free_agent_workflow.action.exemple.class">FreeAgent\WorkflowBundle\Action\Example</parameter>
     </parameters>
 
     <services>
         <service id="free_agent_workflow.manager" class="%free_agent_workflow.manager.class%">
             <argument type="service" id="service_container" />
-        </service>
-
-        <service id="free_agent_workflow.workflow.example" class="%free_agent_workflow.workflow.exemple.class%">
-            <argument type="service" id="service_container" />
-        </service>
-
-        <service id="free_agent_workflow.validator.example" class="%free_agent_workflow.validator.exemple.class%">
-        </service>
-        <service id="free_agent_workflow.action.example" class="%free_agent_workflow.action.exemple.class%">
         </service>
     </services>
 </container>
