@@ -28,6 +28,12 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode('process_handler_class')
                     ->defaultValue('FreeAgent\WorkflowBundle\Handler\ProcessHandler')
                 ->end()
+                ->scalarNode('flow_process_class')
+                    ->defaultValue('FreeAgent\WorkflowBundle\Flow\Process')
+                ->end()
+                ->scalarNode('flow_step_class')
+                    ->defaultValue('FreeAgent\WorkflowBundle\Flow\Step')
+                ->end()
 
                 ->arrayNode('processes')
                     ->useAttributeAsKey('id')

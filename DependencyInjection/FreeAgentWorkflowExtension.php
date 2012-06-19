@@ -31,57 +31,93 @@ class FreeAgentWorkflowExtension extends Extension
 
         $container->setParameter('free_agent_workflow.process_handler_class', $config['process_handler_class']);
 
-        $processes = array();
-        foreach ($config['processes'] as $processName => $processConfig) {
-            $stepReferences = array();
+        // build process definitions
+        $processReferences = $this->buildProcesses($config['processes'], $container, $config['flow_process_class'], $config['flow_step_class']);
 
-            // steps services
-            foreach ($processConfig['steps'] as $stepName => $stepConfig) {
-                // update target reference to service id
-                foreach ($stepConfig['next_steps'] as $nextStepName => $nextStep) {
-                    if ('step' === $nextStep['type']) {
-                        $stepConfig['next_steps'][$nextStepName]['target'] = new Reference(sprintf('free_agent_workflow.process.%s.step.%s', $processName, $nextStep['target']));
-                    } else if ('process' === $nextStep['type']) {
-                        $stepConfig['next_steps'][$nextStepName]['target'] = new Reference(sprintf('free_agent_workflow.process.%s', $nextStep['target']));
-                    }
-                }
+        // inject processes into ProcessManager (not possible from a CompilerPass because definitions are loaded from Extension class...)
+        if ($container->hasDefinition('free_agent_workflow.process_manager')) {
+            $container->findDefinition('free_agent_workflow.process_manager')->replaceArgument(0, $processReferences);
+        }
+    }
 
-                $definition = new Definition('FreeAgent\WorkflowBundle\Flow\Step', array(
-                    $stepName,
-                    $stepConfig['label'],
-                    $stepConfig['next_steps'],
-                    $stepConfig['validations'],
-                    $stepConfig['actions'],
-                    $stepConfig['roles'],
-                ));
-                $definition->setPublic(false)
-                           ->setTags(array(sprintf('free_agent_workflow.process.%s.step', $processName)));
+    /**
+     * Build process definitions from configuration.
+     *
+     * @param array            $processes
+     * @param ContainerBuilder $container
+     * @param string           $processClass
+     * @param string           $stepClass
+     *
+     * @return array
+     */
+    protected function buildProcesses($processes, $container, $processClass, $stepClass)
+    {
+        $processReferences = array();
 
-                $stepReference = sprintf('free_agent_workflow.process.%s.step.%s', $processName, $stepName);
-                $container->setDefinition($stepReference, $definition);
+        foreach ($processes as $processName => $processConfig) {
+            $stepReferences = $this->buildSteps($processName, $processConfig['steps'], $container, $stepClass);
 
-                $stepReferences[$stepName] = new Reference($stepReference);
-            }
-
-            // process service
-            $definition = new Definition('FreeAgent\WorkflowBundle\Flow\Process', array(
+            $definition = new Definition($processClass, array(
                 $processName,
                 $stepReferences,
                 $processConfig['start'],
                 $processConfig['end'],
             ));
+
             $definition->setPublic(false)
                        ->addTag('free_agent_workflow.process', array('alias' => $processName));
 
             $processReference = sprintf('free_agent_workflow.process.%s', $processName);
             $container->setDefinition($processReference, $definition);
 
-            $processes[$processName] = new Reference($processReference);
+            $processReferences[$processName] = new Reference($processReference);
         }
 
-        // inject processes into ProcessManager (not possible from a CompilerPass because definitions are loaded from Extension class...)
-        if ($container->hasDefinition('free_agent_workflow.process_manager')) {
-            $container->findDefinition('free_agent_workflow.process_manager')->replaceArgument(0, $processes);
+        return $processReferences;
+    }
+
+    /**
+     * Build steps definitions from configuration.
+     *
+     * @param string           $processName
+     * @param array            $steps
+     * @param ContainerBuilder $container
+     * @param string           $stepClass
+     *
+     * @return array
+     */
+    protected function buildSteps($processName, $steps, $container, $stepClass)
+    {
+        $stepReferences = array();
+
+        foreach ($steps as $stepName => $stepConfig) {
+            // update target reference to service id
+            foreach ($stepConfig['next_steps'] as $nextStepName => $nextStep) {
+                if ('step' === $nextStep['type']) {
+                    $stepConfig['next_steps'][$nextStepName]['target'] = new Reference(sprintf('free_agent_workflow.process.%s.step.%s', $processName, $nextStep['target']));
+                } else if ('process' === $nextStep['type']) {
+                    $stepConfig['next_steps'][$nextStepName]['target'] = new Reference(sprintf('free_agent_workflow.process.%s', $nextStep['target']));
+                }
+            }
+
+            $definition = new Definition($stepClass, array(
+                $stepName,
+                $stepConfig['label'],
+                $stepConfig['next_steps'],
+                $stepConfig['validations'],
+                $stepConfig['actions'],
+                $stepConfig['roles'],
+            ));
+
+            $definition->setPublic(false)
+                       ->addTag(sprintf('free_agent_workflow.process.%s.step', $processName), array('alias' => $stepName));
+
+            $stepReference = sprintf('free_agent_workflow.process.%s.step.%s', $processName, $stepName);
+            $container->setDefinition($stepReference, $definition);
+
+            $stepReferences[$stepName] = new Reference($stepReference);
         }
+
+        return $stepReferences;
     }
 }
