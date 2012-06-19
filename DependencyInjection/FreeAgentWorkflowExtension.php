@@ -25,8 +25,8 @@ class FreeAgentWorkflowExtension extends Extension
         $loader = new Loader\XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.xml');
 
-        foreach ($config['workflows'] as $key => $workflow) {
-            $container->setParameter('free_agent_workflow.workflows.'.$key, $workflow);
+        foreach ($config['processes'] as $name => $processConfig) {
+            // @todo build process and steps definition
         }
     }
 }
