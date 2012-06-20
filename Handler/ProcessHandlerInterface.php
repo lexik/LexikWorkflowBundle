@@ -17,7 +17,7 @@ interface ProcessHandlerInterface
      * Tries to reach a step with the given model.
      *
      * @param ModelInterface $model
-     * @param string $stepName
+     * @param string $stateName
      */
-    public function reachStep(ModelInterface $model, $stepName);
+    public function reachNextState(ModelInterface $model, $stateName);
 }

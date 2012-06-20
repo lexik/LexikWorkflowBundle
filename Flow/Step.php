@@ -32,24 +32,23 @@ class Step implements NodeInterface
     /**
      * @var array
      */
-    protected $nextSteps;
+    protected $nextStates;
 
     /**
      * Construct.
      *
      * @param string $name
      * @param string $label
-     * @param array $nextSteps
+     * @param array $nextStates
      * @param array $validations
      * @param array $actions
      * @param array $roles
      */
-    public function __construct($name, $label, array $nextSteps, array $validations = array(), array $actions = array(), array $roles = array())
+    public function __construct($name, $label, array $nextStates, array $validations = array(), array $actions = array(), array $roles = array())
     {
         $this->name        = $name;
         $this->label       = $label;
-
-        $this->nextSteps   = $nextSteps;
+        $this->nextStates  = $nextStates;
         $this->validations = $validations;
         $this->actions     = $actions;
         $this->roles       = $roles;
@@ -75,14 +74,37 @@ class Step implements NodeInterface
         return $this->label;
     }
 
+
     /**
-     * Returns all actions to execute one the step is reached.
+     * Returns all next steps.
      *
      * @return array
      */
-    public function getActions()
+    public function getNextStates()
     {
-        return $this->actions;
+        return $this->nextStates;
+    }
+
+    /**
+     * Returns true if the given step name is one of the next steps.
+     *
+     * @param string $stepName
+     * @return boolean
+     */
+    public function hasNextState($stateName)
+    {
+        return in_array($stateName, array_keys($this->nextStates));
+    }
+
+    /**
+     * Returns the target of the given state.
+     *
+     * @param string $stateName
+     * @return FreeAgent\WorkflowBundle\Flow\Step
+     */
+    public function getNextStateTarget($stateName)
+    {
+        return $this->nextStates[$stateName]['target'];
     }
 
     /**
@@ -96,16 +118,6 @@ class Step implements NodeInterface
     }
 
     /**
-     * Returns all next steps.
-     *
-     * @return array
-     */
-    public function getNextSteps()
-    {
-        return $this->nextSteps;
-    }
-
-    /**
      * Returns true if the step requires some validations to be reached.
      *
      * @return boolean
@@ -116,6 +128,16 @@ class Step implements NodeInterface
     }
 
     /**
+     * Returns all actions to execute one the step is reached.
+     *
+     * @return array
+     */
+    public function getActions()
+    {
+        return $this->actions;
+    }
+
+    /**
      * Returns true if the step has some actions to execute once it reached.
      *
      * @return boolean
@@ -123,17 +145,6 @@ class Step implements NodeInterface
     public function hasActions()
     {
         return !empty($this->actions);
-    }
-
-    /**
-     * Returns true if the given step name is one of the next steps.
-     *
-     * @param string $stepName
-     * @return boolean
-     */
-    public function hasNextStep($stepName)
-    {
-        return in_array($stepName, $this->getNextSteps());
     }
 
     /**

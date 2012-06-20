@@ -4,10 +4,12 @@ namespace FreeAgent\WorkflowBundle\Handler;
 
 use Symfony\Component\Security\Core\SecurityContext;
 
+use FreeAgent\WorkflowBundle\Exception\WorkflowException;
 use FreeAgent\WorkflowBundle\Exception\AccessDeniedException;
 use FreeAgent\WorkflowBundle\Exception\ValidationException;
 use FreeAgent\WorkflowBundle\Flow\Step;
 use FreeAgent\WorkflowBundle\Flow\Process;
+use FreeAgent\WorkflowBundle\Entity\ModelState;
 use FreeAgent\WorkflowBundle\Model\ModelStorage;
 use FreeAgent\WorkflowBundle\Model\ModelInterface;
 
@@ -51,21 +53,75 @@ class ProcessHandler implements ProcessHandlerInterface
      */
     public function start(ModelInterface $model)
     {
-        // @todo: throw an exception here if model has already reached steps (for the current process)
+        $modelState = $this->storage->findCurrentModelState($model, $this->process->getName());
 
-        return $this->reachStep($model, $this->process->getStartStep());
+        if ($modelState instanceof ModelState) {
+            throw new WorkflowException('The given model as already started this process.');
+        }
+
+        $step = $this->getProcessStep($this->process->getStartStep());
+
+        return $this->reachStep($model, $step);
     }
 
     /**
      * @see FreeAgent\WorkflowBundle\Handler.ProcessHandlerInterface::reachStep()
      */
-    public function reachStep(ModelInterface $model, $stepName)
+    public function reachNextState(ModelInterface $model, $stateName)
+    {
+        $modelState = $this->storage->findCurrentModelState($model, $this->process->getName());
+
+        if ( ! ($modelState instanceof ModelState)) {
+            throw new WorkflowException(sprintf('The given model has not started this process.'));
+        }
+
+        $previousStep = $this->getProcessStep($modelState->getStepName());
+
+        if (!$previousStep->hasNextState($stateName)) {
+            throw new WorkflowException(sprintf('The step "%s" does not contain any next state named "%s".', $previousStep->getName(), $stateName));
+        }
+
+        $step = $previousStep->getNextStateTarget($stateName);
+
+        return $this->reachStep($model, $step);
+    }
+
+    /**
+     * Reach the given step.
+     *
+     * @param ModelInterface $model
+     * @param Step $step
+     */
+    protected function reachStep(ModelInterface $model, Step $step)
+    {
+        $this->checkCredentials($step);
+
+        if (0 === count($this->executeStepValidations($model, $step))) {
+            $modelState = $this->storage->newModelState($model, $this->process->getName(), $stepName, $step);
+
+            // @todo run actions
+
+            return $modelState;
+        }
+
+        return false;
+    }
+
+    /**
+     * Returns a step by its name.
+     *
+     * @param string $stepName
+     * @return FreeAgent\WorkflowBundle\Flow\Step
+     */
+    protected function getProcessStep($stepName)
     {
         $step = $this->process->getStep($stepName);
 
-        if (0 === count($this->executeStepValidations($model, $step))) {
-            return $this->storage->newModelState($model, $this->process->getName(), $stepName, $step);
+        if (! ($step instanceof Step)) {
+            throw WorkflowException(sprintf('Can\'t find step named "%s" in process "%s".', $stepName, $this->process->getName()));
         }
+
+        return $step;
     }
 
     /**
