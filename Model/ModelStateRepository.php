@@ -7,19 +7,19 @@ use Doctrine\ORM\EntityRepository;
 class ModelStateRepository extends EntityRepository
 {
     /**
-     * Returns the last ModelState for the given model hash.
+     * Returns the last ModelState for the given workflow identifier.
      *
-     * @param string $hash
+     * @param string $workflowIdentifier
      * @param string $processName
      * @return FreeAgent\WorkflowBundle\Entity\ModelState
      */
-    public function findLatestModelState($hash, $processName)
+    public function findLatestModelState($workflowIdentifier, $processName)
     {
         $results = $this->createQueryBuilder('ms')
-            ->andWhere('ms.hash = :hash')
+            ->andWhere('ms.workflowIdentifier = :workflow_identifier')
             ->andWhere('ms.processName = :process')
             ->orderBy('ms.reachedAt', 'DESC')
-            ->setParameter('hash', $hash)
+            ->setParameter('workflow_identifier', $workflowIdentifier)
             ->setParameter('process', $processName)
             ->getQuery()
             ->getResult();

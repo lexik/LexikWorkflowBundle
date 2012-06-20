@@ -111,6 +111,8 @@ class ProcessHandler implements ProcessHandlerInterface
             // @todo run actions
 
             return $modelState;
+        } else {
+            // go to "onInvalid" step
         }
 
         return false;

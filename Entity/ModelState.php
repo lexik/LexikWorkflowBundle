@@ -10,7 +10,7 @@ class ModelState
 {
     protected $id;
 
-    protected $hash;
+    protected $workflowIdentifier;
 
     protected $processName;
 
@@ -31,23 +31,23 @@ class ModelState
     }
 
     /**
-     * Get hash
+     * Get workflowIdentifier
      *
      * @return string
      */
-    public function getHash()
+    public function getWorkflowIdentifier()
     {
-        return $this->hash;
+        return $this->workflowIdentifier;
     }
 
     /**
-     * Set hash
+     * Set workflowIdentifier
      *
-     * @param string $hash
+     * @param string $workflowIdentifier
      */
-    public function setHash($hash)
+    public function setWorkflowIdentifier($workflowIdentifier)
     {
-        $this->hash = $hash;
+        $this->workflowIdentifier = $workflowIdentifier;
     }
 
     /**
