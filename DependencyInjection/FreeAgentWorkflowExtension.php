@@ -121,12 +121,24 @@ class FreeAgentWorkflowExtension extends Extension
                 }
             }
 
+            $validations = array();
+            foreach ($stepConfig['validations'] as $validation) {
+                list($service, $method) = explode(':', $validation);
+                $validations[] = array(new Reference($service), $method);
+            }
+
+            $actions = array();
+            foreach ($stepConfig['actions'] as $action) {
+                list($service, $method) = explode(':', $action);
+                $actions[] = array(new Reference($service), $method);
+            }
+
             $definition = new Definition($stepClass, array(
                 $stepName,
                 $stepConfig['label'],
                 $stepConfig['next_steps'],
-                $stepConfig['validations'],
-                $stepConfig['actions'],
+                $validations,
+                $actions,
                 $stepConfig['roles'],
             ));
 

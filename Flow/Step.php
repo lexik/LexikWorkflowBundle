@@ -44,15 +44,15 @@ class Step implements NodeInterface
      * @param array $actions
      * @param array $roles
      */
-    public function __construct($name, $label, array $nextSteps, array $validations = null, array $actions = null, array $roles = null)
+    public function __construct($name, $label, array $nextSteps, array $validations = array(), array $actions = array(), array $roles = array())
     {
-        $this->name = $name;
-        $this->label = $label;
+        $this->name        = $name;
+        $this->label       = $label;
 
-        $this->nextSteps = $nextSteps;
-        $this->validations = (null != $validations) ? $validations : array();
-        $this->actions = (null != $actions) ? $actions : array();
-        $this->roles = (null != $roles) ? $roles : array();
+        $this->nextSteps   = $nextSteps;
+        $this->validations = $validations;
+        $this->actions     = $actions;
+        $this->roles       = $roles;
     }
 
     /**
