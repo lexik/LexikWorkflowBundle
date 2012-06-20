@@ -2,8 +2,12 @@
 
 namespace FreeAgent\WorkflowBundle\Handler;
 
-use FreeAgent\WorkflowBundle\Model\ModelStorage;
+use Symfony\Component\Security\Core\SecurityContext;
+
+use FreeAgent\WorkflowBundle\Exception\AccessDeniedException;
+use FreeAgent\WorkflowBundle\Flow\Step;
 use FreeAgent\WorkflowBundle\Flow\Process;
+use FreeAgent\WorkflowBundle\Model\ModelStorage;
 use FreeAgent\WorkflowBundle\Model\ModelInterface;
 
 /**
@@ -23,14 +27,20 @@ class ProcessHandler implements ProcessHandlerInterface
     protected $storage;
 
     /**
+     * @var Symfony\Component\Security\Core\SecurityContext
+     */
+    protected $security;
+
+    /**
      * Construct.
      *
      * @param Process $process
      */
-    public function __construct(Process $process, ModelStorage $storage)
+    public function __construct(Process $process, ModelStorage $storage, SecurityContext $security)
     {
-        $this->process = $process;
-        $this->storage = $storage;
+        $this->process  = $process;
+        $this->storage  = $storage;
+        $this->security = $security;
     }
 
     /**
@@ -47,5 +57,18 @@ class ProcessHandler implements ProcessHandlerInterface
     public function reachStep(ModelInterface $model, $stepName)
     {
         throw new \RuntimeException('TODO :p');
+    }
+
+    /**
+     * Check if the user is allowed to reach the step.
+     *
+     * @param Step $step
+     * @throws AccessDeniedException
+     */
+    protected function checkCredentials(Step $step)
+    {
+        if (!$this->security->isGranted($step->getRoles())) {
+            throw new AccessDeniedException($step->getName());
+        }
     }
 }
