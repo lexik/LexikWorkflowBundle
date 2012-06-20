@@ -26,9 +26,13 @@
         
         <field name="stepName" column="step_name" type="string" length="255" />
         
-        <field name="reachedAt" column="reached_at" type="datetime" />
+        <field name="successful" column="successful" type="boolean" />
+        
+        <field name="createdAt" column="created_at" type="datetime" />
         
         <field name="data" column="data" type="string" />
+        
+        <field name="errors" column="errors" type="string" />
         
     </entity>
 </doctrine-mapping>

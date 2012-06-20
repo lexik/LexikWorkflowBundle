@@ -16,9 +16,13 @@ class ModelState
 
     protected $stepName;
 
-    protected $reachedAt;
+    protected $successful;
+
+    protected $createdAt;
 
     protected $data;
+
+    protected $errors;
 
     /**
      * Get Id
@@ -91,23 +95,23 @@ class ModelState
     }
 
     /**
-     * Get reachedAt
+     * Get createdAt
      *
      * @return \DateTime
      */
-    public function getReachedAt()
+    public function getCreatedAt()
     {
-        return $this->reachedAt;
+        return $this->createdAt;
     }
 
     /**
-     * Set reachedAt
+     * Set createdAt
      *
-     * @param DateTime $reachedAt
+     * @param DateTime $createdAt
      */
-    public function setReachedAt($reachedAt)
+    public function setCreatedAt($createdAt)
     {
-        $this->reachedAt = $reachedAt;
+        $this->createdAt = $createdAt;
     }
 
     /**
@@ -135,11 +139,55 @@ class ModelState
     }
 
     /**
+     * Get successful
+     *
+     * @return boolean
+     */
+    public function getSuccessful()
+    {
+        return $this->successful;
+    }
+
+    /**
+     * Set successful
+     *
+     * @param boolean
+     */
+    public function setSuccessful($successful)
+    {
+        $this->successful = (boolean) $successful;
+    }
+
+    /**
+     * Get errors
+     *
+     * @return string
+     */
+    public function getErrors()
+    {
+        return json_decode($this->errors, true);
+    }
+
+    /**
+     * Set errors
+     *
+     * @param string $errors
+     */
+    public function setErrors($errors)
+    {
+        if (!is_string($errors)) {
+            $errors = json_encode($errors);
+        }
+
+        $this->errors = $errors;
+    }
+
+    /**
      * PrePersist callback.
      *
      */
     public function prePersist()
     {
-        $this->reachedAt = new \DateTime('now');
+        $this->createdAt = new \DateTime('now');
     }
 }
