@@ -15,6 +15,8 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 class SampleModel implements ModelInterface
 {
+    public $data = array();
+
     public function getWorkflowIdentifier()
     {
         return 'sample_identifier';
@@ -22,7 +24,7 @@ class SampleModel implements ModelInterface
 
     public function getWorkflowData()
     {
-        return array();
+        return $this->data;
     }
 }
 
@@ -70,7 +72,19 @@ class ProcessHandlerTest extends TestCase
         $this->assertEquals('document_proccess', $modelState->getProcessName());
         $this->assertEquals('step_create_doc', $modelState->getStepName());
         $this->assertTrue($modelState->getReachedAt() instanceof \DateTime);
-        //$this->assertNull($modelState->getData());
+        $this->assertTrue(is_array($modelState->getData()));
+        $this->assertEquals(0, count($modelState->getData()));
+    }
+
+    public function testStartWithData()
+    {
+        $data = array('some', 'informations');
+
+        $model = new SampleModel();
+        $model->data = $data;
+        $modelState = $this->getProcessHandler()->start($model);
+
+        $this->assertEquals($data, $modelState->getData());
     }
 
     /**
