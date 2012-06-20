@@ -37,12 +37,13 @@ class ModelStorage
      * @param string $processName
      * @return FreeAgent\WorkflowBundle\Entity\ModelState
      */
-    public function findCurrentModelState(ModelInterface $model, $processName)
+    public function findCurrentModelState(ModelInterface $model, $processName, $stepName)
     {
-        $modelState = $this->repository->findOneBy(array(
-            'hash' => $model->getIdentifier(),
-            'processName' => $processName,
-        ));
+        $modelState = $this->repository->findLatestModelState(
+            $model->getIdentifier(),
+            $processName,
+            $stepName
+        );
 
         return $modelState;
     }

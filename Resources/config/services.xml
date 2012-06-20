@@ -23,7 +23,7 @@
         
         <service id="free_agent_workflow.model_storage" class="%free_agent_workflow.model_storage.class%">
             <argument type="service" id="doctrine.orm.entity_manager" />
-            <argument>%%free_agent_workflow.model_state.class%%</argument>
+            <argument>%free_agent_workflow.model_state.class%</argument>
         </service>
     </services>
 

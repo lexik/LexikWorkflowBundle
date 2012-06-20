@@ -4,10 +4,12 @@
                   xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
                                       http://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
 
-    <entity name="FreeAgent\WorkflowBundle\Entity\ModelState" table="free_agent_workflow_model_state">
+    <entity name="FreeAgent\WorkflowBundle\Entity\ModelState"
+            table="free_agent_workflow_model_state"
+            repository-class="FreeAgent\WorkflowBundle\Model\ModelStateRepository">
 
         <unique-constraints>
-            <unique-constraint name="hash_process_idx" columns="hash,process_name,step_name" />
+            <unique-constraint name="hash_process_step_idx" columns="hash,process_name,step_name" />
         </unique-constraints>
 
         <lifecycle-callbacks>
