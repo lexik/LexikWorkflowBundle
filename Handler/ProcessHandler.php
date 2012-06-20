@@ -2,6 +2,7 @@
 
 namespace FreeAgent\WorkflowBundle\Handler;
 
+use FreeAgent\WorkflowBundle\Model\ModelStorage;
 use FreeAgent\WorkflowBundle\Flow\Process;
 
 /**
@@ -16,13 +17,19 @@ class ProcessHandler implements ProcessHandlerInterface
     protected $process;
 
     /**
+     * @var FreeAgent\WorkflowBundle\Model\ModelStorage
+     */
+    protected $storage;
+
+    /**
      * Construct.
      *
      * @param Process $process
      */
-    public function __construct(Process $process)
+    public function __construct(Process $process, ModelStorage $storage)
     {
         $this->process = $process;
+        $this->storage = $storage;
     }
 
     /**

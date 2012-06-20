@@ -2,6 +2,8 @@
 
 namespace FreeAgent\WorkflowBundle\Manager;
 
+use FreeAgent\WorkflowBundle\Model\ModelStorage;
+
 use FreeAgent\WorkflowBundle\Exception\WorkflowException;
 
 class ProcessManager
@@ -51,10 +53,10 @@ class ProcessManager
      * @param string $processName
      * @return \FreeAgent\WorkflowBundle\Manager\ProcessHandlerInterface
      */
-    public function createProcessHandler($processName)
+    public function createProcessHandler($processName, ModelStorage $storage)
     {
         $class = $this->processHandlerClass;
-        $handler = new $class($this->getProcess($processName));
+        $handler = new $class($this->getProcess($processName), $storage);
 
         return $handler;
     }

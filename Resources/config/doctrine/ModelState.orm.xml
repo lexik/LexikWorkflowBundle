@@ -7,7 +7,7 @@
     <entity name="FreeAgent\WorkflowBundle\Entity\ModelState" table="free_agent_workflow_model_state">
 
         <unique-constraints>
-            <unique-constraint name="hash_idx" columns="hash" />
+            <unique-constraint name="hash_process_idx" columns="hash,process_name" />
         </unique-constraints>
 
         <lifecycle-callbacks>
