@@ -50,7 +50,10 @@ class FreeAgentWorkflowExtension extends Extension
     protected function buildProcessHandlers($processReferences, $container, $processHandlerClass)
     {
         foreach ($processReferences as $processName => $processReference) {
-            $definition = new Definition($processHandlerClass, array($processName));
+            $definition = new Definition($processHandlerClass, array(
+                $processName,
+                new Reference('free_agent_workflow.model_storage'),
+            ));
             $definition->setFactoryService(new Reference('free_agent_workflow.process_manager'))
                        ->setFactoryMethod('createProcessHandler');
 
