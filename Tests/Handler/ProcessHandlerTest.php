@@ -71,7 +71,7 @@ class ProcessHandlerTest extends TestCase
         $this->assertEquals($model->getWorkflowIdentifier(), $modelState->getWorkflowIdentifier());
         $this->assertEquals('document_proccess', $modelState->getProcessName());
         $this->assertEquals('step_create_doc', $modelState->getStepName());
-        $this->assertTrue($modelState->getReachedAt() instanceof \DateTime);
+        $this->assertTrue($modelState->getCreatedAt() instanceof \DateTime);
         $this->assertTrue(is_array($modelState->getData()));
         $this->assertEquals(0, count($modelState->getData()));
     }
@@ -94,7 +94,7 @@ class ProcessHandlerTest extends TestCase
     public function testStartAlreadyStarted()
     {
         $model = new SampleModel();
-        $this->modelStorage->newModelState($model, 'document_proccess', 'step_create_doc');
+        $this->modelStorage->newModelStateSuccess($model, 'document_proccess', 'step_create_doc');
 
         $this->getProcessHandler()->start($model);
     }
@@ -113,7 +113,7 @@ class ProcessHandlerTest extends TestCase
     public function testReachNextState()
     {
         $model = new SampleModel();
-        $this->modelStorage->newModelState($model, 'document_proccess', 'step_create_doc');
+        $this->modelStorage->newModelStateSuccess($model, 'document_proccess', 'step_create_doc');
 
         $modelState = $this->getProcessHandler()->reachNextState($model, 'step_validate_doc');
 
@@ -128,7 +128,7 @@ class ProcessHandlerTest extends TestCase
     public function testReachNextStateInvalidNextStep()
     {
         $model = new SampleModel();
-        $this->modelStorage->newModelState($model, 'document_proccess', 'step_create_doc');
+        $this->modelStorage->newModelStateSuccess($model, 'document_proccess', 'step_create_doc');
 
         $modelState = $this->getProcessHandler()->reachNextState($model, 'step_fake');
     }

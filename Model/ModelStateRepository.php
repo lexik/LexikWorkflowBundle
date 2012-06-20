@@ -18,7 +18,7 @@ class ModelStateRepository extends EntityRepository
         $results = $this->createQueryBuilder('ms')
             ->andWhere('ms.workflowIdentifier = :workflow_identifier')
             ->andWhere('ms.processName = :process')
-            ->orderBy('ms.reachedAt', 'DESC')
+            ->orderBy('ms.createdAt', 'DESC')
             ->setParameter('workflow_identifier', $workflowIdentifier)
             ->setParameter('process', $processName)
             ->getQuery()

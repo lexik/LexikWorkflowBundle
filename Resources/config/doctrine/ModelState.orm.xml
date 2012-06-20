@@ -21,14 +21,14 @@
         <field name="processName" column="process_name" type="string" length="255" />
 
         <field name="stepName" column="step_name" type="string" length="255" />
-        
+
         <field name="successful" column="successful" type="boolean" />
-        
+
         <field name="createdAt" column="created_at" type="datetime" />
-        
-        <field name="data" column="data" type="string" />
-        
-        <field name="errors" column="errors" type="string" />
-        
+
+        <field name="data" column="data" type="string" nullable="true" />
+
+        <field name="errors" column="errors" type="string" nullable="true" />
+
     </entity>
 </doctrine-mapping>
