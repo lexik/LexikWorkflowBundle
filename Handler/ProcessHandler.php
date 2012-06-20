@@ -100,22 +100,29 @@ class ProcessHandler implements ProcessHandlerInterface
      *
      * @param ModelInterface $model
      * @param Step $step
+     * @return FreeAgent\WorkflowBundle\Entity
      */
     protected function reachStep(ModelInterface $model, Step $step)
     {
         $this->checkCredentials($step);
 
-        if (0 === count($this->executeStepValidations($model, $step))) {
-            $modelState = $this->storage->newModelState($model, $this->process->getName(), $step->getName());
+        $errors = $this->executeStepValidations($model, $step);
+
+        if (0 === count($errors)) {
+            $modelState = $this->storage->newModelStateSuccess($model, $this->process->getName(), $step->getName());
 
             // @todo run actions
 
-            return $modelState;
         } else {
-            // go to "onInvalid" step
+            $modelState = $this->storage->newModelStateError($model, $this->process->getName(), $step->getName(), $errors);
+
+            if ($step->getOnInvalid()) {
+                $step = $this->getProcessStep($step->getOnInvalid());
+                $modelState = $this->reachStep($model, $step);
+            }
         }
 
-        return false;
+        return $modelState;
     }
 
     /**

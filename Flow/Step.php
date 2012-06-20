@@ -35,6 +35,11 @@ class Step implements NodeInterface
     protected $nextStates;
 
     /**
+     * @var string
+     */
+    protected $onInvalid;
+
+    /**
      * Construct.
      *
      * @param string $name
@@ -43,8 +48,9 @@ class Step implements NodeInterface
      * @param array $validations
      * @param array $actions
      * @param array $roles
+     * @param string $onInvalid
      */
-    public function __construct($name, $label, array $nextStates, array $validations = array(), array $actions = array(), array $roles = array())
+    public function __construct($name, $label, array $nextStates, array $validations = array(), array $actions = array(), array $roles = array(), $onInvalid = null)
     {
         $this->name        = $name;
         $this->label       = $label;
@@ -52,6 +58,7 @@ class Step implements NodeInterface
         $this->validations = $validations;
         $this->actions     = $actions;
         $this->roles       = $roles;
+        $this->onInvalid   = $onInvalid;
     }
 
     public function __toString()
@@ -160,5 +167,15 @@ class Step implements NodeInterface
     public function getRoles()
     {
         return $this->roles;
+    }
+
+    /**
+     * Returns the step to reach if validation fail to reach this step.
+     *
+     * @return string
+     */
+    public function getOnInvalid()
+    {
+        return $this->onInvalid;
     }
 }

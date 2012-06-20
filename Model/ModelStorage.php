@@ -48,6 +48,50 @@ class ModelStorage
     }
 
     /**
+     * Create a new successful model state.
+     *
+     * @param ModelInterface $model
+     * @param string $processName
+     * @param string $stepName
+     * @return \FreeAgent\WorkflowBundle\Entity\ModelState
+     */
+    public function newModelStateSuccess(ModelInterface $model, $processName, $stepName)
+    {
+        $modelState = $this->createModelState($model, $processName, $stepName);
+        $modelState->setSuccessful(true);
+
+        $this->om->persist($modelState);
+        $this->om->flush();
+
+        return $modelState;
+    }
+
+    /**
+     * Create a new invalid model state.
+     *
+     * @param ModelInterface $model
+     * @param string $processName
+     * @param string $stepName
+     * @return \FreeAgent\WorkflowBundle\Entity\ModelState
+     */
+    public function newModelStateError(ModelInterface $model, $processName, $stepName, array $errors)
+    {
+        $messages = array();
+        foreach ($errors as $error) {
+            $messages[] = (string) $error;
+        }
+
+        $modelState = $this->createModelState($model, $processName, $stepName);
+        $modelState->setSuccessful(false);
+        $modelState->setErrors($messages);
+
+        $this->om->persist($modelState);
+        $this->om->flush();
+
+        return $modelState;
+    }
+
+    /**
      * Create a new model state.
      *
      * @param ModelInterface $model
@@ -55,16 +99,13 @@ class ModelStorage
      * @param string $stepName
      * @return \FreeAgent\WorkflowBundle\Entity\ModelState
      */
-    public function newModelState(ModelInterface $model, $processName, $stepName)
+    protected function createModelState(ModelInterface $model, $processName, $stepName)
     {
         $modelState = new ModelState();
         $modelState->setWorkflowIdentifier($model->getWorkflowIdentifier());
         $modelState->setProcessName($processName);
         $modelState->setStepName($stepName);
         $modelState->setData($model->getWorkflowData());
-
-        $this->om->persist($modelState);
-        $this->om->flush();
 
         return $modelState;
     }
