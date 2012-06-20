@@ -17,7 +17,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * Contains all logic to handle a process and its steps.
- *
  */
 class ProcessHandler implements ProcessHandlerInterface
 {
@@ -39,12 +38,13 @@ class ProcessHandler implements ProcessHandlerInterface
     /**
      * Construct.
      *
-     * @param Process $process
+     * @param Process      $process
+     * @param ModelStorage $storage
      */
     public function __construct(Process $process, ModelStorage $storage)
     {
-        $this->process  = $process;
-        $this->storage  = $storage;
+        $this->process = $process;
+        $this->storage = $storage;
     }
 
     /**
@@ -111,7 +111,11 @@ class ProcessHandler implements ProcessHandlerInterface
         if (0 === count($errors)) {
             $modelState = $this->storage->newModelStateSuccess($model, $this->process->getName(), $step->getName());
 
-            // @todo run actions
+            // run actions
+            foreach ($step->getActions() as $action) {
+                list($service, $method) = $action;
+                $service->$method($model, $step);
+            }
 
         } else {
             $modelState = $this->storage->newModelStateError($model, $this->process->getName(), $step->getName(), $errors);

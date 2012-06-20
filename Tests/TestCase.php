@@ -72,19 +72,6 @@ EOF;
         $schemaTool->createSchema($em->getMetadataFactory()->getAllMetadata());
     }
 
-//    /**
-//     * Load test fixtures.
-//     *
-//     * @param EntityManager $om
-//     */
-//    protected function loadFixtures(EntityManager $em)
-//    {
-//        $purger = new ORMPurger();
-//        $executor = new ORMExecutor($em, $purger);
-//
-//        $executor->execute(array(new CurrencyData()), false);
-//    }
-
     /**
      * EntityManager mock object together with annotation mapping driver and
      * pdo_sqlite database in memory

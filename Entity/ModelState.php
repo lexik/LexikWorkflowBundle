@@ -8,21 +8,53 @@ namespace FreeAgent\WorkflowBundle\Entity;
  */
 class ModelState
 {
+    /**
+     * @var int
+     */
     protected $id;
 
+    /**
+     * @var string
+     */
     protected $workflowIdentifier;
 
+    /**
+     * @var string
+     */
     protected $processName;
 
+    /**
+     * @var string
+     */
     protected $stepName;
 
+    /**
+     * @var boolean
+     */
     protected $successful;
 
+    /**
+     * @var \DateTime
+     */
     protected $createdAt;
 
+    /**
+     * @var array
+     */
     protected $data;
 
+    /**
+     * @var array
+     */
     protected $errors;
+
+    /**
+     * Construct.
+     */
+    public function __construct()
+    {
+        $this->createdAt = new \DateTime('now');
+    }
 
     /**
      * Get Id
@@ -117,7 +149,7 @@ class ModelState
     /**
      * Get data
      *
-     * @return string
+     * @return array
      */
     public function getData()
     {
@@ -127,7 +159,7 @@ class ModelState
     /**
      * Set data
      *
-     * @param string $data
+     * @param mixed $data An array or a JSON string
      */
     public function setData($data)
     {
@@ -180,14 +212,5 @@ class ModelState
         }
 
         $this->errors = $errors;
-    }
-
-    /**
-     * PrePersist callback.
-     *
-     */
-    public function prePersist()
-    {
-        $this->createdAt = new \DateTime('now');
     }
 }
