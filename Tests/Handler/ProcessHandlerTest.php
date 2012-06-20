@@ -7,38 +7,12 @@ use FreeAgent\WorkflowBundle\Flow\Process;
 use FreeAgent\WorkflowBundle\Flow\Step;
 use FreeAgent\WorkflowBundle\Handler\ProcessHandler;
 use FreeAgent\WorkflowBundle\Model\ModelStorage;
-use FreeAgent\WorkflowBundle\Model\ModelInterface;
 use FreeAgent\WorkflowBundle\Entity\ModelState;
-
-use Symfony\Component\Security\Core\SecurityContextInterface;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-
-class SampleModel implements ModelInterface
-{
-    public $data = array();
-
-    public function getWorkflowIdentifier()
-    {
-        return 'sample_identifier';
-    }
-
-    public function getWorkflowData()
-    {
-        return $this->data;
-    }
-}
-
-class FakeSecurityContext implements SecurityContextInterface
-{
-    public function getToken() {}
-
-    public function setToken(TokenInterface $token = null) {}
-
-    public function isGranted($attributes, $object = null)
-    {
-        return true;
-    }
-}
+use FreeAgent\WorkflowBundle\Exception\ValidationException;
+Use FreeAgent\WorkflowBundle\Tests\Fixtures\FakeModel;
+use FreeAgent\WorkflowBundle\Tests\Fixtures\FakeSecurityContext;
+use FreeAgent\WorkflowBundle\Tests\Fixtures\FakeValidator;
+use FreeAgent\WorkflowBundle\Tests\Fixtures\FakeAction;
 
 class ProcessHandlerTest extends TestCase
 {
@@ -64,7 +38,7 @@ class ProcessHandlerTest extends TestCase
 
     public function testStart()
     {
-        $model = new SampleModel();
+        $model = new FakeModel();
         $modelState = $this->getProcessHandler()->start($model);
 
         $this->assertTrue($modelState instanceof ModelState);
@@ -80,7 +54,7 @@ class ProcessHandlerTest extends TestCase
     {
         $data = array('some', 'informations');
 
-        $model = new SampleModel();
+        $model = new FakeModel();
         $model->data = $data;
         $modelState = $this->getProcessHandler()->start($model);
 
@@ -93,7 +67,7 @@ class ProcessHandlerTest extends TestCase
      */
     public function testStartAlreadyStarted()
     {
-        $model = new SampleModel();
+        $model = new FakeModel();
         $this->modelStorage->newModelStateSuccess($model, 'document_proccess', 'step_create_doc');
 
         $this->getProcessHandler()->start($model);
@@ -105,14 +79,14 @@ class ProcessHandlerTest extends TestCase
      */
     public function testReachNextStateNotStarted()
     {
-        $model = new SampleModel();
+        $model = new FakeModel();
 
         $this->getProcessHandler()->reachNextState($model, 'step_validate_doc');
     }
 
     public function testReachNextState()
     {
-        $model = new SampleModel();
+        $model = new FakeModel();
         $this->modelStorage->newModelStateSuccess($model, 'document_proccess', 'step_create_doc');
 
         $modelState = $this->getProcessHandler()->reachNextState($model, 'step_validate_doc');
@@ -127,10 +101,70 @@ class ProcessHandlerTest extends TestCase
      */
     public function testReachNextStateInvalidNextStep()
     {
-        $model = new SampleModel();
+        $model = new FakeModel();
         $this->modelStorage->newModelStateSuccess($model, 'document_proccess', 'step_create_doc');
 
         $modelState = $this->getProcessHandler()->reachNextState($model, 'step_fake');
+    }
+
+    public function testReachNextStateWithActions()
+    {
+        $step = new Step('sample', 'Sample', array());
+
+        $reflectionClass = new \ReflectionClass('FreeAgent\WorkflowBundle\Flow\Step');
+        $property = $reflectionClass->getProperty('actions');
+        $property->setAccessible(true);
+        $property->setValue($step, array(
+            array(new FakeAction(), 'call'),
+        ));
+
+        $reflectionClass = new \ReflectionClass('FreeAgent\WorkflowBundle\Handler\ProcessHandler');
+        $method = $reflectionClass->getMethod('reachStep');
+        $method->setAccessible(true);
+        $method->invoke($this->getProcessHandler(), new FakeModel(), $step);
+
+        $this->assertEquals(1, FakeAction::$call);
+    }
+
+    public function testReachNextStateError()
+    {
+        $model = new FakeModel();
+        $this->modelStorage->newModelStateSuccess($model, 'document_proccess', 'step_create_doc');
+
+        $modelState = $this->getProcessHandler()->reachNextState($model, 'step_remove_doc');
+
+        $this->assertEquals('step_fake', $modelState->getStepName());
+    }
+
+    public function testExecuteStepValidations()
+    {
+        $processHandler = $this->getProcessHandler();
+        $step = new Step('sample', 'Sample', array());
+
+        $reflectionClass = new \ReflectionClass('FreeAgent\WorkflowBundle\Flow\Step');
+        $property = $reflectionClass->getProperty('validations');
+        $property->setAccessible(true);
+        $property->setValue($step, array(
+            array(new FakeValidator(), 'valid'),
+        ));
+
+        $reflectionClass = new \ReflectionClass('FreeAgent\WorkflowBundle\Handler\ProcessHandler');
+        $method = $reflectionClass->getMethod('executeStepValidations');
+        $method->setAccessible(true);
+        $validationViolations = $method->invoke($processHandler, new FakeModel(), $step);
+
+        $this->assertTrue(is_array($validationViolations));
+        $this->assertEquals(0, count($validationViolations));
+
+        $property->setValue($step, array(
+            array(new FakeValidator(), 'invalid'),
+        ));
+
+        $validationViolations = $method->invoke($processHandler, new FakeModel(), $step);
+
+        $this->assertEquals(1, count($validationViolations));
+        $this->assertTrue($validationViolations[0] instanceof ValidationException);
+        $this->assertEquals('Validator error!', $validationViolations[0]->getMessage());
     }
 
     /**
@@ -148,19 +182,25 @@ class ProcessHandlerTest extends TestCase
     protected function getProcessHandler()
     {
         $stepValidateDoc = new Step('step_validate_doc', 'Validate doc', array());
-        $stepCreateDoc = new Step('step_create_doc', 'Create doc', array(
+        $stepRemoveDoc   = new Step('step_remove_doc', 'Remove doc', array(), array(array(new FakeValidator(), 'invalid')), array(), array(), 'step_fake');
+        $stepFake        = new Step('step_fake', 'Fake', array());
+        $stepCreateDoc   = new Step('step_create_doc', 'Create doc', array(
             'step_validate_doc' => array(
                 'type'   => 'step',
                 'target' => $stepValidateDoc,
-            )
+            ),
+            'step_remove_doc' => array(
+                'type'   => 'step',
+                'target' => $stepRemoveDoc,
+            ),
         ));
-        $stepFake = new Step('step_fake', 'Fake', array());
 
         $process = new Process(
             'document_proccess',
             array(
                 'step_create_doc'   => $stepCreateDoc,
                 'step_validate_doc' => $stepValidateDoc,
+                'step_remove_doc'   => $stepRemoveDoc,
                 'step_fake'         => $stepFake,
             ),
             'step_create_doc',
