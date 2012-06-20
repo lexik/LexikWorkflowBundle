@@ -135,4 +135,14 @@ class Step implements NodeInterface
     {
         return in_array($stepName, $this->getNextSteps());
     }
+
+    /**
+     * Returns required roles to reach the step.
+     *
+     * @return array
+     */
+    public function getRoles()
+    {
+        return $this->roles;
+    }
 }

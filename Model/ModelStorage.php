@@ -39,10 +39,10 @@ class ModelStorage
      */
     public function findCurrentModelState(ModelInterface $model, $processName)
     {
-        $modelState = $this->repository->findOneBy(array(
-            'hash' => $model->getIdentifier(),
-            'processName' => $processName,
-        ));
+        $modelState = $this->repository->findLatestModelState(
+            $model->getIdentifier(),
+            $processName
+        );
 
         return $modelState;
     }
