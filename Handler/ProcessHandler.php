@@ -39,12 +39,13 @@ class ProcessHandler implements ProcessHandlerInterface
     /**
      * Construct.
      *
-     * @param Process $process
+     * @param Process      $process
+     * @param ModelStorage $storage
      */
     public function __construct(Process $process, ModelStorage $storage)
     {
-        $this->process  = $process;
-        $this->storage  = $storage;
+        $this->process = $process;
+        $this->storage = $storage;
     }
 
     /**
@@ -108,7 +109,11 @@ class ProcessHandler implements ProcessHandlerInterface
         if (0 === count($this->executeStepValidations($model, $step))) {
             $modelState = $this->storage->newModelState($model, $this->process->getName(), $step->getName(), $step);
 
-            // @todo run actions
+            // run actions
+            foreach ($step->getActions() as $action) {
+                list($service, $method) = $action;
+                $service->$method($model, $step);
+            }
 
             return $modelState;
         }
