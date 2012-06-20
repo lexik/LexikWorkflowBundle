@@ -50,10 +50,12 @@ class Configuration implements ConfigurationInterface
                             ->scalarNode('start')
                                 ->defaultNull()
                             ->end()
+
                             ->arrayNode('end')
                                 ->defaultValue(array())
                                 ->prototype('scalar')->end()
                             ->end()
+
                             ->arrayNode('steps')
                                 ->isRequired()
                                 ->useAttributeAsKey('id')
@@ -63,9 +65,11 @@ class Configuration implements ConfigurationInterface
                                         ->scalarNode('label')
                                             ->defaultValue('')
                                         ->end()
+
                                         ->arrayNode('roles')
                                             ->prototype('scalar')->end()
                                         ->end()
+
                                         ->arrayNode('actions')
                                             ->validate()
                                                 ->ifTrue(function($value) use ($validatorSyntax) {
@@ -75,6 +79,7 @@ class Configuration implements ConfigurationInterface
                                             ->end()
                                             ->prototype('scalar')->end()
                                         ->end()
+
                                         ->arrayNode('validations')
                                             ->validate()
                                                 ->ifTrue(function($value) use ($validatorSyntax) {
@@ -84,6 +89,7 @@ class Configuration implements ConfigurationInterface
                                             ->end()
                                             ->prototype('scalar')->end()
                                         ->end()
+
                                         ->arrayNode('next_steps')
                                             ->useAttributeAsKey('id')
                                             ->prototype('array')
@@ -96,7 +102,14 @@ class Configuration implements ConfigurationInterface
                                                              ->thenInvalid('Invalid next element type "%s". Please use one of the following types: '.implode(', ', $flowTypes))
                                                         ->end()
                                                     ->end()
-                                                    ->scalarNode('target')->end()
+
+                                                    ->scalarNode('target')
+                                                        ->cannotBeEmpty()
+                                                    ->end()
+
+                                                    ->scalarNode('onInvalid')
+                                                        ->defaultNull()
+                                                    ->end()
                                                 ->end()
                                             ->end()
                                         ->end()
@@ -106,6 +119,7 @@ class Configuration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
+
             ->end()
         ;
 
