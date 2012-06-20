@@ -142,6 +142,7 @@ class FreeAgentWorkflowExtension extends Extension
                 $validations,
                 $actions,
                 $stepConfig['roles'],
+                $stepConfig['onInvalid'],
             ));
 
             $definition->setPublic(false)

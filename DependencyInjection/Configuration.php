@@ -90,6 +90,10 @@ class Configuration implements ConfigurationInterface
                                             ->prototype('scalar')->end()
                                         ->end()
 
+                                        ->scalarNode('onInvalid')
+                                            ->defaultNull()
+                                        ->end()
+
                                         ->arrayNode('next_steps')
                                             ->useAttributeAsKey('id')
                                             ->prototype('array')
@@ -105,10 +109,6 @@ class Configuration implements ConfigurationInterface
 
                                                     ->scalarNode('target')
                                                         ->cannotBeEmpty()
-                                                    ->end()
-
-                                                    ->scalarNode('onInvalid')
-                                                        ->defaultNull()
                                                     ->end()
                                                 ->end()
                                             ->end()
