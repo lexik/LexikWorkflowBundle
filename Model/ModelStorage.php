@@ -40,7 +40,7 @@ class ModelStorage
     public function findCurrentModelState(ModelInterface $model, $processName)
     {
         $modelState = $this->repository->findLatestModelState(
-            $model->getIdentifier(),
+            $model->getWorkflowIdentifier(),
             $processName
         );
 
@@ -59,7 +59,7 @@ class ModelStorage
     public function newModelState(ModelInterface $model, $processName, $stepName, $data)
     {
         $modelState = new ModelState();
-        $modelState->setHash($model->getIdentifier());
+        $modelState->setHash($model->getWorkflowIdentifier());
         $modelState->setProcessName($processName);
         $modelState->setStepName($stepName);
         $modelState->setData(is_array($data) ? json_encode($data) : $data);

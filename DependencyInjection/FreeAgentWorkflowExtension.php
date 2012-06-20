@@ -53,9 +53,10 @@ class FreeAgentWorkflowExtension extends Extension
             $definition = new Definition($processHandlerClass, array(
                 $processName,
                 new Reference('free_agent_workflow.model_storage'),
-                new Reference('security.context'),
             ));
-            $definition->setFactoryService(new Reference('free_agent_workflow.process_manager'))
+
+            $definition->addMethodCall('setSecurityContext', array(new Reference('security.context')))
+                       ->setFactoryService(new Reference('free_agent_workflow.process_manager'))
                        ->setFactoryMethod('createProcessHandler');
 
             $container->setDefinition(sprintf('free_agent_workflow.handler.%s', $processName), $definition);

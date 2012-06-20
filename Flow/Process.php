@@ -44,6 +44,11 @@ class Process implements NodeInterface
         $this->endSteps  = $endSteps;
     }
 
+    public function __toString()
+    {
+        return $this->getName();
+    }
+
     /**
      * Get process name.
      *

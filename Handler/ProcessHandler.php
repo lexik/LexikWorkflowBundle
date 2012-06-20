@@ -2,7 +2,7 @@
 
 namespace FreeAgent\WorkflowBundle\Handler;
 
-use Symfony\Component\Security\Core\SecurityContext;
+use Symfony\Component\Security\Core\SecurityContextInterface;
 
 use FreeAgent\WorkflowBundle\Exception\WorkflowException;
 use FreeAgent\WorkflowBundle\Exception\AccessDeniedException;
@@ -32,7 +32,7 @@ class ProcessHandler implements ProcessHandlerInterface
     protected $storage;
 
     /**
-     * @var Symfony\Component\Security\Core\SecurityContext
+     * @var Symfony\Component\Security\Core\SecurityContextInterface
      */
     protected $security;
 
@@ -41,10 +41,19 @@ class ProcessHandler implements ProcessHandlerInterface
      *
      * @param Process $process
      */
-    public function __construct(Process $process, ModelStorage $storage, SecurityContext $security)
+    public function __construct(Process $process, ModelStorage $storage)
     {
         $this->process  = $process;
         $this->storage  = $storage;
+    }
+
+    /**
+     * Set security context.
+     *
+     * @param SecurityContextInterface $security
+     */
+    public function setSecurityContext(SecurityContextInterface $security)
+    {
         $this->security = $security;
     }
 
@@ -72,16 +81,16 @@ class ProcessHandler implements ProcessHandlerInterface
         $modelState = $this->storage->findCurrentModelState($model, $this->process->getName());
 
         if ( ! ($modelState instanceof ModelState)) {
-            throw new WorkflowException(sprintf('The given model has not started this process.'));
+            throw new WorkflowException('The given model has not started this process.');
         }
 
-        $previousStep = $this->getProcessStep($modelState->getStepName());
+        $currentStep = $this->getProcessStep($modelState->getStepName());
 
-        if (!$previousStep->hasNextState($stateName)) {
-            throw new WorkflowException(sprintf('The step "%s" does not contain any next state named "%s".', $previousStep->getName(), $stateName));
+        if (!$currentStep->hasNextState($stateName)) {
+            throw new WorkflowException(sprintf('The step "%s" does not contain any next state named "%s".', $currentStep->getName(), $stateName));
         }
 
-        $step = $previousStep->getNextStateTarget($stateName);
+        $step = $currentStep->getNextStateTarget($stateName);
 
         return $this->reachStep($model, $step);
     }
@@ -97,7 +106,7 @@ class ProcessHandler implements ProcessHandlerInterface
         $this->checkCredentials($step);
 
         if (0 === count($this->executeStepValidations($model, $step))) {
-            $modelState = $this->storage->newModelState($model, $this->process->getName(), $stepName, $step);
+            $modelState = $this->storage->newModelState($model, $this->process->getName(), $step->getName(), $step);
 
             // @todo run actions
 
@@ -118,7 +127,7 @@ class ProcessHandler implements ProcessHandlerInterface
         $step = $this->process->getStep($stepName);
 
         if (! ($step instanceof Step)) {
-            throw WorkflowException(sprintf('Can\'t find step named "%s" in process "%s".', $stepName, $this->process->getName()));
+            throw new WorkflowException(sprintf('Can\'t find step named "%s" in process "%s".', $stepName, $this->process->getName()));
         }
 
         return $step;

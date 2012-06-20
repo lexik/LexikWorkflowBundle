@@ -15,13 +15,19 @@ class FreeAgentWorkflowExtensionTest extends TestCase
 {
     public function testLoad()
     {
+        $container = new ContainerBuilder();
+
+        // fake entity manager and security context services
+        $container->set('doctrine.orm.entity_manager', $this->getMockSqliteEntityManager());
+        $container->set('security.context', $this->getMockSecurityContext());
+
         $extension = new FreeAgentWorkflowExtension();
-        $extension->load(array($this->getSimpleConfig()), $container = new ContainerBuilder());
+        $extension->load(array($this->getSimpleConfig()), $container);
 
         $this->assertTrue($container->getDefinition('free_agent_workflow.process.document_proccess') instanceof Definition);
 
         $extension = new FreeAgentWorkflowExtension();
-        $extension->load(array($this->getConfig()), $container = new ContainerBuilder());
+        $extension->load(array($this->getConfig()), $container);
 
         $this->assertTrue($container->getDefinition('free_agent_workflow.process.document_proccess') instanceof Definition);
         $this->assertTrue($container->getDefinition('free_agent_workflow.process.document_proccess.step.step_create_doc') instanceof Definition);

@@ -54,6 +54,11 @@ class Step implements NodeInterface
         $this->roles       = $roles;
     }
 
+    public function __toString()
+    {
+        return $this->getLabel();
+    }
+
     /**
      * Get step name
      *
