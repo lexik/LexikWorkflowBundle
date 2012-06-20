@@ -10,4 +10,11 @@ interface ModelInterface
      * @return mixed
      */
     public function getWorkflowIdentifier();
+
+    /**
+     * Returns data to store in the ModelState.
+     *
+     * @return array
+     */
+    public function getWorkflowData();
 }

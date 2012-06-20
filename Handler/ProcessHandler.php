@@ -107,7 +107,7 @@ class ProcessHandler implements ProcessHandlerInterface
         $this->checkCredentials($step);
 
         if (0 === count($this->executeStepValidations($model, $step))) {
-            $modelState = $this->storage->newModelState($model, $this->process->getName(), $step->getName(), $step);
+            $modelState = $this->storage->newModelState($model, $this->process->getName(), $step->getName());
 
             // run actions
             foreach ($step->getActions() as $action) {
@@ -116,6 +116,8 @@ class ProcessHandler implements ProcessHandlerInterface
             }
 
             return $modelState;
+        } else {
+            // go to "onInvalid" step
         }
 
         return false;

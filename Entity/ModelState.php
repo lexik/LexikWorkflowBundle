@@ -10,7 +10,7 @@ class ModelState
 {
     protected $id;
 
-    protected $hash;
+    protected $workflowIdentifier;
 
     protected $processName;
 
@@ -31,23 +31,23 @@ class ModelState
     }
 
     /**
-     * Get hash
+     * Get workflowIdentifier
      *
      * @return string
      */
-    public function getHash()
+    public function getWorkflowIdentifier()
     {
-        return $this->hash;
+        return $this->workflowIdentifier;
     }
 
     /**
-     * Set hash
+     * Set workflowIdentifier
      *
-     * @param string $hash
+     * @param string $workflowIdentifier
      */
-    public function setHash($hash)
+    public function setWorkflowIdentifier($workflowIdentifier)
     {
-        $this->hash = $hash;
+        $this->workflowIdentifier = $workflowIdentifier;
     }
 
     /**
@@ -117,7 +117,7 @@ class ModelState
      */
     public function getData()
     {
-        return $this->data;
+        return json_decode($this->data, true);
     }
 
     /**
@@ -127,6 +127,10 @@ class ModelState
      */
     public function setData($data)
     {
+        if (!is_string($data)) {
+            $data = json_encode($data);
+        }
+
         $this->data = $data;
     }
 

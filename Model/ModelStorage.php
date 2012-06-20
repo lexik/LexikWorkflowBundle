@@ -53,16 +53,15 @@ class ModelStorage
      * @param ModelInterface $model
      * @param string $processName
      * @param string $stepName
-     * @param mixed $data
      * @return \FreeAgent\WorkflowBundle\Entity\ModelState
      */
-    public function newModelState(ModelInterface $model, $processName, $stepName, $data)
+    public function newModelState(ModelInterface $model, $processName, $stepName)
     {
         $modelState = new ModelState();
-        $modelState->setHash($model->getWorkflowIdentifier());
+        $modelState->setWorkflowIdentifier($model->getWorkflowIdentifier());
         $modelState->setProcessName($processName);
         $modelState->setStepName($stepName);
-        $modelState->setData(is_array($data) ? json_encode($data) : $data);
+        $modelState->setData($model->getWorkflowData());
 
         $this->om->persist($modelState);
         $this->om->flush();
