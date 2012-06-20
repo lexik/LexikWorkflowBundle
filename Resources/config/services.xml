@@ -15,7 +15,7 @@
         <service id="free_agent_workflow.manager" class="%free_agent_workflow.manager.class%">
             <argument type="service" id="service_container" />
         </service>
-        
+
         <service id="free_agent_workflow.process_manager" class="%free_agent_workflow.process_manager.class%">
             <argument type="collection" />
             <argument>%free_agent_workflow.process_handler_class%</argument>
@@ -26,5 +26,5 @@
             <argument>%%free_agent_workflow.model_state.class%%</argument>
         </service>
     </services>
-    
+
 </container>

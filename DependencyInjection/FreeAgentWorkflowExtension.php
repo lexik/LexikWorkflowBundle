@@ -2,14 +2,13 @@
 
 namespace FreeAgent\WorkflowBundle\DependencyInjection;
 
-use Symfony\Component\DependencyInjection\Parameter;
-
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\Parameter;
 
 /**
  * This is the class that loads and manages your bundle configuration
@@ -31,12 +30,31 @@ class FreeAgentWorkflowExtension extends Extension
 
         $container->setParameter('free_agent_workflow.process_handler_class', $config['process_handler_class']);
 
-        // build process definitions
+        // build process and factories definitions
         $processReferences = $this->buildProcesses($config['processes'], $container, $config['flow_process_class'], $config['flow_step_class']);
+        $this->buildProcessHandlers($processReferences, $container, $config['process_handler_class']);
 
         // inject processes into ProcessManager (not possible from a CompilerPass because definitions are loaded from Extension class...)
         if ($container->hasDefinition('free_agent_workflow.process_manager')) {
             $container->findDefinition('free_agent_workflow.process_manager')->replaceArgument(0, $processReferences);
+        }
+    }
+
+    /**
+     * Build process handler (factories) definitions from configuration.
+     *
+     * @param array            $processReferences
+     * @param ContainerBuilder $container
+     * @param string           $processHandlerClass
+     */
+    protected function buildProcessHandlers($processReferences, $container, $processHandlerClass)
+    {
+        foreach ($processReferences as $processName => $processReference) {
+            $definition = new Definition($processHandlerClass, array($processName));
+            $definition->setFactoryService(new Reference('free_agent_workflow.process_manager'))
+                       ->setFactoryMethod('createProcessHandler');
+
+            $container->setDefinition(sprintf('free_agent_workflow.handler.%s', $processName), $definition);
         }
     }
 
