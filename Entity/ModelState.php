@@ -117,7 +117,7 @@ class ModelState
      */
     public function getData()
     {
-        return $this->data;
+        return json_decode($this->data, true);
     }
 
     /**
@@ -127,6 +127,10 @@ class ModelState
      */
     public function setData($data)
     {
+        if (!is_string($data)) {
+            $data = json_encode($data);
+        }
+
         $this->data = $data;
     }
 
