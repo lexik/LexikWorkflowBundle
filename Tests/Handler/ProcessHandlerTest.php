@@ -8,6 +8,7 @@ use FreeAgent\WorkflowBundle\Flow\Step;
 use FreeAgent\WorkflowBundle\Handler\ProcessHandler;
 use FreeAgent\WorkflowBundle\Model\ModelStorage;
 use FreeAgent\WorkflowBundle\Model\ModelInterface;
+use FreeAgent\WorkflowBundle\Entity\ModelState;
 
 use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -16,7 +17,12 @@ class SampleModel implements ModelInterface
 {
     public function getWorkflowIdentifier()
     {
-        return 'sample_hash';
+        return 'sample_identifier';
+    }
+
+    public function getWorkflowData()
+    {
+        return array();
     }
 }
 
@@ -34,41 +40,120 @@ class FakeSecurityContext implements SecurityContextInterface
 
 class ProcessHandlerTest extends TestCase
 {
+    /**
+     * @var Doctrine\ORM\EntityManager
+     */
+    protected $em;
+
+    /**
+     * @var FreeAgent\WorkflowBundle\Model\ModelStorage
+     */
+    protected $modelStorage;
+
+    protected function setUp()
+    {
+        parent::setUp();
+
+        $this->em = $this->getMockSqliteEntityManager();
+        $this->createSchema($this->em);
+
+        $this->modelStorage = new ModelStorage($this->em, 'FreeAgent\WorkflowBundle\Entity\ModelState');
+    }
+
     public function testStart()
     {
-        $processHandler = $this->getProcessHandler();
+        $model = new SampleModel();
+        $modelState = $this->getProcessHandler()->start($model);
 
+        $this->assertTrue($modelState instanceof ModelState);
+        $this->assertEquals($model->getWorkflowIdentifier(), $modelState->getWorkflowIdentifier());
+        $this->assertEquals('document_proccess', $modelState->getProcessName());
+        $this->assertEquals('step_create_doc', $modelState->getStepName());
+        $this->assertTrue($modelState->getReachedAt() instanceof \DateTime);
+        //$this->assertNull($modelState->getData());
+    }
+
+    /**
+     * @expectedException        FreeAgent\WorkflowBundle\Exception\WorkflowException
+     * @expectedExceptionMessage The given model as already started this process.
+     */
+    public function testStartAlreadyStarted()
+    {
+        $model = new SampleModel();
+        $this->modelStorage->newModelState($model, 'document_proccess', 'step_create_doc');
+
+        $this->getProcessHandler()->start($model);
+    }
+
+    /**
+     * @expectedException        FreeAgent\WorkflowBundle\Exception\WorkflowException
+     * @expectedExceptionMessage The given model has not started this process.
+     */
+    public function testReachNextStateNotStarted()
+    {
         $model = new SampleModel();
 
-        $processHandler->start($model);
+        $this->getProcessHandler()->reachNextState($model, 'step_validate_doc');
+    }
+
+    public function testReachNextState()
+    {
+        $model = new SampleModel();
+        $this->modelStorage->newModelState($model, 'document_proccess', 'step_create_doc');
+
+        $modelState = $this->getProcessHandler()->reachNextState($model, 'step_validate_doc');
+
+        $this->assertTrue($modelState instanceof ModelState);
+        $this->assertEquals('step_validate_doc', $modelState->getStepName());
+    }
+
+    /**
+     * @expectedException        FreeAgent\WorkflowBundle\Exception\WorkflowException
+     * @expectedExceptionMessage The step "step_create_doc" does not contain any next state named "step_fake".
+     */
+    public function testReachNextStateInvalidNextStep()
+    {
+        $model = new SampleModel();
+        $this->modelStorage->newModelState($model, 'document_proccess', 'step_create_doc');
+
+        $modelState = $this->getProcessHandler()->reachNextState($model, 'step_fake');
+    }
+
+    /**
+     * @expectedException        FreeAgent\WorkflowBundle\Exception\WorkflowException
+     * @expectedExceptionMessage Can't find step named "step_unknow" in process "document_proccess".
+     */
+    public function testGetProcessStepInvalidStepName()
+    {
+        $reflectionClass = new \ReflectionClass('FreeAgent\WorkflowBundle\Handler\ProcessHandler');
+        $method = $reflectionClass->getMethod('getProcessStep');
+        $method->setAccessible(true);
+        $method->invoke($this->getProcessHandler(), 'step_unknow');
     }
 
     protected function getProcessHandler()
     {
         $stepValidateDoc = new Step('step_validate_doc', 'Validate doc', array());
-        $stepCreateDoc   = new Step('step_create_doc', 'Create doc', array(
+        $stepCreateDoc = new Step('step_create_doc', 'Create doc', array(
             'step_validate_doc' => array(
                 'type'   => 'step',
                 'target' => $stepValidateDoc,
             )
         ));
+        $stepFake = new Step('step_fake', 'Fake', array());
 
         $process = new Process(
             'document_proccess',
             array(
                 'step_create_doc'   => $stepCreateDoc,
                 'step_validate_doc' => $stepValidateDoc,
+                'step_fake'         => $stepFake,
             ),
             'step_create_doc',
             array('step_validate_doc')
         );
 
-        $em = $this->getMockSqliteEntityManager();
-        $this->createSchema($em);
-
-        $modelStorage = new ModelStorage($em, 'FreeAgent\WorkflowBundle\Entity\ModelState');
-
-        $processHandler = new ProcessHandler($process, $modelStorage);
+        $processHandler = new ProcessHandler($process, $this->modelStorage);
         $processHandler->setSecurityContext(new FakeSecurityContext());
 
         return $processHandler;
