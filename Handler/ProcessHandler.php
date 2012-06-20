@@ -3,6 +3,7 @@
 namespace FreeAgent\WorkflowBundle\Handler;
 
 use FreeAgent\WorkflowBundle\Flow\Process;
+use FreeAgent\WorkflowBundle\Model\ModelInterface;
 
 /**
  * Contains all logic to handle a process and its steps.
