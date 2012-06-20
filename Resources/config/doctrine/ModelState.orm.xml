@@ -12,10 +12,6 @@
             <unique-constraint name="identifier_process_step_idx" columns="workflow_identifier,process_name,step_name" />
         </unique-constraints>
 
-        <lifecycle-callbacks>
-            <lifecycle-callback type="prePersist" method="prePersist" />
-        </lifecycle-callbacks>
-
         <id name="id" type="integer" column="id">
             <generator strategy="AUTO"/>
         </id>

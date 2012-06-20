@@ -17,7 +17,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * Contains all logic to handle a process and its steps.
- *
  */
 class ProcessHandler implements ProcessHandlerInterface
 {

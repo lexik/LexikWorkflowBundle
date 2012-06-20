@@ -1,15 +1,10 @@
 <?php
 
-$vendorDir = __DIR__.'/../vendor';
-require_once $vendorDir.'/autoload.php';
-
-spl_autoload_register(function($class) {
-    if (0 === strpos($class, 'FreeAgent\\WorkflowBundle\\')) {
-        $path = __DIR__.'/../'.implode('/', array_slice(explode('\\', $class), 2)).'.php';
-        if (!stream_resolve_include_path($path)) {
-            return false;
-        }
-        require_once $path;
-        return true;
-    }
-});
+if (!$loader = include __DIR__.'/../vendor/autoload.php') {
+    $nl = PHP_SAPI === 'cli' ? PHP_EOL : '<br />';
+    echo "$nl$nl";
+    die('You must set up the project dependencies.'.$nl.
+        'Run the following commands in '.dirname(__DIR__).':'.$nl.$nl.
+        'curl -s http://getcomposer.org/installer | php'.$nl.
+        'php composer.phar install'.$nl);
+}
