@@ -37,6 +37,15 @@ class ModelStateRepositoryTest extends TestCase
 
         $this->em->persist($model2);
 
+        $model3 = new ModelState();
+        $model3->setWorkflowIdentifier('a1b2c3');
+        $model3->setCreatedAt(new \DateTime('2012-02-20'));
+        $model3->setProcessName('process_1');
+        $model3->setStepName('step_C');
+        $model3->setSuccessful(false);
+
+        $this->em->persist($model3);
+
         $this->em->flush();
     }
 
@@ -50,6 +59,7 @@ class ModelStateRepositoryTest extends TestCase
 
         $this->assertNull($repository->findLatestModelState('id', 'process'));
         $this->assertNull($repository->findLatestModelState('a1b2c3', 'process_?'));
+        $this->assertNull($repository->findLatestModelState('a1b2c3333', 'process_1'));
 
         $model = $repository->findLatestModelState('a1b2c3', 'process_1');
         $this->assertEquals('a1b2c3', $model->getWorkflowIdentifier());
