@@ -1,12 +1,11 @@
 <?php
 
-namespace FreeAgent\WorkflowBundle\Manager;
+namespace FreeAgent\WorkflowBundle\Handler;
 
 use FreeAgent\WorkflowBundle\Model\ModelStorage;
-
 use FreeAgent\WorkflowBundle\Exception\WorkflowException;
 
-class ProcessManager
+class ProcessHandlerFactory
 {
     /**
      * @var array
@@ -31,7 +30,7 @@ class ProcessManager
     }
 
     /**
-     * Returns a process by it name.
+     * Returns a process by its name.
      *
      * @param string $name
      * @return FreeAgent\WorkflowBundle\Flow\Process
@@ -48,7 +47,7 @@ class ProcessManager
     }
 
     /**
-     * Create a new Process handler for the given process.
+     * Create a new ProcessHandler for the given process.
      *
      * @param string $processName
      * @return \FreeAgent\WorkflowBundle\Manager\ProcessHandlerInterface

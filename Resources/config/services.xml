@@ -5,18 +5,13 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <parameters>
-        <parameter key="free_agent_workflow.manager.class">FreeAgent\WorkflowBundle\Manager\Manager</parameter>
-        <parameter key="free_agent_workflow.process_manager.class">FreeAgent\WorkflowBundle\Manager\ProcessManager</parameter>
+        <parameter key="free_agent_workflow.process_handler_factory.class">FreeAgent\WorkflowBundle\Handler\ProcessHandlerFactory</parameter>
         <parameter key="free_agent_workflow.model_storage.class">FreeAgent\WorkflowBundle\Model\ModelStorage</parameter>
         <parameter key="free_agent_workflow.model_state.class">FreeAgent\WorkflowBundle\Entity\ModelState</parameter>
     </parameters>
 
     <services>
-        <service id="free_agent_workflow.manager" class="%free_agent_workflow.manager.class%">
-            <argument type="service" id="service_container" />
-        </service>
-
-        <service id="free_agent_workflow.process_manager" class="%free_agent_workflow.process_manager.class%">
+        <service id="free_agent_workflow.process_handler_factory" class="%free_agent_workflow.process_handler_factory.class%">
             <argument type="collection" />
             <argument>%free_agent_workflow.process_handler_class%</argument>
         </service>
