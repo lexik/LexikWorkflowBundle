@@ -146,6 +146,7 @@ This interface provide 2 methods:
 Here an example of a `PostModel` class we could use in the `post_publication` process.
 
 ```php
+<?php
 namespace Project\Bundle\SuperBundle\Workflow\Model;
 
 use FreeAgent\WorkflowBundle\Model\ModelInterface;
@@ -198,6 +199,7 @@ To validate a step, just create your own class with methods to check the model o
 Each method used for validation will receive the model object the workflow is currently working on.
 
 ```php
+<?php
 namespace Project\Bundle\SuperBundle\Workflow\Validators
 
 use FreeAgent\WorkflowBundle\Model\ModelInterface;
@@ -224,6 +226,7 @@ To do this you just need to create a class and define it as a service.
 Each method called will receive the model object the workflow is currently working on and the reached step.
 
 ```php
+<?php
 namespace Project\Bundle\SuperBundle\Workflow\Validators
 
 use FreeAgent\WorkflowBundle\Model\ModelInterface;
@@ -251,6 +254,7 @@ Usage
 Here a simple example of how to use the workflow:
 
 ```php
+<?php
 // create a model object (see the PostModel class defined previously in the Model object section)
 $model = new PostModel($myPost);
 
