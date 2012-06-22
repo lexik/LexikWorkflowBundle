@@ -115,11 +115,11 @@ class FreeAgentWorkflowExtension extends Extension
 
         foreach ($steps as $stepName => $stepConfig) {
             // update target reference to service id
-            foreach ($stepConfig['next_steps'] as $nextStepName => $nextStep) {
+            foreach ($stepConfig['next_states'] as $nextStepName => $nextStep) {
                 if ('step' === $nextStep['type']) {
-                    $stepConfig['next_steps'][$nextStepName]['target'] = new Reference(sprintf('free_agent_workflow.process.%s.step.%s', $processName, $nextStep['target']));
+                    $stepConfig['next_states'][$nextStepName]['target'] = new Reference(sprintf('free_agent_workflow.process.%s.step.%s', $processName, $nextStep['target']));
                 } else if ('process' === $nextStep['type']) {
-                    $stepConfig['next_steps'][$nextStepName]['target'] = new Reference(sprintf('free_agent_workflow.process.%s', $nextStep['target']));
+                    $stepConfig['next_states'][$nextStepName]['target'] = new Reference(sprintf('free_agent_workflow.process.%s', $nextStep['target']));
                 }
             }
 
@@ -138,7 +138,7 @@ class FreeAgentWorkflowExtension extends Extension
             $definition = new Definition($stepClass, array(
                 $stepName,
                 $stepConfig['label'],
-                $stepConfig['next_steps'],
+                $stepConfig['next_states'],
                 $validations,
                 $actions,
                 $stepConfig['roles'],

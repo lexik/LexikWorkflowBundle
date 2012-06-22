@@ -179,7 +179,9 @@ class ProcessHandler implements ProcessHandlerInterface
      */
     protected function checkCredentials(Step $step)
     {
-        if (!$this->security->isGranted($step->getRoles())) {
+        $roles = $step->getRoles();
+
+        if (!empty($roles) && !$this->security->isGranted($roles)) {
             throw new AccessDeniedException($step->getName());
         }
     }

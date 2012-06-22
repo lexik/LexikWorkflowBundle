@@ -24,7 +24,7 @@ processes:
                 roles: [ ROLE_ADMIN, ROLE_USER ]
 #                validations:
 #                    - workflow.validator.check_wahtever_you_need
-                next_steps:
+                next_states:
                     validate:
                         target: step_validate_doc
                     remove:

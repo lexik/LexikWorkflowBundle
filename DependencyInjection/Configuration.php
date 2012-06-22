@@ -94,7 +94,7 @@ class Configuration implements ConfigurationInterface
                                             ->defaultNull()
                                         ->end()
 
-                                        ->arrayNode('next_steps')
+                                        ->arrayNode('next_states')
                                             ->useAttributeAsKey('id')
                                             ->prototype('array')
                                                 ->addDefaultsIfNotSet()
