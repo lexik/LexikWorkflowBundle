@@ -46,7 +46,17 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('processes')
                     ->useAttributeAsKey('id')
                     ->prototype('array')
+                        ->validate()
+                            ->ifTrue(function($value) {
+                                return !empty($value['import']) && !empty($value['steps']);
+                            })
+                            ->thenInvalid('You can\'t use "import" and "steps" keys at the same time.')
+                        ->end()
                         ->children()
+                            ->scalarNode('import')
+                                ->defaultNull()
+                            ->end()
+
                             ->scalarNode('start')
                                 ->defaultNull()
                             ->end()
@@ -57,7 +67,7 @@ class Configuration implements ConfigurationInterface
                             ->end()
 
                             ->arrayNode('steps')
-                                ->isRequired()
+                                ->defaultValue(array())
                                 ->useAttributeAsKey('id')
                                 ->prototype('array')
                                     ->addDefaultsIfNotSet()

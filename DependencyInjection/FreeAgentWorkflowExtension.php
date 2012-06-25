@@ -9,6 +9,7 @@ use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Parameter;
+use Symfony\Component\Yaml\Parser;
 
 /**
  * This is the class that loads and manages your bundle configuration
@@ -78,6 +79,17 @@ class FreeAgentWorkflowExtension extends Extension
         $processReferences = array();
 
         foreach ($processes as $processName => $processConfig) {
+            if (!empty($processConfig['import'])) {
+                if (is_file($processConfig['import'])) {
+                    $yaml = new Parser();
+                    $config = $yaml->parse(file_get_contents($processConfig['import']));
+
+                    $processConfig = array_merge($processConfig, $config[$processName]);
+                } else {
+                    throw new \InvalidArgumentException(sprintf('Can\'t load process from file "%s"', $processConfig['import']));
+                }
+            }
+
             $stepReferences = $this->buildSteps($processName, $processConfig['steps'], $container, $stepClass);
 
             $definition = new Definition($processClass, array(
