@@ -2,6 +2,8 @@
 
 namespace FreeAgent\WorkflowBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+
 /**
  * Used to store a state of a model object.
  *
@@ -49,11 +51,22 @@ class ModelState
     protected $errors;
 
     /**
+     * @var ModelState
+     */
+    protected $previous;
+
+    /**
+     * @var ArrayCollection
+     */
+    protected $next;
+
+    /**
      * Construct.
      */
     public function __construct()
     {
         $this->createdAt = new \DateTime('now');
+        $this->next = new ArrayCollection();
     }
 
     /**
@@ -212,5 +225,47 @@ class ModelState
         }
 
         $this->errors = $errors;
+    }
+
+    /**
+     * Get previous
+     *
+     * @return \FreeAgent\WorkflowBundle\Entity\ModelState
+     */
+    public function getPrevious()
+    {
+        return $this->previous;
+    }
+
+    /**
+     * Set previous
+     *
+     * @param ModelState $state
+     */
+    public function setPrevious(ModelState $state)
+    {
+        $this->previous = $state;
+    }
+
+    /**
+    * Get next
+    *
+    * @return ArrayCollection
+    */
+    public function getNext()
+    {
+        return $this->next;
+    }
+
+    /**
+     * Add next
+     *
+     * @param ModelState $state
+     */
+    public function addNext(ModelState $state)
+    {
+        $state->setPrevious($this);
+
+        $this->next[] = $state;
     }
 }
