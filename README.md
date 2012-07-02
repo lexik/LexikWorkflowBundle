@@ -78,7 +78,7 @@ free_agent_workflow:
                     validations:
                         - my.validaion.service.id:methodName
                         - ...
-                    model_status: [ setStatus, Project\Bundle\SuperBundle\Workflow\Model\PostModel::STATUS_DRAFT ]
+                    model_status: [ setStatus, Project\Bundle\SuperBundle\Entity\Post::STATUS_DRAFT ]
                     actions:
                         - my.action.service.id:methodName
                         - ...
@@ -91,7 +91,7 @@ free_agent_workflow:
                     validations:
                         - my.validaion.service.id:methodName
                         - ...
-                    model_status: [ setStatus, Project\Bundle\SuperBundle\Workflow\Model\PostModel::STATUS_VALIDATED ]
+                    model_status: [ setStatus, Project\Bundle\SuperBundle\Entity\Post::STATUS_VALIDATED ]
                     actions:
                         - my.action.service.id:methodName
                         - ...
@@ -104,7 +104,7 @@ free_agent_workflow:
                     validations:
                         - my.validaion.service.id:methodName
                         - ...
-                    model_status: [ setStatus, Project\Bundle\SuperBundle\Workflow\Model\PostModel::STATUS_PUBLISHED ]
+                    model_status: [ setStatus, Project\Bundle\SuperBundle\Entity\Post::STATUS_PUBLISHED ]
                     actions:
                         - my.action.service.id:methodName
                         - ...
@@ -118,7 +118,7 @@ free_agent_workflow:
                     validations:
                         - my.validaion.service.id:methodName
                         - ...
-                    model_status: [ setStatus, Project\Bundle\SuperBundle\Workflow\Model\PostModel::STATUS_UNPUBLISHED ]
+                    model_status: [ setStatus, Project\Bundle\SuperBundle\Entity\Post::STATUS_UNPUBLISHED ]
                     actions:
                         - my.action.service.id:methodName
                         - ...
@@ -132,7 +132,7 @@ free_agent_workflow:
                     validations:
                         - my.validaion.service.id:methodName
                         - ...
-                    model_status: [ setStatus, Project\Bundle\SuperBundle\Workflow\Model\PostModel::STATUS_DELETED ]
+                    model_status: [ setStatus, Project\Bundle\SuperBundle\Entity\Post::STATUS_DELETED ]
                     actions:
                         - my.action.service.id:methodName
                         - ...
@@ -159,14 +159,6 @@ use Project\Bundle\SuperBundle\Entity\Post;
 
 class PostModel implements ModelInterface
 {
-    const STATUS_DRAFT       = 1;
-    const STATUS_VALIDATED   = 2;
-    const STATUS_PUBLISHED   = 3;
-    const STATUS_UNPUBLISHED = 4;
-    const STATUS_DELETED     = 5;
-
-    private $status;
-
     private $post;
 
     public function __construct(Post $post)
@@ -174,19 +166,19 @@ class PostModel implements ModelInterface
         $this->post = $post;
     }
 
+    public function getPost()
+    {
+        return $this->post;
+    }
+
     public function setStatus($status)
     {
-        $this->status = (int) $status;
+        $this->post->setStatus($status);
     }
 
     public function getStatus()
     {
-        return $this->status;
-    }
-
-    public function getPost()
-    {
-        return $this->post;
+        return $this->post->getStatus();
     }
 
     /**
@@ -248,7 +240,7 @@ You can easily update the status of your model through `model_status` option.
 It's a shortcut action that call a method of your model with a constant as argument and flush it.
 
 ```yaml
-model_status: [ setStatus, Project\Bundle\SuperBundle\Workflow\Model\PostModel::STATUS_PUBLISHED ]
+model_status: [ setStatus, Project\Bundle\SuperBundle\Entity\Post::STATUS_PUBLISHED ]
 ```
 
 Step actions
@@ -267,10 +259,9 @@ use FreeAgent\WorkflowBundle\Flow\Step;
 
 class PostPublicationActions
 {
-    public function setDraftStatus(ModelInterface $model, Step $step)
+    public function notifyAdmins(ModelInterface $model, Step $step)
     {
-        $model->getPost()->setStatus('draft');
-        // ...
+        // notify admins through email that a new post is on draft status...
     }
 }
 ```
@@ -297,12 +288,12 @@ $processHandler = $container->get('free_agent_workflow.handler.post_publication'
 // start the process
 $modelState = $processHandler->start($model);
 
-// $model->getStatus() === PostModel::STATUS_DRAFT
+// $model->getStatus() === Project\Bundle\SuperBundle\Entity\Post::STATUS_DRAFT
 
 // reach a next state
 $modelState = $processHandler->reachNextState($model, 'validate'); // here 'validate' is the key defined in the draft_created next states.
 
-// $model->getStatus() === PostModel::STATUS_VALIDATED
+// $model->getStatus() === Project\Bundle\SuperBundle\Entity\Post::STATUS_VALIDATED
 
 if ( ! $modelState->getSuccessful() ) {
     var_dump($modelState->getErrors());
