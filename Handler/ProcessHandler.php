@@ -110,11 +110,15 @@ class ProcessHandler implements ProcessHandlerInterface
      *
      * @param ModelInterface $model
      * @param Step $step
-     * @return FreeAgent\WorkflowBundle\Entity
+     * @return FreeAgent\WorkflowBundle\Entity\ModelState
      */
     protected function reachStep(ModelInterface $model, Step $step)
     {
-        $this->checkCredentials($step);
+        try {
+            $this->checkCredentials($step);
+        } catch (AccessDeniedException $e) {
+            return $this->storage->newModelStateError($model, $this->process->getName(), $step->getName(), array($e));
+        }
 
         $errors = $this->executeValidations($model, $step->getValidations());
 
