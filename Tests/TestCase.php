@@ -69,6 +69,7 @@ EOF;
     protected function createSchema(EntityManager $em)
     {
         $schemaTool = new \Doctrine\ORM\Tools\SchemaTool($em);
+        $schemaTool->dropSchema($em->getMetadataFactory()->getAllMetadata());
         $schemaTool->createSchema($em->getMetadataFactory()->getAllMetadata());
     }
 

@@ -48,6 +48,7 @@ class ProcessHandlerTest extends TestCase
         $this->assertTrue($modelState->getCreatedAt() instanceof \DateTime);
         $this->assertTrue(is_array($modelState->getData()));
         $this->assertEquals(0, count($modelState->getData()));
+        $this->assertEquals(FakeModel::STATUS_CREATE, $model->getStatus());
     }
 
     public function testStartWithData()
@@ -93,6 +94,7 @@ class ProcessHandlerTest extends TestCase
 
         $this->assertTrue($modelState instanceof ModelState);
         $this->assertEquals('step_validate_doc', $modelState->getStepName());
+        $this->assertEquals(FakeModel::STATUS_VALIDATE, $model->getStatus());
     }
 
     /**
@@ -181,19 +183,36 @@ class ProcessHandlerTest extends TestCase
 
     protected function getProcessHandler()
     {
-        $stepValidateDoc = new Step('step_validate_doc', 'Validate doc', array());
-        $stepRemoveDoc   = new Step('step_remove_doc', 'Remove doc', array(), array(array(new FakeValidator(), 'invalid')), array(), array(), 'step_fake');
+        $stepValidateDoc = new Step('step_validate_doc', 'Validate doc',
+            array(),
+            array(),
+            array(),
+            array('setStatus', 'FreeAgent\WorkflowBundle\Tests\Fixtures\FakeModel::STATUS_VALIDATE')
+        );
+        $stepRemoveDoc   = new Step('step_remove_doc', 'Remove doc',
+            array(),
+            array(array(new FakeValidator(), 'invalid')),
+            array(),
+            array('setStatus', 'FreeAgent\WorkflowBundle\Tests\Fixtures\FakeModel::STATUS_REMOVE'),
+            array(),
+            'step_fake'
+        );
         $stepFake        = new Step('step_fake', 'Fake', array());
-        $stepCreateDoc   = new Step('step_create_doc', 'Create doc', array(
-            'step_validate_doc' => array(
-                'type'   => 'step',
-                'target' => $stepValidateDoc,
+        $stepCreateDoc   = new Step('step_create_doc', 'Create doc',
+            array(
+                'step_validate_doc' => array(
+                    'type'   => 'step',
+                    'target' => $stepValidateDoc,
+                ),
+                'step_remove_doc' => array(
+                    'type'   => 'step',
+                    'target' => $stepRemoveDoc,
+                )
             ),
-            'step_remove_doc' => array(
-                'type'   => 'step',
-                'target' => $stepRemoveDoc,
-            ),
-        ));
+            array(),
+            array(),
+            array('setStatus', 'FreeAgent\WorkflowBundle\Tests\Fixtures\FakeModel::STATUS_CREATE')
+        );
 
         $process = new Process(
             'document_proccess',

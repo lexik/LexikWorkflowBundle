@@ -27,6 +27,11 @@ class Step implements NodeInterface
     /**
      * @var array
      */
+    protected $modelStatus;
+
+    /**
+     * @var array
+     */
     protected $validations;
 
     /**
@@ -44,19 +49,21 @@ class Step implements NodeInterface
      *
      * @param string $name
      * @param string $label
-     * @param array $nextStates
-     * @param array $validations
-     * @param array $actions
-     * @param array $roles
+     * @param array  $nextStates
+     * @param array  $validations
+     * @param array  $actions
+     * @param array  $modelStatus
+     * @param array  $roles
      * @param string $onInvalid
      */
-    public function __construct($name, $label, array $nextStates, array $validations = array(), array $actions = array(), array $roles = array(), $onInvalid = null)
+    public function __construct($name, $label, array $nextStates, array $validations = array(), array $actions = array(), array $modelStatus = array(), array $roles = array(), $onInvalid = null)
     {
         $this->name        = $name;
         $this->label       = $label;
         $this->nextStates  = $nextStates;
         $this->validations = $validations;
         $this->actions     = $actions;
+        $this->modelStatus = $modelStatus;
         $this->roles       = $roles;
         $this->onInvalid   = $onInvalid;
     }
@@ -157,6 +164,26 @@ class Step implements NodeInterface
     public function hasActions()
     {
         return !empty($this->actions);
+    }
+
+    /**
+     * Returns the status updates one the step is reached.
+     *
+     * @return array
+     */
+    public function getModelStatus()
+    {
+        return $this->modelStatus;
+    }
+
+    /**
+     * Returns true if the step has a status to update once it reached.
+     *
+     * @return boolean
+     */
+    public function hasModelStatus()
+    {
+        return !empty($this->modelStatus);
     }
 
     /**

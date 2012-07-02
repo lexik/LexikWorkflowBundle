@@ -153,6 +153,7 @@ class FreeAgentWorkflowExtension extends Extension
                 $stepConfig['next_states'],
                 $validations,
                 $actions,
+                $stepConfig['model_status'],
                 $stepConfig['roles'],
                 $stepConfig['onInvalid'],
             ));
