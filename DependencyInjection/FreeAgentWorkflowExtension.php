@@ -2,6 +2,8 @@
 
 namespace FreeAgent\WorkflowBundle\DependencyInjection;
 
+use FreeAgent\WorkflowBundle\Flow\State;
+
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
@@ -126,36 +128,20 @@ class FreeAgentWorkflowExtension extends Extension
         $stepReferences = array();
 
         foreach ($steps as $stepName => $stepConfig) {
-            // update target reference to service id
-            foreach ($stepConfig['next_states'] as $nextStepName => $nextStep) {
-                if ('step' === $nextStep['type']) {
-                    $stepConfig['next_states'][$nextStepName]['target'] = new Reference(sprintf('free_agent_workflow.process.%s.step.%s', $processName, $nextStep['target']));
-                } else if ('process' === $nextStep['type']) {
-                    $stepConfig['next_states'][$nextStepName]['target'] = new Reference(sprintf('free_agent_workflow.process.%s', $nextStep['target']));
-                }
-            }
-
-            $validations = array();
-            foreach ($stepConfig['validations'] as $validation) {
-                list($service, $method) = explode(':', $validation);
-                $validations[] = array(new Reference($service), $method);
-            }
-
-            $actions = array();
-            foreach ($stepConfig['actions'] as $action) {
-                list($service, $method) = explode(':', $action);
-                $actions[] = array(new Reference($service), $method);
-            }
+            $validations = $this->convertToServiceReferences($stepConfig['validations']);
+            $actions = $this->convertToServiceReferences($stepConfig['actions']);
 
             $definition = new Definition($stepClass, array(
                 $stepName,
                 $stepConfig['label'],
-                $stepConfig['next_states'],
+                array(),
                 $validations,
                 $actions,
                 $stepConfig['roles'],
                 $stepConfig['onInvalid'],
             ));
+
+            $this->addStepNextStates($definition, $stepConfig['next_states'], $processName);
 
             $definition->setPublic(false)
                        ->addTag(sprintf('free_agent_workflow.process.%s.step', $processName), array('alias' => $stepName));
@@ -167,5 +153,47 @@ class FreeAgentWorkflowExtension extends Extension
         }
 
         return $stepReferences;
+    }
+
+    protected function addStepNextStates(Definition $step, $stepsNextStates, $processName)
+    {
+        foreach ($stepsNextStates as $stateName => $data) {
+            $target = null;
+
+            if (State::TYPE_STEP === $data['type']) {
+                $target = new Reference(sprintf('free_agent_workflow.process.%s.step.%s', $processName, $data['target']));
+
+            } else if (State::TYPE_PROCESS === $data['type']) {
+                $target = new Reference(sprintf('free_agent_workflow.process.%s', $data['target']));
+
+            } else {
+                throw new \InvalidArgumentException(sprintf('Unknown type "%s", please use "step" or "process"', $data['type']));
+            }
+
+            $step->addMethodCall('addNextState', array(
+                $stateName,
+                $data['type'],
+                $target,
+                $this->convertToServiceReferences($data['validations'])
+            ));
+        }
+    }
+
+    /**
+     * Convert "service.id:method" string to service reference object.
+     *
+     * @param array $serviceMethods
+     * @return array
+     */
+    private function convertToServiceReferences(array $serviceMethods)
+    {
+        $references = array();
+
+        foreach ($serviceMethods as $serviceMethod) {
+            list($serviceId, $method) = explode(':', $serviceMethod);
+            $references[] = array(new Reference($serviceId), $method);
+        }
+
+        return $references;
     }
 }
