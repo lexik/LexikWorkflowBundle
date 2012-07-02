@@ -2,6 +2,7 @@
 
 namespace FreeAgent\WorkflowBundle\Handler;
 
+use FreeAgent\WorkflowBundle\Entity\ModelState;
 use FreeAgent\WorkflowBundle\Model\ModelInterface;
 
 interface ProcessHandlerInterface
@@ -10,6 +11,7 @@ interface ProcessHandlerInterface
      * Start the current process for the given model.
      *
      * @param ModelInterface $model
+     * @return ModelState
      */
     public function start(ModelInterface $model);
 
@@ -18,6 +20,7 @@ interface ProcessHandlerInterface
      *
      * @param ModelInterface $model
      * @param string $stateName
+     * @return ModelState
      */
     public function reachNextState(ModelInterface $model, $stateName);
 }

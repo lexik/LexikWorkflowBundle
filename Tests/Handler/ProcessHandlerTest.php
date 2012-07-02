@@ -2,13 +2,14 @@
 
 namespace FreeAgent\WorkflowBundle\Tests\Handler;
 
-use FreeAgent\WorkflowBundle\Tests\TestCase;
+use FreeAgent\WorkflowBundle\Flow\State;
 use FreeAgent\WorkflowBundle\Flow\Process;
 use FreeAgent\WorkflowBundle\Flow\Step;
 use FreeAgent\WorkflowBundle\Handler\ProcessHandler;
 use FreeAgent\WorkflowBundle\Model\ModelStorage;
 use FreeAgent\WorkflowBundle\Entity\ModelState;
 use FreeAgent\WorkflowBundle\Exception\ValidationException;
+use FreeAgent\WorkflowBundle\Tests\TestCase;
 Use FreeAgent\WorkflowBundle\Tests\Fixtures\FakeModel;
 use FreeAgent\WorkflowBundle\Tests\Fixtures\FakeSecurityContext;
 use FreeAgent\WorkflowBundle\Tests\Fixtures\FakeValidator;
@@ -138,7 +139,7 @@ class ProcessHandlerTest extends TestCase
         $this->assertEquals('step_fake', $modelState->getStepName());
     }
 
-    public function testExecuteStepValidations()
+    public function testExecuteValidations()
     {
         $processHandler = $this->getProcessHandler();
         $step = new Step('sample', 'Sample', array());
@@ -151,9 +152,9 @@ class ProcessHandlerTest extends TestCase
         ));
 
         $reflectionClass = new \ReflectionClass('FreeAgent\WorkflowBundle\Handler\ProcessHandler');
-        $method = $reflectionClass->getMethod('executeStepValidations');
+        $method = $reflectionClass->getMethod('executeValidations');
         $method->setAccessible(true);
-        $validationViolations = $method->invoke($processHandler, new FakeModel(), $step);
+        $validationViolations = $method->invoke($processHandler, new FakeModel(), $step->getValidations());
 
         $this->assertTrue(is_array($validationViolations));
         $this->assertEquals(0, count($validationViolations));
@@ -162,7 +163,7 @@ class ProcessHandlerTest extends TestCase
             array(new FakeValidator(), 'invalid'),
         ));
 
-        $validationViolations = $method->invoke($processHandler, new FakeModel(), $step);
+        $validationViolations = $method->invoke($processHandler, new FakeModel(), $step->getValidations());
 
         $this->assertEquals(1, count($validationViolations));
         $this->assertTrue($validationViolations[0] instanceof ValidationException);
@@ -189,6 +190,7 @@ class ProcessHandlerTest extends TestCase
             array(),
             array('setStatus', 'FreeAgent\WorkflowBundle\Tests\Fixtures\FakeModel::STATUS_VALIDATE')
         );
+
         $stepRemoveDoc   = new Step('step_remove_doc', 'Remove doc',
             array(),
             array(array(new FakeValidator(), 'invalid')),
@@ -197,22 +199,17 @@ class ProcessHandlerTest extends TestCase
             array(),
             'step_fake'
         );
+
         $stepFake        = new Step('step_fake', 'Fake', array());
+
         $stepCreateDoc   = new Step('step_create_doc', 'Create doc',
-            array(
-                'step_validate_doc' => array(
-                    'type'   => 'step',
-                    'target' => $stepValidateDoc,
-                ),
-                'step_remove_doc' => array(
-                    'type'   => 'step',
-                    'target' => $stepRemoveDoc,
-                )
-            ),
+            array(),
             array(),
             array(),
             array('setStatus', 'FreeAgent\WorkflowBundle\Tests\Fixtures\FakeModel::STATUS_CREATE')
         );
+        $stepCreateDoc->addNextState('step_validate_doc', State::TYPE_STEP, $stepValidateDoc);
+        $stepCreateDoc->addNextState('step_remove_doc', State::TYPE_STEP, $stepRemoveDoc);
 
         $process = new Process(
             'document_proccess',

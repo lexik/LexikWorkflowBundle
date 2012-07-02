@@ -134,6 +134,16 @@ class Configuration implements ConfigurationInterface
                                                     ->scalarNode('target')
                                                         ->cannotBeEmpty()
                                                     ->end()
+
+                                                    ->arrayNode('validations')
+                                                        ->validate()
+                                                            ->ifTrue(function($value) use ($validatorSyntax) {
+                                                                return (is_array($value) && $validatorSyntax($value));
+                                                            })
+                                                            ->thenInvalid('You must specify valid validation name as serviceId:method string')
+                                                        ->end()
+                                                        ->prototype('scalar')->end()
+                                                    ->end()
                                                 ->end()
                                             ->end()
                                         ->end()

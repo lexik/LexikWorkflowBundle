@@ -56,7 +56,7 @@ class Step implements NodeInterface
      * @param array  $roles
      * @param string $onInvalid
      */
-    public function __construct($name, $label, array $nextStates, array $validations = array(), array $actions = array(), array $modelStatus = array(), array $roles = array(), $onInvalid = null)
+    public function __construct($name, $label, array $nextStates = array(), array $validations = array(), array $actions = array(), array $modelStatus = array(), array $roles = array(), $onInvalid = null)
     {
         $this->name        = $name;
         $this->label       = $label;
@@ -68,6 +68,9 @@ class Step implements NodeInterface
         $this->onInvalid   = $onInvalid;
     }
 
+    /**
+     * @return string
+     */
     public function __toString()
     {
         return $this->getLabel();
@@ -119,11 +122,24 @@ class Step implements NodeInterface
      * Returns the target of the given state.
      *
      * @param string $stateName
-     * @return FreeAgent\WorkflowBundle\Flow\Step
+     * @return FreeAgent\WorkflowBundle\Flow\State
      */
-    public function getNextStateTarget($stateName)
+    public function getNextState($name)
     {
-        return $this->nextStates[$stateName]['target'];
+        return $this->nextStates[$name];
+    }
+
+    /**
+     * Create and add a new next state.
+     *
+     * @param string $name
+     * @param string $type
+     * @param Step $target
+     * @param array $validations
+     */
+    public function addNextState($name, $type, $target, array $validations = array())
+    {
+        $this->nextStates[$name] = new State($name, $type, $target, $validations);
     }
 
     /**

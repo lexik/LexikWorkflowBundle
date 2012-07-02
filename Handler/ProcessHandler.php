@@ -90,9 +90,19 @@ class ProcessHandler implements ProcessHandlerInterface
             throw new WorkflowException(sprintf('The step "%s" does not contain any next state named "%s".', $currentStep->getName(), $stateName));
         }
 
-        $step = $currentStep->getNextStateTarget($stateName);
+        $state = $currentStep->getNextState($stateName);
 
-        return $this->reachStep($model, $step);
+        // pre validations
+        $errors = $this->executeValidations($model, $state->getAdditionalValidations());
+        $modelState = null;
+
+        if (count($errors) > 0) {
+            $modelState = $this->storage->newModelStateError($model, $this->process->getName(), $state->getTarget()->getName(), $errors);
+        } else {
+            $modelState = $this->reachStep($model, $state->getTarget());
+        }
+
+        return $modelState;
     }
 
     /**
@@ -100,13 +110,17 @@ class ProcessHandler implements ProcessHandlerInterface
      *
      * @param ModelInterface $model
      * @param Step $step
-     * @return FreeAgent\WorkflowBundle\Entity
+     * @return FreeAgent\WorkflowBundle\Entity\ModelState
      */
     protected function reachStep(ModelInterface $model, Step $step)
     {
-        $this->checkCredentials($step);
+        try {
+            $this->checkCredentials($step);
+        } catch (AccessDeniedException $e) {
+            return $this->storage->newModelStateError($model, $this->process->getName(), $step->getName(), array($e));
+        }
 
-        $errors = $this->executeStepValidations($model, $step);
+        $errors = $this->executeValidations($model, $step->getValidations());
 
         if (0 === count($errors)) {
             $modelState = $this->storage->newModelStateSuccess($model, $this->process->getName(), $step->getName());
@@ -167,15 +181,15 @@ class ProcessHandler implements ProcessHandlerInterface
      * Execute validations of a given step.
      *
      * @param ModelInterface $model
-     * @param Step           $step
+     * @param array          $validations
      *
      * @return array An array of validation exceptions
      */
-    protected function executeStepValidations(ModelInterface $model, Step $step)
+    protected function executeValidations(ModelInterface $model, array $validations)
     {
         $validationViolations = array();
 
-        foreach ($step->getValidations() as $validation) {
+        foreach ($validations as $validation) {
             list($validator, $method) = $validation;
 
             try {
