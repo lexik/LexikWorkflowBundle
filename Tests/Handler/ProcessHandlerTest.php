@@ -89,12 +89,15 @@ class ProcessHandlerTest extends TestCase
     public function testReachNextState()
     {
         $model = new FakeModel();
-        $this->modelStorage->newModelStateSuccess($model, 'document_proccess', 'step_create_doc');
+        $previous = $this->modelStorage->newModelStateSuccess($model, 'document_proccess', 'step_create_doc');
 
         $modelState = $this->getProcessHandler()->reachNextState($model, 'step_validate_doc');
 
         $this->assertTrue($modelState instanceof ModelState);
         $this->assertEquals('step_validate_doc', $modelState->getStepName());
+        $this->assertTrue($modelState->getSuccessful());
+        $this->assertTrue($modelState->getPrevious() instanceof ModelState);
+        $this->assertEquals($previous->getId(), $modelState->getPrevious()->getId());
         $this->assertEquals(FakeModel::STATUS_VALIDATE, $model->getStatus());
     }
 

@@ -78,13 +78,13 @@ class ProcessHandler implements ProcessHandlerInterface
      */
     public function reachNextState(ModelInterface $model, $stateName)
     {
-        $modelState = $this->storage->findCurrentModelState($model, $this->process->getName());
+        $currentModelState = $this->storage->findCurrentModelState($model, $this->process->getName());
 
-        if ( ! ($modelState instanceof ModelState)) {
+        if ( ! ($currentModelState instanceof ModelState)) {
             throw new WorkflowException('The given model has not started this process.');
         }
 
-        $currentStep = $this->getProcessStep($modelState->getStepName());
+        $currentStep = $this->getProcessStep($currentModelState->getStepName());
 
         if (!$currentStep->hasNextState($stateName)) {
             throw new WorkflowException(sprintf('The step "%s" does not contain any next state named "%s".', $currentStep->getName(), $stateName));
@@ -97,9 +97,9 @@ class ProcessHandler implements ProcessHandlerInterface
         $modelState = null;
 
         if (count($errors) > 0) {
-            $modelState = $this->storage->newModelStateError($model, $this->process->getName(), $state->getTarget()->getName(), $errors);
+            $modelState = $this->storage->newModelStateError($model, $this->process->getName(), $state->getTarget()->getName(), $errors, $currentModelState);
         } else {
-            $modelState = $this->reachStep($model, $state->getTarget());
+            $modelState = $this->reachStep($model, $state->getTarget(), $currentModelState);
         }
 
         return $modelState;
@@ -109,25 +109,26 @@ class ProcessHandler implements ProcessHandlerInterface
      * Reach the given step.
      *
      * @param ModelInterface $model
-     * @param Step $step
+     * @param Step           $step
+     * @param ModelState     $currentModelState
      * @return FreeAgent\WorkflowBundle\Entity\ModelState
      */
-    protected function reachStep(ModelInterface $model, Step $step)
+    protected function reachStep(ModelInterface $model, Step $step, ModelState $currentModelState = null)
     {
         try {
             $this->checkCredentials($step);
         } catch (AccessDeniedException $e) {
-            return $this->storage->newModelStateError($model, $this->process->getName(), $step->getName(), array($e));
+            return $this->storage->newModelStateError($model, $this->process->getName(), $step->getName(), array($e), $currentModelState);
         }
 
         $errors = $this->executeValidations($model, $step->getValidations());
 
         if (0 === count($errors)) {
-            $modelState = $this->storage->newModelStateSuccess($model, $this->process->getName(), $step->getName());
+            $modelState = $this->storage->newModelStateSuccess($model, $this->process->getName(), $step->getName(), $currentModelState);
 
             $this->executeStepActions($model, $step);
         } else {
-            $modelState = $this->storage->newModelStateError($model, $this->process->getName(), $step->getName(), $errors);
+            $modelState = $this->storage->newModelStateError($model, $this->process->getName(), $step->getName(), $errors, $currentModelState);
 
             if ($step->getOnInvalid()) {
                 $step = $this->getProcessStep($step->getOnInvalid());
