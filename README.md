@@ -78,56 +78,61 @@ free_agent_workflow:
                     validations:
                         - my.validaion.service.id:methodName
                         - ...
+                    model_status: [ setStatus, Project\Bundle\SuperBundle\Entity\Post::STATUS_DRAFT ]
                     actions:
                         - my.action.service.id:methodName
                         - ...
                     next_states:
-                        validate: { type: step, target: validted_by_admin } # you can omit "type: step" as "step" is the default value of the "type" node. You can also use "type: process" (soon).
-                
-                validted_by_admin:
+                        validate: { type: step, target: validated_by_admin } # you can omit "type: step" as "step" is the default value of the "type" node. You can also use "type: process" (soon).
+
+                validated_by_admin:
                     label: "Post validated"
                     roles: [ ROLE_ADMIN ]
                     validations:
                         - my.validaion.service.id:methodName
                         - ...
+                    model_status: [ setStatus, Project\Bundle\SuperBundle\Entity\Post::STATUS_VALIDATED ]
                     actions:
                         - my.action.service.id:methodName
                         - ...
                     next_states:
                         publish: { target: published }
-                
+
                 published:
                     label: "Post published"
                     roles: [ ROLE_USER ]
                     validations:
                         - my.validaion.service.id:methodName
                         - ...
+                    model_status: [ setStatus, Project\Bundle\SuperBundle\Entity\Post::STATUS_PUBLISHED ]
                     actions:
                         - my.action.service.id:methodName
                         - ...
                     onInvalid: draft_created # will try to reach the "draft_created" step in case validations to reach "published" fail.
                     next_states:
                         unpublish: { target: unpublished }
-                
+
                 unpublished:
                     label: "Post unpublished"
                     roles: [ ROLE_USER ]
                     validations:
                         - my.validaion.service.id:methodName
                         - ...
+                    model_status: [ setStatus, Project\Bundle\SuperBundle\Entity\Post::STATUS_UNPUBLISHED ]
                     actions:
                         - my.action.service.id:methodName
                         - ...
                     next_states:
                         delete:  { target: deleted }
                         publish: { target: published }
-                
+
                 deleted:
                     label: "Post deleted"
                     roles: [ ROLE_ADMIN ]
                     validations:
                         - my.validaion.service.id:methodName
                         - ...
+                    model_status: [ setStatus, Project\Bundle\SuperBundle\Entity\Post::STATUS_DELETED ]
                     actions:
                         - my.action.service.id:methodName
                         - ...
@@ -160,12 +165,22 @@ class PostModel implements ModelInterface
     {
         $this->post = $post;
     }
-    
+
     public function getPost()
     {
         return $this->post;
     }
-    
+
+    public function setStatus($status)
+    {
+        $this->post->setStatus($status);
+    }
+
+    public function getStatus()
+    {
+        return $this->post->getStatus();
+    }
+
     /**
      * Returns a unique identifier.
      *
@@ -210,12 +225,22 @@ class PostPublicationValidator
     {
         // check wahtever you need.
         // if something goes wrong and $model is not valid just throw a ValidationException.
-        
+
         if ( ! $model->getPost()->getContent() ) {
             throw new FreeAgent\WorkflowBundle\Exception\ValidationException('error message');
         }
     }
 }
+```
+
+Step model status
+-----------------
+
+You can easily update the status of your model through `model_status` option.
+It's a shortcut action that call a method of your model with a constant as argument and flush it.
+
+```yaml
+model_status: [ setStatus, Project\Bundle\SuperBundle\Entity\Post::STATUS_PUBLISHED ]
 ```
 
 Step actions
@@ -234,10 +259,9 @@ use FreeAgent\WorkflowBundle\Flow\Step;
 
 class PostPublicationActions
 {
-    public function setDraftStatus(ModelInterface $model, Step $step)
+    public function notifyAdmins(ModelInterface $model, Step $step)
     {
-        $model->getPost()->setStatus('draft');
-        // ...
+        // notify admins through email that a new post is on draft status...
     }
 }
 ```
@@ -264,8 +288,12 @@ $processHandler = $container->get('free_agent_workflow.handler.post_publication'
 // start the process
 $modelState = $processHandler->start($model);
 
+// $model->getStatus() === Project\Bundle\SuperBundle\Entity\Post::STATUS_DRAFT
+
 // reach a next state
 $modelState = $processHandler->reachNextState($model, 'validate'); // here 'validate' is the key defined in the draft_created next states.
+
+// $model->getStatus() === Project\Bundle\SuperBundle\Entity\Post::STATUS_VALIDATED
 
 if ( ! $modelState->getSuccessful() ) {
     var_dump($modelState->getErrors());
