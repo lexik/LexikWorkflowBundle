@@ -30,6 +30,11 @@ class ModelStorage
         $this->repository = $this->om->getRepository($entityClass);
     }
 
+    public function flush()
+    {
+        $this->om->flush();
+    }
+
     /**
      * Returns the current model state.
      *

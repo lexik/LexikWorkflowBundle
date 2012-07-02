@@ -21,17 +21,17 @@ use Doctrine\Common\Collections\ArrayCollection;
 class ProcessHandler implements ProcessHandlerInterface
 {
     /**
-     * @var FreeAgent\WorkflowBundle\Flow\Process
+     * @var \FreeAgent\WorkflowBundle\Flow\Process
      */
     protected $process;
 
     /**
-     * @var FreeAgent\WorkflowBundle\Model\ModelStorage
+     * @var \FreeAgent\WorkflowBundle\Model\ModelStorage
      */
     protected $storage;
 
     /**
-     * @var Symfony\Component\Security\Core\SecurityContextInterface
+     * @var \Symfony\Component\Security\Core\SecurityContextInterface
      */
     protected $security;
 
@@ -125,12 +125,7 @@ class ProcessHandler implements ProcessHandlerInterface
         if (0 === count($errors)) {
             $modelState = $this->storage->newModelStateSuccess($model, $this->process->getName(), $step->getName());
 
-            // run actions
-            foreach ($step->getActions() as $action) {
-                list($service, $method) = $action;
-                $service->$method($model, $step);
-            }
-
+            $this->executeStepActions($model, $step);
         } else {
             $modelState = $this->storage->newModelStateError($model, $this->process->getName(), $step->getName(), $errors);
 
@@ -161,7 +156,29 @@ class ProcessHandler implements ProcessHandlerInterface
     }
 
     /**
-     * Execute some validations.
+     * Execute actions of a given step.
+     *
+     * @param ModelInterface $model
+     * @param Step           $step
+     */
+    protected function executeStepActions(ModelInterface $model, Step $step)
+    {
+        // update model status
+        if ($step->hasModelStatus()) {
+            list($method, $constant) = $step->getModelStatus();
+            $model->$method(constant($constant));
+            $this->storage->flush();
+        }
+
+        // run actions
+        foreach ($step->getActions() as $action) {
+            list($service, $method) = $action;
+            $service->$method($model, $step);
+        }
+    }
+
+    /**
+     * Execute validations of a given step.
      *
      * @param ModelInterface $model
      * @param array          $validations

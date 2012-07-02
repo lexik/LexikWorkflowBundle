@@ -137,6 +137,7 @@ class FreeAgentWorkflowExtension extends Extension
                 array(),
                 $validations,
                 $actions,
+                $stepConfig['model_status'],
                 $stepConfig['roles'],
                 $stepConfig['onInvalid'],
             ));
@@ -155,6 +156,14 @@ class FreeAgentWorkflowExtension extends Extension
         return $stepReferences;
     }
 
+    /**
+     * Add all next states to the step definition.
+     *
+     * @param Definition $step
+     * @param array $stepsNextStates
+     * @param string $processName
+     * @throws \InvalidArgumentException
+     */
     protected function addStepNextStates(Definition $step, $stepsNextStates, $processName)
     {
         foreach ($stepsNextStates as $stateName => $data) {
