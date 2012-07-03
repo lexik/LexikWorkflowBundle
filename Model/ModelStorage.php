@@ -58,11 +58,12 @@ class ModelStorage
      * @param ModelInterface $model
      * @param string $processName
      * @param string $stepName
+     * @param ModelState $previous
      * @return \FreeAgent\WorkflowBundle\Entity\ModelState
      */
-    public function newModelStateSuccess(ModelInterface $model, $processName, $stepName)
+    public function newModelStateSuccess(ModelInterface $model, $processName, $stepName, $previous = null)
     {
-        $modelState = $this->createModelState($model, $processName, $stepName);
+        $modelState = $this->createModelState($model, $processName, $stepName, $previous);
         $modelState->setSuccessful(true);
 
         $this->om->persist($modelState);
@@ -77,16 +78,18 @@ class ModelStorage
      * @param ModelInterface $model
      * @param string $processName
      * @param string $stepName
+     * @param ModelState $previous
+     * @param array $errors
      * @return \FreeAgent\WorkflowBundle\Entity\ModelState
      */
-    public function newModelStateError(ModelInterface $model, $processName, $stepName, array $errors)
+    public function newModelStateError(ModelInterface $model, $processName, $stepName, array $errors, $previous = null)
     {
         $messages = array();
         foreach ($errors as $error) {
             $messages[] = (string) $error;
         }
 
-        $modelState = $this->createModelState($model, $processName, $stepName);
+        $modelState = $this->createModelState($model, $processName, $stepName, $previous);
         $modelState->setSuccessful(false);
         $modelState->setErrors($messages);
 
@@ -102,15 +105,20 @@ class ModelStorage
      * @param ModelInterface $model
      * @param string $processName
      * @param string $stepName
+     * @param ModelState $previous
      * @return \FreeAgent\WorkflowBundle\Entity\ModelState
      */
-    protected function createModelState(ModelInterface $model, $processName, $stepName)
+    protected function createModelState(ModelInterface $model, $processName, $stepName, $previous = null)
     {
         $modelState = new ModelState();
         $modelState->setWorkflowIdentifier($model->getWorkflowIdentifier());
         $modelState->setProcessName($processName);
         $modelState->setStepName($stepName);
         $modelState->setData($model->getWorkflowData());
+
+        if ($previous instanceof ModelState) {
+            $modelState->setPrevious($previous);
+        }
 
         return $modelState;
     }
