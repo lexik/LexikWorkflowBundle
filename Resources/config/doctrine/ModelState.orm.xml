@@ -8,9 +8,9 @@
             table="free_agent_workflow_model_state"
             repository-class="FreeAgent\WorkflowBundle\Model\ModelStateRepository">
 
-        <unique-constraints>
-            <unique-constraint name="identifier_process_step_idx" columns="workflow_identifier,process_name,step_name" />
-        </unique-constraints>
+        <indexes>
+            <index name="identifier_idx" columns="workflow_identifier"/>
+        </indexes>
 
         <id name="id" type="integer" column="id">
             <generator strategy="AUTO"/>
