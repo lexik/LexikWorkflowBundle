@@ -44,12 +44,10 @@ class ModelStorage
      */
     public function findCurrentModelState(ModelInterface $model, $processName)
     {
-        $modelState = $this->repository->findLatestModelState(
+        return $this->repository->findLatestModelState(
             $model->getWorkflowIdentifier(),
             $processName
         );
-
-        return $modelState;
     }
 
     /**

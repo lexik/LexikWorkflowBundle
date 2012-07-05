@@ -140,6 +140,19 @@ class ProcessHandler implements ProcessHandlerInterface
     }
 
     /**
+     * Returns the current model state.
+     *
+     * @param ModelInterface $model
+     * @param string         $processName
+     *
+     * @return FreeAgent\WorkflowBundle\Entity\ModelState
+     */
+    public function getCurrentState(ModelInterface $model, $processName)
+    {
+        return $this->storage->findCurrentModelState($model, $processName);
+    }
+
+    /**
      * Returns a step by its name.
      *
      * @param string $stepName
