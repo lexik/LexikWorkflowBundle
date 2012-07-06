@@ -30,6 +30,9 @@ class ModelStorage
         $this->repository = $this->om->getRepository($entityClass);
     }
 
+    /**
+     * Flush changes.
+     */
     public function flush()
     {
         $this->om->flush();
@@ -47,6 +50,23 @@ class ModelStorage
         return $this->repository->findLatestModelState(
             $model->getWorkflowIdentifier(),
             $processName
+        );
+    }
+
+    /**
+     * Returns all model states.
+     *
+     * @param ModelInterface $model
+     * @param string $processName
+     * @param string $successOnly
+     * @return array
+     */
+    public function findAllModelStates(ModelInterface $model, $processName, $successOnly = true)
+    {
+        return $this->repository->findModelStates(
+            $model->getWorkflowIdentifier(),
+            $processName,
+            $successOnly
         );
     }
 

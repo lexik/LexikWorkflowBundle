@@ -28,4 +28,30 @@ class ModelStateRepository extends EntityRepository
 
         return isset($results[0]) ? $results[0] : null;
     }
+
+    /**
+     * Returns all model states for the given workflow identifier.
+     *
+     * @param string $workflowIdentifier
+     * @param string $processName
+     * @param boolean $successOnly
+     * @return array
+     */
+    public function findModelStates($workflowIdentifier, $processName, $successOnly)
+    {
+        $qb = $this->createQueryBuilder('ms')
+            ->andWhere('ms.workflowIdentifier = :workflow_identifier')
+            ->andWhere('ms.processName = :process')
+            ->orderBy('ms.createdAt', 'ASC')
+            ->setParameter('workflow_identifier', $workflowIdentifier)
+            ->setParameter('process', $processName)
+        ;
+
+        if ($successOnly) {
+            $qb->andWhere('ms.successful = :success')
+                ->setParameter('success', true);
+        }
+
+        return $qb->getQuery()->getResult();
+    }
 }

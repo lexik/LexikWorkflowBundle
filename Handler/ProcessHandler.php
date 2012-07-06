@@ -152,6 +152,18 @@ class ProcessHandler implements ProcessHandlerInterface
     }
 
     /**
+     * Returns all model state of the given model object.
+     *
+     * @param ModelInterface $model
+     * @param boolean $successOnly
+     * @return array
+     */
+    public function getAllStates(ModelInterface $model, $successOnly = true)
+    {
+        return $this->storage->findAllModelStates($model, $this->process->getName(), $successOnly);
+    }
+
+    /**
      * Returns a step by its name.
      *
      * @param string $stepName

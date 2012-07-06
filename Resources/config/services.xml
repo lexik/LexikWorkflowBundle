@@ -20,6 +20,12 @@
             <argument type="service" id="doctrine.orm.entity_manager" />
             <argument>%free_agent_workflow.model_state.class%</argument>
         </service>
+        
+        <!-- Twig extension -->
+        <service id="free_agent_workflow.twig.workflow_extension" class="FreeAgent\WorkflowBundle\Twig\Extension\WorkflowExtension" public="false">
+            <argument type="service" id="free_agent_workflow.process_handler_factory" />
+            <tag name="twig.extension" />
+        </service>
     </services>
 
 </container>
