@@ -26,12 +26,12 @@
 
         <field name="createdAt" column="created_at" type="datetime" />
 
-        <field name="data" column="data" type="string" nullable="true" />
+        <field name="data" column="data" type="text" nullable="true" />
 
-        <field name="errors" column="errors" type="string" nullable="true" />
-        
+        <field name="errors" column="errors" type="text" nullable="true" />
+
         <one-to-many field="next" target-entity="FreeAgent\WorkflowBundle\Entity\ModelState" mapped-by="previous" />
-        
+
         <many-to-one field="previous" target-entity="FreeAgent\WorkflowBundle\Entity\ModelState" inversed-by="next">
             <join-column name="previous_id" referenced-column-name="id" />
         </many-to-one>
