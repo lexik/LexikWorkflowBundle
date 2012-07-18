@@ -19,7 +19,7 @@ class ModelStateRepository extends EntityRepository
             ->andWhere('ms.workflowIdentifier = :workflow_identifier')
             ->andWhere('ms.processName = :process')
             ->andWhere('ms.successful = :success')
-            ->orderBy('ms.createdAt', 'DESC')
+            ->orderBy('ms.id', 'DESC')
             ->setParameter('workflow_identifier', $workflowIdentifier)
             ->setParameter('process', $processName)
             ->setParameter('success', true)
