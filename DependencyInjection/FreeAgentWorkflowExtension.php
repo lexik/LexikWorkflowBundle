@@ -37,9 +37,9 @@ class FreeAgentWorkflowExtension extends Extension
         $processReferences = $this->buildProcesses($config['processes'], $container, $config['flow_process_class'], $config['flow_step_class']);
         $this->buildProcessHandlers($processReferences, $container, $config['process_handler_class']);
 
-        // inject processes into ProcessHandlerFactory (not possible from a CompilerPass because definitions are loaded from Extension class...)
-        if ($container->hasDefinition('free_agent_workflow.process_handler_factory')) {
-            $container->findDefinition('free_agent_workflow.process_handler_factory')->replaceArgument(0, $processReferences);
+        // inject processes into ProcessAggregator (not possible from a CompilerPass because definitions are loaded from Extension class...)
+        if ($container->hasDefinition('free_agent_workflow.process_aggregator')) {
+            $container->findDefinition('free_agent_workflow.process_aggregator')->replaceArgument(0, $processReferences);
         }
     }
 
@@ -54,13 +54,11 @@ class FreeAgentWorkflowExtension extends Extension
     {
         foreach ($processReferences as $processName => $processReference) {
             $definition = new Definition($processHandlerClass, array(
-                $processName,
+                new Reference(sprintf('free_agent_workflow.process.%s', $processName)),
                 new Reference('free_agent_workflow.model_storage'),
             ));
 
-            $definition->addMethodCall('setSecurityContext', array(new Reference('security.context')))
-                       ->setFactoryService(new Reference('free_agent_workflow.process_handler_factory'))
-                       ->setFactoryMethod('createProcessHandler');
+            $definition->addMethodCall('setSecurityContext', array(new Reference('security.context')));
 
             $container->setDefinition(sprintf('free_agent_workflow.handler.%s', $processName), $definition);
         }

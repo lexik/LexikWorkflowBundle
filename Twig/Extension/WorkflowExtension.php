@@ -3,24 +3,24 @@
 namespace FreeAgent\WorkflowBundle\Twig\Extension;
 
 use FreeAgent\WorkflowBundle\Entity\ModelState;
-use FreeAgent\WorkflowBundle\Handler\ProcessHandlerFactory;
+use FreeAgent\WorkflowBundle\Handler\ProcessAggregator;
 use FreeAgent\WorkflowBundle\Flow\Step;
 
 class WorkflowExtension extends \Twig_Extension
 {
     /**
-     * @var ProcessHandlerFactory
+     * @var ProcessAggregator
      */
-    private $factory;
+    private $aggregator;
 
     /**
      * Construct.
      *
-     * @param ProcessHandlerFactory $factory
+     * @param ProcessAggregator $aggregator
      */
-    public function __construct(ProcessHandlerFactory $factory)
+    public function __construct(ProcessAggregator $aggregator)
     {
-        $this->factory = $factory;
+        $this->aggregator = $aggregator;
     }
 
     /**
@@ -50,7 +50,7 @@ class WorkflowExtension extends \Twig_Extension
      */
     public function getStepLabel(ModelState $state)
     {
-        $step = $this->factory
+        $step = $this->aggregator
             ->getProcess($state->getProcessName())
             ->getStep($state->getStepName());
 

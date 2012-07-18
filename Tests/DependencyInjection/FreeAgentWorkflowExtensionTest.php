@@ -5,7 +5,7 @@ namespace FreeAgent\WorkflowBundle\Tests\DependencyInjection;
 use FreeAgent\WorkflowBundle\Tests\TestCase;
 use FreeAgent\WorkflowBundle\DependencyInjection\FreeAgentWorkflowExtension;
 use FreeAgent\WorkflowBundle\Flow\Process;
-use FreeAgent\WorkflowBundle\Handler\ProcessHandlerFactory;
+use FreeAgent\WorkflowBundle\Handler\ProcessAggregator;
 use FreeAgent\WorkflowBundle\Handler\ProcessHandler;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -35,8 +35,8 @@ class FreeAgentWorkflowExtensionTest extends TestCase
         $this->assertTrue($container->getDefinition('free_agent_workflow.process.document_proccess.step.step_remove_doc') instanceof Definition);
         $this->assertTrue($container->getDefinition('free_agent_workflow.handler.document_proccess') instanceof Definition);
 
-        $processHandlerFactory = $container->get('free_agent_workflow.process_handler_factory');
-        $this->assertTrue($processHandlerFactory instanceof ProcessHandlerFactory);
+        $processHandlerFactory = $container->get('free_agent_workflow.process_aggregator');
+        $this->assertTrue($processHandlerFactory instanceof ProcessAggregator);
         $this->assertTrue($processHandlerFactory->getProcess('document_proccess') instanceof Process);
 
         $processHandler = $container->get('free_agent_workflow.handler.document_proccess');
