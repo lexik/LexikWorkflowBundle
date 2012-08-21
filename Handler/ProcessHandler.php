@@ -58,7 +58,7 @@ class ProcessHandler implements ProcessHandlerInterface
     }
 
     /**
-     * @see FreeAgent\WorkflowBundle\Handler.ProcessHandlerInterface::start()
+     * {@inheritdoc}
      */
     public function start(ModelInterface $model)
     {
@@ -74,7 +74,7 @@ class ProcessHandler implements ProcessHandlerInterface
     }
 
     /**
-     * @see FreeAgent\WorkflowBundle\Handler.ProcessHandlerInterface::reachStep()
+     * {@inheritdoc}
      */
     public function reachNextState(ModelInterface $model, $stateName)
     {
@@ -140,15 +140,21 @@ class ProcessHandler implements ProcessHandlerInterface
     }
 
     /**
-     * Returns the current model state.
-     *
-     * @param ModelInterface $model
-     *
-     * @return FreeAgent\WorkflowBundle\Entity\ModelState
+     * {@inheritdoc}
      */
     public function getCurrentState(ModelInterface $model)
     {
         return $this->storage->findCurrentModelState($model, $this->process->getName());
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isProcessComplete(ModelInterface $model)
+    {
+        $state = $this->getCurrentState($model);
+
+        return in_array($state->getStepName(), $this->process->getEndSteps());
     }
 
     /**

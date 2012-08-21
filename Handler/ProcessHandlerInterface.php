@@ -23,4 +23,20 @@ interface ProcessHandlerInterface
      * @return ModelState
      */
     public function reachNextState(ModelInterface $model, $stateName);
+
+    /**
+     * Returns the current model state.
+     *
+     * @param ModelInterface $model
+     * @return ModelState
+     */
+    public function getCurrentState(ModelInterface $model);
+
+    /**
+     * Returns true if the given model has completed the process.
+     *
+     * @param ModelInterface $model
+     * @return boolean
+     */
+    public function isProcessComplete(ModelInterface $model);
 }

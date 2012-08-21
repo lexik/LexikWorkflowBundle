@@ -36,7 +36,7 @@ class Process implements NodeInterface
      * @param string $startStep
      * @param array  $endSteps
      */
-    public function __construct($name, array $steps, $startStep, $endSteps)
+    public function __construct($name, array $steps, $startStep, array $endSteps)
     {
         $this->name      = $name;
         $this->steps     = new ArrayCollection($steps);
@@ -89,5 +89,15 @@ class Process implements NodeInterface
     public function getStartStep()
     {
         return $this->startStep;
+    }
+
+    /**
+     * Returns an array of step name.
+     *
+     * @return array
+     */
+    public function getEndSteps()
+    {
+        return $this->endSteps;
     }
 }
