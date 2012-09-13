@@ -71,6 +71,20 @@ class ModelStorage
     }
 
     /**
+     * Delete all model states.
+     *
+     * @param ModelInterface $model
+     * @param string $processName
+     */
+    public function deleteAllModelStates(ModelInterface $model, $processName = null)
+    {
+        return $this->repository->deleteModelStates(
+            $model->getWorkflowIdentifier(),
+            $processName
+        );
+    }
+
+    /**
      * Create a new successful model state.
      *
      * @param ModelInterface $model

@@ -54,4 +54,26 @@ class ModelStateRepository extends EntityRepository
 
         return $qb->getQuery()->getResult();
     }
+
+    /**
+     * Delete all model states for the given workflowIndentifier (and process name if given).
+     *
+     * @param string $workflowIdentifier
+     * @param string $processName
+     * @return int
+     */
+    public function deleteModelStates($workflowIdentifier, $processName = null)
+    {
+        $qb = $this->_em->createQueryBuilder()
+            ->delete($this->_entityName, 'ms')
+            ->andWhere('ms.workflowIdentifier = :workflow_identifier')
+            ->setParameter('workflow_identifier', $workflowIdentifier);
+
+        if (null !== $processName) {
+            $qb->andWhere('ms.processName = :process')
+                ->setParameter('process', $processName);
+        }
+
+        return $qb->getQuery()->getResult();
+    }
 }
