@@ -137,7 +137,7 @@ class FreeAgentWorkflowExtension extends Extension
                 $actions,
                 $stepConfig['model_status'],
                 $stepConfig['roles'],
-                $stepConfig['onInvalid'],
+                $stepConfig['on_invalid'],
             ));
 
             $this->addStepNextStates($definition, $stepConfig['next_states'], $processName);

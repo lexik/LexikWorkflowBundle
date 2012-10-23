@@ -114,7 +114,7 @@ class Configuration implements ConfigurationInterface
                                             ->prototype('scalar')->end()
                                         ->end()
 
-                                        ->scalarNode('onInvalid')
+                                        ->scalarNode('on_invalid')
                                             ->defaultNull()
                                         ->end()
 

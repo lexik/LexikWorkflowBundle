@@ -51,7 +51,7 @@ How does it work ?
 To define your workflow you will have to discribe some processes, a process consists of a sequence of connected steps.
 A step contains some validations, actions and roles. A step can't be reached if the current user in session does not have roles defined on this step.
 Validations are executed when you try to reach the step, if those validations are successful we consider the step has been reached and we run all actions defined on the reached step.
-If validations fail, you will stay on the current step except if the "onInvalid" step if defined, in this case you won't stay on the current step but we will try to reach the "onInvalid" step.
+If validations fail, you will stay on the current step except if the "on_invalid" step if defined, in this case you won't stay on the current step but we will try to reach the "on_invalid" step.
 The workflow work on a "model" object, a model is a class that implements `FreeAgent\WorkflowBundle\Model\ModelInterface`.
 Each times a model try to reach a step we store a row in the database to keep the steps history.
 
@@ -62,7 +62,7 @@ Workflow definition
 Let's we need to define a simple workflow to create and publish a post.
 First we have to create a draft, then an admin must validate this draft and after that it can be published.
 Once the post is published any user can unpublish it, and if the post is not published an admin can delete it.
-And let's say that if the validation to reach the published step fail we will go back to the draft step (this is just to use the "onInvalid" option).
+And let's say that if the validation to reach the published step fail we will go back to the draft step (this is just to use the "on_invalid" option).
 
 ```yaml
 # app/config/config.yml
@@ -108,7 +108,7 @@ free_agent_workflow:
                     actions:
                         - my.action.service.id:methodName
                         - ...
-                    onInvalid: draft_created # will try to reach the "draft_created" step in case validations to reach "published" fail.
+                    on_invalid: draft_created # will try to reach the "draft_created" step in case validations to reach "published" fail.
                     next_states:
                         unpublish: { target: unpublished }
 
