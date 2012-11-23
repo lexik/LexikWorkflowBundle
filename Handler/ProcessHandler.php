@@ -198,7 +198,6 @@ class ProcessHandler implements ProcessHandlerInterface
         if ($step->hasModelStatus()) {
             list($method, $constant) = $step->getModelStatus();
             $model->$method(constant($constant));
-            $this->storage->flush();
         }
 
         // run actions

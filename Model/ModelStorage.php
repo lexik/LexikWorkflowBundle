@@ -31,14 +31,6 @@ class ModelStorage
     }
 
     /**
-     * Flush changes.
-     */
-    public function flush()
-    {
-        $this->om->flush();
-    }
-
-    /**
      * Returns the current model state.
      *
      * @param ModelInterface $model
@@ -99,7 +91,7 @@ class ModelStorage
         $modelState->setSuccessful(true);
 
         $this->om->persist($modelState);
-        $this->om->flush();
+        $this->om->flush($modelState);
 
         return $modelState;
     }
@@ -126,7 +118,7 @@ class ModelStorage
         $modelState->setErrors($messages);
 
         $this->om->persist($modelState);
-        $this->om->flush();
+        $this->om->flush($modelState);
 
         return $modelState;
     }
