@@ -33,7 +33,7 @@
         <one-to-many field="next" target-entity="FreeAgent\WorkflowBundle\Entity\ModelState" mapped-by="previous" />
 
         <many-to-one field="previous" target-entity="FreeAgent\WorkflowBundle\Entity\ModelState" inversed-by="next">
-            <join-column name="previous_id" referenced-column-name="id" />
+            <join-column name="previous_id" referenced-column-name="id" on-delete="SET NULL" />
         </many-to-one>
 
     </entity>
