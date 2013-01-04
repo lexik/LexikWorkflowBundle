@@ -56,6 +56,7 @@ class FreeAgentWorkflowExtension extends Extension
             $definition = new Definition($processHandlerClass, array(
                 new Reference(sprintf('free_agent_workflow.process.%s', $processName)),
                 new Reference('free_agent_workflow.model_storage'),
+                new Reference('event_dispatcher'),
             ));
 
             $definition->addMethodCall('setSecurityContext', array(new Reference('security.context')));

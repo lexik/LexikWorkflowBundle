@@ -79,9 +79,6 @@ free_agent_workflow:
                         - my.validaion.service.id:methodName
                         - ...
                     model_status: [ setStatus, Project\Bundle\SuperBundle\Entity\Post::STATUS_DRAFT ]
-                    actions:
-                        - my.action.service.id:methodName
-                        - ...
                     next_states:
                         validate: { type: step, target: validated_by_admin } # you can omit "type: step" as "step" is the default value of the "type" node. You can also use "type: process" (soon).
 
@@ -92,9 +89,6 @@ free_agent_workflow:
                         - my.validaion.service.id:methodName
                         - ...
                     model_status: [ setStatus, Project\Bundle\SuperBundle\Entity\Post::STATUS_VALIDATED ]
-                    actions:
-                        - my.action.service.id:methodName
-                        - ...
                     next_states:
                         publish: { target: published }
 
@@ -105,9 +99,6 @@ free_agent_workflow:
                         - my.validaion.service.id:methodName
                         - ...
                     model_status: [ setStatus, Project\Bundle\SuperBundle\Entity\Post::STATUS_PUBLISHED ]
-                    actions:
-                        - my.action.service.id:methodName
-                        - ...
                     on_invalid: draft_created # will try to reach the "draft_created" step in case validations to reach "published" fail.
                     next_states:
                         unpublish: { target: unpublished }
@@ -119,9 +110,6 @@ free_agent_workflow:
                         - my.validaion.service.id:methodName
                         - ...
                     model_status: [ setStatus, Project\Bundle\SuperBundle\Entity\Post::STATUS_UNPUBLISHED ]
-                    actions:
-                        - my.action.service.id:methodName
-                        - ...
                     next_states:
                         delete:  { target: deleted }
                         publish: { target: published }
@@ -133,9 +121,6 @@ free_agent_workflow:
                         - my.validaion.service.id:methodName
                         - ...
                     model_status: [ setStatus, Project\Bundle\SuperBundle\Entity\Post::STATUS_DELETED ]
-                    actions:
-                        - my.action.service.id:methodName
-                        - ...
                     next_states: ~
 ```
 
@@ -246,25 +231,8 @@ model_status: [ setStatus, Project\Bundle\SuperBundle\Entity\Post::STATUS_PUBLIS
 Step actions
 ------------
 
-If you need to execute some logic once a step is reached, you can add some actions on the step.
-To do this you just need to create a class and define it as a service.
-Each method called will receive the model object the workflow is currently working on and the reached step.
-
-```php
-<?php
-namespace Project\Bundle\SuperBundle\Workflow\Validators
-
-use FreeAgent\WorkflowBundle\Model\ModelInterface;
-use FreeAgent\WorkflowBundle\Flow\Step;
-
-class PostPublicationActions
-{
-    public function notifyAdmins(ModelInterface $model, Step $step)
-    {
-        // notify admins through email that a new post is on draft status...
-    }
-}
-```
+If you need to execute some logic once a step is reached, you just need to listen the `process.step_reached` event.
+You will get a `FreeAgent\WorkflowBundle\Event\StepEvent` object on wich you can get the step, the model and the last model state.
 
 Step roles
 ----------
