@@ -64,6 +64,8 @@ class StepEvent
 
     /**
      * Returs the last model state.
+     *
+     * @return ModelState
      */
     public function getModelState()
     {

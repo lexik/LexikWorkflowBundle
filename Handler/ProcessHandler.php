@@ -5,7 +5,6 @@ namespace FreeAgent\WorkflowBundle\Handler;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 
-use FreeAgent\WorkflowBundle\Event\WorkflowEvents;
 use FreeAgent\WorkflowBundle\Event\StepEvent;
 use FreeAgent\WorkflowBundle\Exception\WorkflowException;
 use FreeAgent\WorkflowBundle\Exception\AccessDeniedException;
@@ -142,11 +141,13 @@ class ProcessHandler implements ProcessHandlerInterface
                 $model->$method(constant($constant));
             }
 
-            $this->dispatcher->dispatch(WorkflowEvents::STEP_REACHED, new StepEvent($step, $model, $modelState));
+            $eventName = sprintf('%s.%s.reached', $this->process->getName() , $step->getName());
+            $this->dispatcher->dispatch($eventName, new StepEvent($step, $model, $modelState));
         } else {
             $modelState = $this->storage->newModelStateError($model, $this->process->getName(), $step->getName(), $errors, $currentModelState);
 
-            $this->dispatcher->dispatch(WorkflowEvents::STEP_VALIDATION_FAIL, new StepEvent($step, $model, $modelState));
+            $eventName = sprintf('%s.%s.validation_fail', $this->process->getName() , $step->getName());
+            $this->dispatcher->dispatch($eventName, new StepEvent($step, $model, $modelState));
 
             if ($step->getOnInvalid()) {
                 $step = $this->getProcessStep($step->getOnInvalid());
