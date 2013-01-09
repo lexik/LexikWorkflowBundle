@@ -2,6 +2,8 @@
 
 namespace FreeAgent\WorkflowBundle\Event;
 
+use Symfony\Component\EventDispatcher\Event;
+
 use FreeAgent\WorkflowBundle\Entity\ModelState;
 use FreeAgent\WorkflowBundle\Model\ModelInterface;
 use FreeAgent\WorkflowBundle\Flow\Step;
@@ -11,7 +13,7 @@ use FreeAgent\WorkflowBundle\Flow\Step;
  *
  * @author Cédric Girard <c.girard@lexik.fr>
  */
-class StepEvent
+class StepEvent extends Event
 {
     /**
      * @var Step
