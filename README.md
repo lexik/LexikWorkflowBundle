@@ -235,6 +235,52 @@ If you need to execute some logic once a step is successfuly reached, you just n
 You will get a `FreeAgent\WorkflowBundle\Event\StepEvent` object on wich you can get the step, the model and the last model state.
 In case of the step is not reached due to validation error you can listen the `<process_name>.<step_name>.validation_fail` event.
 
+Let's see a simple example, here I listen events for the step `published` from the `post_publication` process.
+
+```php
+<?php
+
+namespace Project\Bundle\SuperBundle\Workflow\Listener;
+
+use FreeAgent\WorkflowBundle\Event\StepEvent;
+
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+
+class PostPublicationProcessSubscriber implements EventSubscriberInterface
+{
+    /**
+     * {@inheritDoc}
+     */
+    public static function getSubscribedEvents()
+    {
+        return array(
+            'post_publication.published.reached' => array(
+                'handleSuccessfulyPublished',
+            ),
+            'post_publication.published.validation_fail' => array(
+                'handleValidationFail',
+            ),
+        );
+    }
+    
+    public function handleSuccessfulyPublished(StepEvent $event)
+    {
+    	// ... 
+    }
+    
+    public function handleValidationFail(StepEvent $event)
+    {
+    	// ...
+    }
+}
+```
+
+```xml
+<service id="project.workflow.listener.post_publication" class="Project\Bundle\SuperBundle\Workflow\Listener\PostPublicationProcessSubscriber">
+    <tag name="kernel.event_subscriber" />
+</service>
+```
+
 Step roles
 ----------
 
