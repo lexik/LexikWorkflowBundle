@@ -231,8 +231,9 @@ model_status: [ setStatus, Project\Bundle\SuperBundle\Entity\Post::STATUS_PUBLIS
 Step actions
 ------------
 
-If you need to execute some logic once a step is reached, you just need to listen the `process.step_reached` event.
+If you need to execute some logic once a step is successfuly reached, you just need to listen the `<process_name>.<step_name>.reached` event.
 You will get a `FreeAgent\WorkflowBundle\Event\StepEvent` object on wich you can get the step, the model and the last model state.
+In case of the step is not reached due to validation error you can listen the `<process_name>.<step_name>.validation_fail` event.
 
 Step roles
 ----------
