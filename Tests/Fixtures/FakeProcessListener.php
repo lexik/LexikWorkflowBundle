@@ -2,11 +2,11 @@
 
 namespace FreeAgent\WorkflowBundle\Tests\Fixtures;
 
-class FakeAction
+class FakeProcessListener
 {
     static public $call = 0;
 
-    public function call()
+    public function handleSucccess()
     {
         self::$call++;
     }

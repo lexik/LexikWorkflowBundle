@@ -2,6 +2,10 @@
 
 namespace FreeAgent\WorkflowBundle\Tests\Handler;
 
+use FreeAgent\WorkflowBundle\Tests\Fixtures\FakeProcessListener;
+
+use Symfony\Component\EventDispatcher\EventDispatcher;
+
 use FreeAgent\WorkflowBundle\Flow\State;
 use FreeAgent\WorkflowBundle\Flow\Process;
 use FreeAgent\WorkflowBundle\Flow\Step;
@@ -113,23 +117,16 @@ class ProcessHandlerTest extends TestCase
         $modelState = $this->getProcessHandler()->reachNextState($model, 'step_fake');
     }
 
-    public function testReachNextStateWithActions()
+    public function testReachNextStateWithListener()
     {
-        $step = new Step('sample', 'Sample', array());
-
-        $reflectionClass = new \ReflectionClass('FreeAgent\WorkflowBundle\Flow\Step');
-        $property = $reflectionClass->getProperty('actions');
-        $property->setAccessible(true);
-        $property->setValue($step, array(
-            array(new FakeAction(), 'call'),
-        ));
+        $this->assertEquals(0, FakeProcessListener::$call);
 
         $reflectionClass = new \ReflectionClass('FreeAgent\WorkflowBundle\Handler\ProcessHandler');
         $method = $reflectionClass->getMethod('reachStep');
         $method->setAccessible(true);
-        $method->invoke($this->getProcessHandler(), new FakeModel(), $step);
+        $method->invoke($this->getProcessHandler(), new FakeModel(), new Step('step_fake', 'Fake'));
 
-        $this->assertEquals(1, FakeAction::$call);
+        $this->assertEquals(1, FakeProcessListener::$call);
     }
 
     public function testReachNextStateError()
@@ -190,14 +187,12 @@ class ProcessHandlerTest extends TestCase
         $stepValidateDoc = new Step('step_validate_doc', 'Validate doc',
             array(),
             array(),
-            array(),
             array('setStatus', 'FreeAgent\WorkflowBundle\Tests\Fixtures\FakeModel::STATUS_VALIDATE')
         );
 
         $stepRemoveDoc   = new Step('step_remove_doc', 'Remove doc',
             array(),
             array(array(new FakeValidator(), 'invalid')),
-            array(),
             array('setStatus', 'FreeAgent\WorkflowBundle\Tests\Fixtures\FakeModel::STATUS_REMOVE'),
             array(),
             'step_fake'
@@ -206,7 +201,6 @@ class ProcessHandlerTest extends TestCase
         $stepFake        = new Step('step_fake', 'Fake', array());
 
         $stepCreateDoc   = new Step('step_create_doc', 'Create doc',
-            array(),
             array(),
             array(),
             array('setStatus', 'FreeAgent\WorkflowBundle\Tests\Fixtures\FakeModel::STATUS_CREATE')
@@ -226,7 +220,10 @@ class ProcessHandlerTest extends TestCase
             array('step_validate_doc')
         );
 
-        $processHandler = new ProcessHandler($process, $this->modelStorage);
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addListener('document_proccess.step_fake.reached', array(new FakeProcessListener(), 'handleSucccess'));
+
+        $processHandler = new ProcessHandler($process, $this->modelStorage, $dispatcher);
         $processHandler->setSecurityContext(new FakeSecurityContext());
 
         return $processHandler;

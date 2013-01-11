@@ -29,8 +29,6 @@ processes:
                         target: step_validate_doc
                     remove:
                         target: step_remove_doc
-#                actions:
-#                    - workflow.action.send_email
             step_validate_doc:
                 roles: [ ROLE_ADMIN, ROLE_USER ]
 #                validations:

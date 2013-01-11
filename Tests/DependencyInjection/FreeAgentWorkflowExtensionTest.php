@@ -8,6 +8,7 @@ use FreeAgent\WorkflowBundle\Flow\Process;
 use FreeAgent\WorkflowBundle\Handler\ProcessAggregator;
 use FreeAgent\WorkflowBundle\Handler\ProcessHandler;
 
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 
@@ -20,6 +21,7 @@ class FreeAgentWorkflowExtensionTest extends TestCase
         // fake entity manager and security context services
         $container->set('doctrine.orm.entity_manager', $this->getMockSqliteEntityManager());
         $container->set('security.context', $this->getMockSecurityContext());
+        $container->set('event_dispatcher', new EventDispatcher());
 
         $extension = new FreeAgentWorkflowExtension();
         $extension->load(array($this->getSimpleConfig()), $container);
