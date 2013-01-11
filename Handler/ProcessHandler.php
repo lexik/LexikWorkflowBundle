@@ -2,8 +2,10 @@
 
 namespace FreeAgent\WorkflowBundle\Handler;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 
+use FreeAgent\WorkflowBundle\Event\StepEvent;
 use FreeAgent\WorkflowBundle\Exception\WorkflowException;
 use FreeAgent\WorkflowBundle\Exception\AccessDeniedException;
 use FreeAgent\WorkflowBundle\Exception\ValidationException;
@@ -21,30 +23,37 @@ use Doctrine\Common\Collections\ArrayCollection;
 class ProcessHandler implements ProcessHandlerInterface
 {
     /**
-     * @var \FreeAgent\WorkflowBundle\Flow\Process
+     * @var Process
      */
     protected $process;
 
     /**
-     * @var \FreeAgent\WorkflowBundle\Model\ModelStorage
+     * @var ModelStorage
      */
     protected $storage;
 
     /**
-     * @var \Symfony\Component\Security\Core\SecurityContextInterface
+     * @var SecurityContextInterface
      */
     protected $security;
+
+    /**
+     * @var EventDispatcherInterface
+     */
+    protected $dispatcher;
 
     /**
      * Construct.
      *
      * @param Process      $process
      * @param ModelStorage $storage
+     * @param EventDispatcherInterface $dispatcher
      */
-    public function __construct(Process $process, ModelStorage $storage)
+    public function __construct(Process $process, ModelStorage $storage, EventDispatcherInterface $dispatcher)
     {
         $this->process = $process;
         $this->storage = $storage;
+        $this->dispatcher = $dispatcher;
     }
 
     /**
@@ -126,9 +135,19 @@ class ProcessHandler implements ProcessHandlerInterface
         if (0 === count($errors)) {
             $modelState = $this->storage->newModelStateSuccess($model, $this->process->getName(), $step->getName(), $currentModelState);
 
-            $this->executeStepActions($model, $step);
+            // update model status
+            if ($step->hasModelStatus()) {
+                list($method, $constant) = $step->getModelStatus();
+                $model->$method(constant($constant));
+            }
+
+            $eventName = sprintf('%s.%s.reached', $this->process->getName() , $step->getName());
+            $this->dispatcher->dispatch($eventName, new StepEvent($step, $model, $modelState));
         } else {
             $modelState = $this->storage->newModelStateError($model, $this->process->getName(), $step->getName(), $errors, $currentModelState);
+
+            $eventName = sprintf('%s.%s.validation_fail', $this->process->getName() , $step->getName());
+            $this->dispatcher->dispatch($eventName, new StepEvent($step, $model, $modelState));
 
             if ($step->getOnInvalid()) {
                 $step = $this->getProcessStep($step->getOnInvalid());
@@ -184,27 +203,6 @@ class ProcessHandler implements ProcessHandlerInterface
         }
 
         return $step;
-    }
-
-    /**
-     * Execute actions of a given step.
-     *
-     * @param ModelInterface $model
-     * @param Step           $step
-     */
-    protected function executeStepActions(ModelInterface $model, Step $step)
-    {
-        // update model status
-        if ($step->hasModelStatus()) {
-            list($method, $constant) = $step->getModelStatus();
-            $model->$method(constant($constant));
-        }
-
-        // run actions
-        foreach ($step->getActions() as $action) {
-            list($service, $method) = $action;
-            $service->$method($model, $step);
-        }
     }
 
     /**
