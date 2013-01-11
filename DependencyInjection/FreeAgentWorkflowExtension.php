@@ -128,14 +128,12 @@ class FreeAgentWorkflowExtension extends Extension
 
         foreach ($steps as $stepName => $stepConfig) {
             $validations = $this->convertToServiceReferences($stepConfig['validations']);
-            $actions = $this->convertToServiceReferences($stepConfig['actions']);
 
             $definition = new Definition($stepClass, array(
                 $stepName,
                 $stepConfig['label'],
                 array(),
                 $validations,
-                $actions,
                 $stepConfig['model_status'],
                 $stepConfig['roles'],
                 $stepConfig['on_invalid'],

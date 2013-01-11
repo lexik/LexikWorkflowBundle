@@ -22,11 +22,6 @@ class Step implements NodeInterface
     /**
      * @var array
      */
-    protected $actions;
-
-    /**
-     * @var array
-     */
     protected $modelStatus;
 
     /**
@@ -51,18 +46,16 @@ class Step implements NodeInterface
      * @param string $label
      * @param array  $nextStates
      * @param array  $validations
-     * @param array  $actions
      * @param array  $modelStatus
      * @param array  $roles
      * @param string $onInvalid
      */
-    public function __construct($name, $label, array $nextStates = array(), array $validations = array(), array $actions = array(), array $modelStatus = array(), array $roles = array(), $onInvalid = null)
+    public function __construct($name, $label, array $nextStates = array(), array $validations = array(), array $modelStatus = array(), array $roles = array(), $onInvalid = null)
     {
         $this->name        = $name;
         $this->label       = $label;
         $this->nextStates  = $nextStates;
         $this->validations = $validations;
-        $this->actions     = $actions;
         $this->modelStatus = $modelStatus;
         $this->roles       = $roles;
         $this->onInvalid   = $onInvalid;
@@ -160,26 +153,6 @@ class Step implements NodeInterface
     public function hasValidations()
     {
         return !empty($this->validations);
-    }
-
-    /**
-     * Returns all actions to execute one the step is reached.
-     *
-     * @return array
-     */
-    public function getActions()
-    {
-        return $this->actions;
-    }
-
-    /**
-     * Returns true if the step has some actions to execute once it reached.
-     *
-     * @return boolean
-     */
-    public function hasActions()
-    {
-        return !empty($this->actions);
     }
 
     /**

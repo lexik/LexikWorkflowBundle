@@ -94,16 +94,6 @@ class Configuration implements ConfigurationInterface
                                             ->prototype('scalar')->end()
                                         ->end()
 
-                                        ->arrayNode('actions')
-                                            ->validate()
-                                                ->ifTrue(function($value) use ($validatorSyntax) {
-                                                    return (is_array($value) && $validatorSyntax($value));
-                                                })
-                                                ->thenInvalid('You must specify valid action name as serviceId:method string')
-                                            ->end()
-                                            ->prototype('scalar')->end()
-                                        ->end()
-
                                         ->arrayNode('validations')
                                             ->validate()
                                                 ->ifTrue(function($value) use ($validatorSyntax) {
