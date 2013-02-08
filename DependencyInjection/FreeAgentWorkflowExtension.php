@@ -2,7 +2,7 @@
 
 namespace FreeAgent\WorkflowBundle\DependencyInjection;
 
-use FreeAgent\WorkflowBundle\Flow\State;
+use FreeAgent\WorkflowBundle\Flow\NextState;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\FileLocator;
@@ -33,11 +33,11 @@ class FreeAgentWorkflowExtension extends Extension
 
         $container->setParameter('free_agent_workflow.process_handler.class', $config['classes']['process_handler']);
 
-        // build process and factories definitions
+        // build process definitions
         $processReferences = $this->buildProcesses($config['processes'], $container, $config['classes']['process'], $config['classes']['step']);
         $this->buildProcessHandlers($processReferences, $container, $config['classes']['process_handler']);
 
-        // inject processes into ProcessAggregator (not possible from a CompilerPass because definitions are loaded from Extension class...)
+        // inject processes into ProcessAggregator (not possible from a CompilerPass because definitions are loaded from Extension class)
         if ($container->hasDefinition('free_agent_workflow.process_aggregator')) {
             $container->findDefinition('free_agent_workflow.process_aggregator')->replaceArgument(0, $processReferences);
         }
@@ -166,10 +166,10 @@ class FreeAgentWorkflowExtension extends Extension
         foreach ($stepsNextStates as $stateName => $data) {
             $target = null;
 
-            if (State::TYPE_STEP === $data['type']) {
+            if (NextState::TARGET_TYPE_STEP === $data['type']) {
                 $target = new Reference(sprintf('free_agent_workflow.process.%s.step.%s', $processName, $data['target']));
 
-            } else if (State::TYPE_PROCESS === $data['type']) {
+            } else if (NextState::TARGET_TYPE_PROCESS === $data['type']) {
                 $target = new Reference(sprintf('free_agent_workflow.process.%s', $data['target']));
 
             } else {

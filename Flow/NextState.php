@@ -37,7 +37,7 @@ class NextState implements NextStateInterface
      * @param NodeInterface $target
      * @param array         $validations
      */
-    public function __construct($name, $targetType, NodeInterface $target, array $validations = array())
+    public function __construct($name, $targetType, $target, array $validations = array())
     {
         $this->name = $name;
         $this->targetType = $targetType;

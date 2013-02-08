@@ -40,6 +40,7 @@ class Configuration implements ConfigurationInterface
         $classesNode = new ArrayNodeDefinition('classes');
 
         $classesNode
+            ->addDefaultsIfNotSet()
             ->children()
                 ->scalarNode('process_handler')
                     ->defaultValue('FreeAgent\WorkflowBundle\Handler\ProcessHandler')

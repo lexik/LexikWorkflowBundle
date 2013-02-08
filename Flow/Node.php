@@ -108,8 +108,8 @@ abstract class Node
      * @param string             $name
      * @param NextStateInterface $state
      */
-    public function addNextState($name, NextStateInterface $state)
+    public function addNextState($name, $targetType, $target, array $validations = array())
     {
-        $this->nextStates[$name] = $state;
+        $this->nextStates[$name] = new NextState($name, $targetType, $target, $validations);
     }
 }
