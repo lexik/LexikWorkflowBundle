@@ -2,17 +2,15 @@
 
 namespace FreeAgent\WorkflowBundle\Flow;
 
-interface StateInterface
+/**
+ * Next state inerface.
+ *
+ * @author Cédric Girard <c.girard@lexik.fr>
+ */
+interface NextStateInterface
 {
-    const TYPE_STEP    = 'step';
-    const TYPE_PROCESS = 'process';
-
-    /**
-     * Returns the state type.
-     *
-     * @return string
-     */
-    public function getType();
+    const TARGET_TYPE_STEP    = 'step';
+    const TARGET_TYPE_PROCESS = 'process';
 
     /**
      * Returns the state name.
@@ -20,6 +18,13 @@ interface StateInterface
      * @return string
      */
     public function getName();
+
+    /**
+     * Returns the state target type.
+     *
+     * @return string
+     */
+    public function getTargetType();
 
     /**
      * Returns the state target.

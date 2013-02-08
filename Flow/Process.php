@@ -2,17 +2,15 @@
 
 namespace FreeAgent\WorkflowBundle\Flow;
 
-use FreeAgent\WorkflowBundle\Model\ModelInterface;
-
 use Doctrine\Common\Collections\ArrayCollection;
 
-class Process implements NodeInterface
+/**
+ * Process class.
+ *
+ * @author Cédric Girard <c.girard@lexik.fr>
+ */
+class Process extends Node
 {
-    /**
-     * @var string
-     */
-    protected $name;
-
     /**
      * @var ArrayCollection
      */
@@ -38,25 +36,19 @@ class Process implements NodeInterface
      */
     public function __construct($name, array $steps, $startStep, array $endSteps)
     {
-        $this->name      = $name;
+        parent::__construct($name);
+
         $this->steps     = new ArrayCollection($steps);
         $this->startStep = $startStep;
         $this->endSteps  = $endSteps;
     }
 
+    /**
+     * @return string
+     */
     public function __toString()
     {
         return $this->getName();
-    }
-
-    /**
-     * Get process name.
-     *
-     * @return string
-     */
-    public function getName()
-    {
-        return $this->name;
     }
 
     /**
@@ -72,13 +64,13 @@ class Process implements NodeInterface
     /**
      * Returns a step by its name.
      *
-     * @param string $stepName
+     * @param string $name
      *
      * @return FreeAgent\WorkflowBundle\Flow\Step
      */
-    public function getStep($stepName)
+    public function getStep($name)
     {
-        return $this->steps->get($stepName);
+        return $this->steps->get($name);
     }
 
     /**

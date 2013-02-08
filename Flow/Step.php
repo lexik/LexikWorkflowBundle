@@ -2,13 +2,13 @@
 
 namespace FreeAgent\WorkflowBundle\Flow;
 
-class Step implements NodeInterface
+/**
+ * Step of a process.
+ *
+ * @author Cédric Girard <c.girard@lexik.fr>
+ */
+class Step extends Node
 {
-    /**
-     * @var string
-     */
-    protected $name;
-
     /**
      * @var string
      */
@@ -23,16 +23,6 @@ class Step implements NodeInterface
      * @var array
      */
     protected $modelStatus;
-
-    /**
-     * @var array
-     */
-    protected $validations;
-
-    /**
-     * @var array
-     */
-    protected $nextStates;
 
     /**
      * @var string
@@ -52,10 +42,9 @@ class Step implements NodeInterface
      */
     public function __construct($name, $label, array $nextStates = array(), array $validations = array(), array $modelStatus = array(), array $roles = array(), $onInvalid = null)
     {
-        $this->name        = $name;
+        parent::__construct($name, $nextStates, $validations);
+
         $this->label       = $label;
-        $this->nextStates  = $nextStates;
-        $this->validations = $validations;
         $this->modelStatus = $modelStatus;
         $this->roles       = $roles;
         $this->onInvalid   = $onInvalid;
@@ -70,16 +59,6 @@ class Step implements NodeInterface
     }
 
     /**
-     * Get step name
-     *
-     * @return string
-     */
-    public function getName()
-    {
-        return $this->name;
-    }
-
-    /**
      * Get step label.
      *
      * @return string
@@ -87,72 +66,6 @@ class Step implements NodeInterface
     public function getLabel()
     {
         return $this->label;
-    }
-
-
-    /**
-     * Returns all next steps.
-     *
-     * @return array
-     */
-    public function getNextStates()
-    {
-        return $this->nextStates;
-    }
-
-    /**
-     * Returns true if the given step name is one of the next steps.
-     *
-     * @param string $stepName
-     * @return boolean
-     */
-    public function hasNextState($stateName)
-    {
-        return in_array($stateName, array_keys($this->nextStates));
-    }
-
-    /**
-     * Returns the target of the given state.
-     *
-     * @param string $stateName
-     * @return FreeAgent\WorkflowBundle\Flow\State
-     */
-    public function getNextState($name)
-    {
-        return $this->nextStates[$name];
-    }
-
-    /**
-     * Create and add a new next state.
-     *
-     * @param string $name
-     * @param string $type
-     * @param Step $target
-     * @param array $validations
-     */
-    public function addNextState($name, $type, $target, array $validations = array())
-    {
-        $this->nextStates[$name] = new State($name, $type, $target, $validations);
-    }
-
-    /**
-     * Return all validations to execute the check the step is reachable.
-     *
-     * @return array
-     */
-    public function getValidations()
-    {
-        return $this->validations;
-    }
-
-    /**
-     * Returns true if the step requires some validations to be reached.
-     *
-     * @return boolean
-     */
-    public function hasValidations()
-    {
-        return !empty($this->validations);
     }
 
     /**
