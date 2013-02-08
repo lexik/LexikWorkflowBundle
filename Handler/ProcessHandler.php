@@ -177,11 +177,7 @@ class ProcessHandler implements ProcessHandlerInterface
     }
 
     /**
-     * Returns all model state of the given model object.
-     *
-     * @param ModelInterface $model
-     * @param boolean $successOnly
-     * @return array
+     * {@inheritdoc}
      */
     public function getAllStates(ModelInterface $model, $successOnly = true)
     {
