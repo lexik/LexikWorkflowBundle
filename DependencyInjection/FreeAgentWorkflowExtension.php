@@ -31,11 +31,11 @@ class FreeAgentWorkflowExtension extends Extension
         $loader = new Loader\XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.xml');
 
-        $container->setParameter('free_agent_workflow.process_handler_class', $config['process_handler_class']);
+        $container->setParameter('free_agent_workflow.process_handler.class', $config['classes']['process_handler']);
 
         // build process and factories definitions
-        $processReferences = $this->buildProcesses($config['processes'], $container, $config['flow_process_class'], $config['flow_step_class']);
-        $this->buildProcessHandlers($processReferences, $container, $config['process_handler_class']);
+        $processReferences = $this->buildProcesses($config['processes'], $container, $config['classes']['process'], $config['classes']['step']);
+        $this->buildProcessHandlers($processReferences, $container, $config['classes']['process_handler']);
 
         // inject processes into ProcessAggregator (not possible from a CompilerPass because definitions are loaded from Extension class...)
         if ($container->hasDefinition('free_agent_workflow.process_aggregator')) {
