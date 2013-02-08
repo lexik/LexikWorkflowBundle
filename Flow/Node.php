@@ -47,7 +47,7 @@ abstract class Node
     }
 
     /**
-     * Return all validations to execute the check the step is reachable.
+     * Returns all validations to execute to check if the step is reachable.
      *
      * @return array
      */
