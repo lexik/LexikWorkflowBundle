@@ -32,12 +32,12 @@ class NextState implements NextStateInterface
     /**
      * Construct.
      *
-     * @param string        $name
-     * @param string        $targetType
-     * @param NodeInterface $target
-     * @param array         $validations
+     * @param string $name
+     * @param string $targetType
+     * @param Node   $target
+     * @param array  $validations
      */
-    public function __construct($name, $targetType, $target, array $validations = array())
+    public function __construct($name, $targetType, Node $target, array $validations = array())
     {
         $this->name = $name;
         $this->targetType = $targetType;

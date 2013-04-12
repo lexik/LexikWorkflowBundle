@@ -2,11 +2,9 @@
 
 namespace FreeAgent\WorkflowBundle\Tests\Handler;
 
-use FreeAgent\WorkflowBundle\Tests\Fixtures\FakeProcessListener;
-
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-use FreeAgent\WorkflowBundle\Flow\State;
+use FreeAgent\WorkflowBundle\Flow\NextStateInterface;
 use FreeAgent\WorkflowBundle\Flow\Process;
 use FreeAgent\WorkflowBundle\Flow\Step;
 use FreeAgent\WorkflowBundle\Handler\ProcessHandler;
@@ -14,6 +12,7 @@ use FreeAgent\WorkflowBundle\Model\ModelStorage;
 use FreeAgent\WorkflowBundle\Entity\ModelState;
 use FreeAgent\WorkflowBundle\Exception\ValidationException;
 use FreeAgent\WorkflowBundle\Tests\TestCase;
+use FreeAgent\WorkflowBundle\Tests\Fixtures\FakeProcessListener;
 Use FreeAgent\WorkflowBundle\Tests\Fixtures\FakeModel;
 use FreeAgent\WorkflowBundle\Tests\Fixtures\FakeSecurityContext;
 use FreeAgent\WorkflowBundle\Tests\Fixtures\FakeValidator;
@@ -69,7 +68,7 @@ class ProcessHandlerTest extends TestCase
 
     /**
      * @expectedException        FreeAgent\WorkflowBundle\Exception\WorkflowException
-     * @expectedExceptionMessage The given model as already started this process.
+     * @expectedExceptionMessage The given model has already started the "document_proccess" process.
      */
     public function testStartAlreadyStarted()
     {
@@ -81,13 +80,13 @@ class ProcessHandlerTest extends TestCase
 
     /**
      * @expectedException        FreeAgent\WorkflowBundle\Exception\WorkflowException
-     * @expectedExceptionMessage The given model has not started this process.
+     * @expectedExceptionMessage The given model has not started the "document_proccess" process.
      */
     public function testReachNextStateNotStarted()
     {
         $model = new FakeModel();
 
-        $this->getProcessHandler()->reachNextState($model, 'step_validate_doc');
+        $this->getProcessHandler()->reachNextState($model, 'validate');
     }
 
     public function testReachNextState()
@@ -95,7 +94,7 @@ class ProcessHandlerTest extends TestCase
         $model = new FakeModel();
         $previous = $this->modelStorage->newModelStateSuccess($model, 'document_proccess', 'step_create_doc');
 
-        $modelState = $this->getProcessHandler()->reachNextState($model, 'step_validate_doc');
+        $modelState = $this->getProcessHandler()->reachNextState($model, 'validate');
 
         $this->assertTrue($modelState instanceof ModelState);
         $this->assertEquals('step_validate_doc', $modelState->getStepName());
@@ -134,7 +133,7 @@ class ProcessHandlerTest extends TestCase
         $model = new FakeModel();
         $this->modelStorage->newModelStateSuccess($model, 'document_proccess', 'step_create_doc');
 
-        $modelState = $this->getProcessHandler()->reachNextState($model, 'step_remove_doc');
+        $modelState = $this->getProcessHandler()->reachNextState($model, 'remove');
 
         $this->assertEquals('step_fake', $modelState->getStepName());
     }
@@ -184,13 +183,17 @@ class ProcessHandlerTest extends TestCase
 
     protected function getProcessHandler()
     {
-        $stepValidateDoc = new Step('step_validate_doc', 'Validate doc',
+        $stepValidateDoc = new Step(
+            'step_validate_doc',
+            'Validate doc',
             array(),
             array(),
             array('setStatus', 'FreeAgent\WorkflowBundle\Tests\Fixtures\FakeModel::STATUS_VALIDATE')
         );
 
-        $stepRemoveDoc   = new Step('step_remove_doc', 'Remove doc',
+        $stepRemoveDoc = new Step(
+            'step_remove_doc',
+            'Remove doc',
             array(),
             array(array(new FakeValidator(), 'invalid')),
             array('setStatus', 'FreeAgent\WorkflowBundle\Tests\Fixtures\FakeModel::STATUS_REMOVE'),
@@ -198,15 +201,17 @@ class ProcessHandlerTest extends TestCase
             'step_fake'
         );
 
-        $stepFake        = new Step('step_fake', 'Fake', array());
+        $stepFake = new Step('step_fake', 'Fake', array());
 
-        $stepCreateDoc   = new Step('step_create_doc', 'Create doc',
+        $stepCreateDoc = new Step(
+            'step_create_doc',
+            'Create doc',
             array(),
             array(),
             array('setStatus', 'FreeAgent\WorkflowBundle\Tests\Fixtures\FakeModel::STATUS_CREATE')
         );
-        $stepCreateDoc->addNextState('step_validate_doc', State::TYPE_STEP, $stepValidateDoc);
-        $stepCreateDoc->addNextState('step_remove_doc', State::TYPE_STEP, $stepRemoveDoc);
+        $stepCreateDoc->addNextState('validate', NextStateInterface::TARGET_TYPE_STEP, $stepValidateDoc);
+        $stepCreateDoc->addNextState('remove', NextStateInterface::TARGET_TYPE_STEP, $stepRemoveDoc);
 
         $process = new Process(
             'document_proccess',

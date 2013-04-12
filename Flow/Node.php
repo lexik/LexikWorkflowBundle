@@ -32,8 +32,8 @@ abstract class Node
     public function __construct($name, array $nextStates = array(), array $validations = array())
     {
         $this->name        = $name;
-        $this->validations = $nextStates;
-        $this->nextStates  = $validations;
+        $this->validations = $validations;
+        $this->nextStates  = $nextStates;
     }
 
     /**
@@ -90,7 +90,7 @@ abstract class Node
     /**
      * Returns the target of the given state.
      *
-     * @param string $stateName
+     * @param string $name
      * @return NextStateInterface
      */
     public function getNextState($name)
@@ -105,10 +105,12 @@ abstract class Node
     /**
      * Add a next state.
      *
-     * @param string             $name
-     * @param NextStateInterface $state
+     * @param string $name
+     * @param string $targetType
+     * @param Node   $state
+     * @param array  $validations
      */
-    public function addNextState($name, $targetType, $target, array $validations = array())
+    public function addNextState($name, $targetType, Node $target, array $validations = array())
     {
         $this->nextStates[$name] = new NextState($name, $targetType, $target, $validations);
     }

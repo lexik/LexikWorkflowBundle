@@ -2,6 +2,8 @@
 
 namespace FreeAgent\WorkflowBundle\DependencyInjection;
 
+use FreeAgent\WorkflowBundle\Flow\NextStateInterface;
+
 use FreeAgent\WorkflowBundle\Flow\NextState;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -166,10 +168,10 @@ class FreeAgentWorkflowExtension extends Extension
         foreach ($stepsNextStates as $stateName => $data) {
             $target = null;
 
-            if (NextState::TARGET_TYPE_STEP === $data['type']) {
+            if (NextStateInterface::TARGET_TYPE_STEP === $data['type']) {
                 $target = new Reference(sprintf('free_agent_workflow.process.%s.step.%s', $processName, $data['target']));
 
-            } else if (NextState::TARGET_TYPE_PROCESS === $data['type']) {
+            } else if (NextStateInterface::TARGET_TYPE_PROCESS === $data['type']) {
                 $target = new Reference(sprintf('free_agent_workflow.process.%s', $data['target']));
 
             } else {

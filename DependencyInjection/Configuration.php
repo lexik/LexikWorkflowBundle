@@ -90,7 +90,7 @@ class Configuration implements ConfigurationInterface
                     ->end()
                 ->end()
                 ->append($this->createStepsNodeDefinition())
-                //->append($this->createNextStatesNodeDefinition())
+                //->append($this->createNextStatesNodeDefinition()) // @todo allow a process to have sub processes
             ->end()
         ;
 
