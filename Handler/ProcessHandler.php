@@ -100,15 +100,19 @@ class ProcessHandler implements ProcessHandlerInterface
         }
 
         $state = $currentStep->getNextState($stateName);
+        $step = $state->getTarget();
 
         // pre validations
         $errors = $this->executeValidations($model, $state->getAdditionalValidations());
         $modelState = null;
 
         if (count($errors) > 0) {
-            $modelState = $this->storage->newModelStateError($model, $this->process->getName(), $state->getTarget()->getName(), $errors, $currentModelState);
+            $modelState = $this->storage->newModelStateError($model, $this->process->getName(), $step->getName(), $errors, $currentModelState);
+
+            $eventName = sprintf('%s.%s.pre_validation_fail', $this->process->getName() , $step->getName());
+            $this->dispatcher->dispatch($eventName, new StepEvent($step, $model, $modelState));
         } else {
-            $modelState = $this->reachStep($model, $state->getTarget(), $currentModelState);
+            $modelState = $this->reachStep($model, $step, $currentModelState);
         }
 
         return $modelState;
