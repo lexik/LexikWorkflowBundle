@@ -1,48 +1,34 @@
-Overview
-========
+LexikWorkflowBundle
+===================
 
 This Symfony2 bundle allow to define and manage some simple workflow.
 
-
 Installation
-============
+------------
 
-Update your `deps` and `deps.lock` files:
+Installation with composer:
 
-```
-// deps
-...
-[FreeAgentWorkflowBundle]
-    git=https://github.com/lexik/FreeAgentWorkflowBundle.git
-    target=/bundles/Lexik/Bundle/WorkflowBundle
-
-// deps.lock
-...
-FreeAgentWorkflowBundle <commit>
+``` json
+    ...
+    "require": {
+        ...
+        "lexik/workflow-bundle": "dev-master",
+        ...
+    },
+    ...
 ```
 
-Register the namespaces with the autoloader:
+Next, be sure to enable these bundles in your `app/AppKernel.php` file:
 
-```php
-<?php
-// app/autoload.php
-$loader->registerNamespaces(array(
-    // ...
-    'Lexik' => __DIR__.'/../vendor/bundles',
-    // ...
-));
-```
-
-Register the bundle with your kernel:
-
-```php
-<?php
-// in AppKernel::registerBundles()
-$bundles = array(
-    // ...
-    new Lexik\Bundle\WorkflowBundle\FreeAgentWorkflowBundle(),
-    // ...
-);
+``` php
+public function registerBundles()
+{
+    return array(
+        // ...
+        new Lexik\Bundle\WorkflowBundle\LexikWorkflowBundle(),
+        // ...
+    );
+}
 ```
 
 How does it work ?
