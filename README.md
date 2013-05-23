@@ -1,6 +1,8 @@
 LexikWorkflowBundle
 ===================
 
+[![Build Status](https://secure.travis-ci.org/lexik/LexikWorkflowBundle.png)](http://travis-ci.org/lexik/LexikWorkflowBundle)
+
 This Symfony2 bundle allow to define and manage some simple workflow.
 
 Installation
