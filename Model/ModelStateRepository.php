@@ -1,6 +1,6 @@
 <?php
 
-namespace FreeAgent\WorkflowBundle\Model;
+namespace Lexik\Bundle\WorkflowBundle\Model;
 
 use Doctrine\ORM\EntityRepository;
 
@@ -11,7 +11,7 @@ class ModelStateRepository extends EntityRepository
      *
      * @param string $workflowIdentifier
      * @param string $processName
-     * @return FreeAgent\WorkflowBundle\Entity\ModelState
+     * @return Lexik\Bundle\WorkflowBundle\Entity\ModelState
      */
     public function findLatestModelState($workflowIdentifier, $processName)
     {

@@ -1,8 +1,8 @@
 <?php
 
-namespace FreeAgent\WorkflowBundle\Tests\Fixtures;
+namespace Lexik\Bundle\WorkflowBundle\Tests\Fixtures;
 
-use FreeAgent\WorkflowBundle\Exception\ValidationException;
+use Lexik\Bundle\WorkflowBundle\Exception\ValidationException;
 
 class FakeValidator
 {

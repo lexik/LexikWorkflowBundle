@@ -1,8 +1,8 @@
 <?php
 
-namespace FreeAgent\WorkflowBundle\Tests\Fixtures;
+namespace Lexik\Bundle\WorkflowBundle\Tests\Fixtures;
 
-use FreeAgent\WorkflowBundle\Model\ModelInterface;
+use Lexik\Bundle\WorkflowBundle\Model\ModelInterface;
 
 class FakeModel implements ModelInterface
 {

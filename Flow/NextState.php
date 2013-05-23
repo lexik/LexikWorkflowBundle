@@ -1,6 +1,6 @@
 <?php
 
-namespace FreeAgent\WorkflowBundle\Flow;
+namespace Lexik\Bundle\WorkflowBundle\Flow;
 
 /**
  * A State represent one of the available next element (step) a given step.

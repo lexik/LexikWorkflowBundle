@@ -1,6 +1,6 @@
 <?php
 
-namespace FreeAgent\WorkflowBundle\DependencyInjection;
+namespace Lexik\Bundle\WorkflowBundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
@@ -19,7 +19,7 @@ class Configuration implements ConfigurationInterface
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('free_agent_workflow');
+        $rootNode = $treeBuilder->root('lexik_workflow');
 
         $rootNode
             ->addDefaultsIfNotSet()
@@ -43,13 +43,13 @@ class Configuration implements ConfigurationInterface
             ->addDefaultsIfNotSet()
             ->children()
                 ->scalarNode('process_handler')
-                    ->defaultValue('FreeAgent\WorkflowBundle\Handler\ProcessHandler')
+                    ->defaultValue('Lexik\Bundle\WorkflowBundle\Handler\ProcessHandler')
                 ->end()
                 ->scalarNode('process')
-                    ->defaultValue('FreeAgent\WorkflowBundle\Flow\Process')
+                    ->defaultValue('Lexik\Bundle\WorkflowBundle\Flow\Process')
                 ->end()
                 ->scalarNode('step')
-                    ->defaultValue('FreeAgent\WorkflowBundle\Flow\Step')
+                    ->defaultValue('Lexik\Bundle\WorkflowBundle\Flow\Step')
                 ->end()
             ->end()
         ;

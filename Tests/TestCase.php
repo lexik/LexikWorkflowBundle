@@ -1,6 +1,6 @@
 <?php
 
-namespace FreeAgent\WorkflowBundle\Tests;
+namespace Lexik\Bundle\WorkflowBundle\Tests;
 
 use Symfony\Component\Yaml\Parser;
 use Symfony\Component\Security\Core\SecurityContext;
@@ -67,7 +67,7 @@ EOF;
     protected function createSchema(EntityManager $em)
     {
         $schemaTool = new \Doctrine\ORM\Tools\SchemaTool($em);
-        $schemaTool->dropSchema($em->getMetadataFactory()->getAllMetadata());
+        //$schemaTool->dropSchema($em->getMetadataFactory()->getAllMetadata());
         $schemaTool->createSchema($em->getMetadataFactory()->getAllMetadata());
     }
 
@@ -82,11 +82,9 @@ EOF;
         $cache = new \Doctrine\Common\Cache\ArrayCache();
 
         // xml driver
-        $prefixes = array(
-            'FreeAgent\WorkflowBundle\Entity' => __DIR__.'/../Resources/config/doctrine',
-        );
-        $xmlDriver = new \Symfony\Bridge\Doctrine\Mapping\Driver\XmlDriver(array_values($prefixes));
-        $xmlDriver->setNamespacePrefixes(array_flip($prefixes));
+        $xmlDriver = new \Doctrine\ORM\Mapping\Driver\SimplifiedXmlDriver(array(
+            __DIR__.'/../Resources/config/doctrine' => 'Lexik\Bundle\WorkflowBundle\Entity',
+        ));
 
         // configuration mock
         $config = $this->getMock('Doctrine\ORM\Configuration');
@@ -111,6 +109,14 @@ EOF;
         $config->expects($this->any())
             ->method('getClassMetadataFactoryName')
             ->will($this->returnValue('Doctrine\ORM\Mapping\ClassMetadataFactory'));
+        $config->expects($this->any())
+            ->method('getDefaultRepositoryClassName')
+            ->will($this->returnValue('Doctrine\\ORM\\EntityRepository'));
+        $config
+            ->expects($this->any())
+            ->method('getQuoteStrategy')
+            ->will($this->returnValue(new \Doctrine\ORM\Mapping\DefaultQuoteStrategy()))
+        ;
 
         $conn = array(
             'driver' => 'pdo_sqlite',

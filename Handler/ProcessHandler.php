@@ -1,19 +1,19 @@
 <?php
 
-namespace FreeAgent\WorkflowBundle\Handler;
+namespace Lexik\Bundle\WorkflowBundle\Handler;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 
-use FreeAgent\WorkflowBundle\Event\StepEvent;
-use FreeAgent\WorkflowBundle\Exception\WorkflowException;
-use FreeAgent\WorkflowBundle\Exception\AccessDeniedException;
-use FreeAgent\WorkflowBundle\Exception\ValidationException;
-use FreeAgent\WorkflowBundle\Flow\Step;
-use FreeAgent\WorkflowBundle\Flow\Process;
-use FreeAgent\WorkflowBundle\Entity\ModelState;
-use FreeAgent\WorkflowBundle\Model\ModelStorage;
-use FreeAgent\WorkflowBundle\Model\ModelInterface;
+use Lexik\Bundle\WorkflowBundle\Event\StepEvent;
+use Lexik\Bundle\WorkflowBundle\Exception\WorkflowException;
+use Lexik\Bundle\WorkflowBundle\Exception\AccessDeniedException;
+use Lexik\Bundle\WorkflowBundle\Exception\ValidationException;
+use Lexik\Bundle\WorkflowBundle\Flow\Step;
+use Lexik\Bundle\WorkflowBundle\Flow\Process;
+use Lexik\Bundle\WorkflowBundle\Entity\ModelState;
+use Lexik\Bundle\WorkflowBundle\Model\ModelStorage;
+use Lexik\Bundle\WorkflowBundle\Model\ModelInterface;
 
 use Doctrine\Common\Collections\ArrayCollection;
 

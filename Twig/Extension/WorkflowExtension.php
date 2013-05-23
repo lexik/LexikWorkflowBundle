@@ -1,10 +1,10 @@
 <?php
 
-namespace FreeAgent\WorkflowBundle\Twig\Extension;
+namespace Lexik\Bundle\WorkflowBundle\Twig\Extension;
 
-use FreeAgent\WorkflowBundle\Entity\ModelState;
-use FreeAgent\WorkflowBundle\Handler\ProcessAggregator;
-use FreeAgent\WorkflowBundle\Flow\Step;
+use Lexik\Bundle\WorkflowBundle\Entity\ModelState;
+use Lexik\Bundle\WorkflowBundle\Handler\ProcessAggregator;
+use Lexik\Bundle\WorkflowBundle\Flow\Step;
 
 class WorkflowExtension extends \Twig_Extension
 {

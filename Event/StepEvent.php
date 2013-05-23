@@ -1,12 +1,12 @@
 <?php
 
-namespace FreeAgent\WorkflowBundle\Event;
+namespace Lexik\Bundle\WorkflowBundle\Event;
 
 use Symfony\Component\EventDispatcher\Event;
 
-use FreeAgent\WorkflowBundle\Entity\ModelState;
-use FreeAgent\WorkflowBundle\Model\ModelInterface;
-use FreeAgent\WorkflowBundle\Flow\Step;
+use Lexik\Bundle\WorkflowBundle\Entity\ModelState;
+use Lexik\Bundle\WorkflowBundle\Model\ModelInterface;
+use Lexik\Bundle\WorkflowBundle\Flow\Step;
 
 /**
  * Step event.

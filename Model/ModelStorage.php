@@ -1,8 +1,8 @@
 <?php
 
-namespace FreeAgent\WorkflowBundle\Model;
+namespace Lexik\Bundle\WorkflowBundle\Model;
 
-use FreeAgent\WorkflowBundle\Entity\ModelState;
+use Lexik\Bundle\WorkflowBundle\Entity\ModelState;
 
 use Doctrine\ORM\EntityManager;
 
@@ -35,7 +35,7 @@ class ModelStorage
      *
      * @param ModelInterface $model
      * @param string $processName
-     * @return FreeAgent\WorkflowBundle\Entity\ModelState
+     * @return Lexik\Bundle\WorkflowBundle\Entity\ModelState
      */
     public function findCurrentModelState(ModelInterface $model, $processName)
     {
@@ -83,7 +83,7 @@ class ModelStorage
      * @param string $processName
      * @param string $stepName
      * @param ModelState $previous
-     * @return \FreeAgent\WorkflowBundle\Entity\ModelState
+     * @return \Lexik\Bundle\WorkflowBundle\Entity\ModelState
      */
     public function newModelStateSuccess(ModelInterface $model, $processName, $stepName, $previous = null)
     {
@@ -104,7 +104,7 @@ class ModelStorage
      * @param string $stepName
      * @param ModelState $previous
      * @param array $errors
-     * @return \FreeAgent\WorkflowBundle\Entity\ModelState
+     * @return \Lexik\Bundle\WorkflowBundle\Entity\ModelState
      */
     public function newModelStateError(ModelInterface $model, $processName, $stepName, array $errors, $previous = null)
     {
@@ -130,7 +130,7 @@ class ModelStorage
      * @param string $processName
      * @param string $stepName
      * @param ModelState $previous
-     * @return \FreeAgent\WorkflowBundle\Entity\ModelState
+     * @return \Lexik\Bundle\WorkflowBundle\Entity\ModelState
      */
     protected function createModelState(ModelInterface $model, $processName, $stepName, $previous = null)
     {

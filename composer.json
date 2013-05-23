@@ -1,5 +1,5 @@
 {
-    "name": "free-agent/workflow-bundle",
+    "name": "lexik/workflow-bundle",
     "type": "symfony-bundle",
     "description": "Simple workflow bundle for Symfony2",
     "keywords": ["workflow"],
@@ -13,13 +13,13 @@
     ],
     "require": {
         "php": ">=5.3.3",
-        "symfony/symfony": ">=2.0,<2.2"
+        "symfony/symfony": ">=2.0,<2.3-dev"
     },
     "require-dev": {
         "doctrine/orm": ">=2.2,<2.4"
     },
     "autoload": {
-        "psr-0": { "FreeAgent\\WorkflowBundle": "" }
+        "psr-0": { "Lexik\\Bundle\\WorkflowBundle": "" }
     },
-    "target-dir": "FreeAgent/WorkflowBundle"
+    "target-dir": "Lexik/Bundle/WorkflowBundle"
 }

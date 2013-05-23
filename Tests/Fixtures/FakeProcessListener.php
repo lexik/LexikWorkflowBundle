@@ -1,6 +1,6 @@
 <?php
 
-namespace FreeAgent\WorkflowBundle\Tests\Fixtures;
+namespace Lexik\Bundle\WorkflowBundle\Tests\Fixtures;
 
 class FakeProcessListener
 {

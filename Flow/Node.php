@@ -1,6 +1,6 @@
 <?php
 
-namespace FreeAgent\WorkflowBundle\Flow;
+namespace Lexik\Bundle\WorkflowBundle\Flow;
 
 /**
  * Workflow node.

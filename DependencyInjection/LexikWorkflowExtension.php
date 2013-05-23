@@ -1,10 +1,9 @@
 <?php
 
-namespace FreeAgent\WorkflowBundle\DependencyInjection;
+namespace Lexik\Bundle\WorkflowBundle\DependencyInjection;
 
-use FreeAgent\WorkflowBundle\Flow\NextStateInterface;
-
-use FreeAgent\WorkflowBundle\Flow\NextState;
+use Lexik\Bundle\WorkflowBundle\Flow\NextStateInterface;
+use Lexik\Bundle\WorkflowBundle\Flow\NextState;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\FileLocator;
@@ -20,7 +19,7 @@ use Symfony\Component\Yaml\Parser;
  *
  * To learn more see {@link http://symfony.com/doc/current/cookbook/bundles/extension.html}
  */
-class FreeAgentWorkflowExtension extends Extension
+class LexikWorkflowExtension extends Extension
 {
     /**
      * {@inheritDoc}
@@ -33,15 +32,15 @@ class FreeAgentWorkflowExtension extends Extension
         $loader = new Loader\XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.xml');
 
-        $container->setParameter('free_agent_workflow.process_handler.class', $config['classes']['process_handler']);
+        $container->setParameter('lexik_workflow.process_handler.class', $config['classes']['process_handler']);
 
         // build process definitions
         $processReferences = $this->buildProcesses($config['processes'], $container, $config['classes']['process'], $config['classes']['step']);
         $this->buildProcessHandlers($processReferences, $container, $config['classes']['process_handler']);
 
         // inject processes into ProcessAggregator (not possible from a CompilerPass because definitions are loaded from Extension class)
-        if ($container->hasDefinition('free_agent_workflow.process_aggregator')) {
-            $container->findDefinition('free_agent_workflow.process_aggregator')->replaceArgument(0, $processReferences);
+        if ($container->hasDefinition('lexik_workflow.process_aggregator')) {
+            $container->findDefinition('lexik_workflow.process_aggregator')->replaceArgument(0, $processReferences);
         }
     }
 
@@ -56,14 +55,14 @@ class FreeAgentWorkflowExtension extends Extension
     {
         foreach ($processReferences as $processName => $processReference) {
             $definition = new Definition($processHandlerClass, array(
-                new Reference(sprintf('free_agent_workflow.process.%s', $processName)),
-                new Reference('free_agent_workflow.model_storage'),
+                new Reference(sprintf('lexik_workflow.process.%s', $processName)),
+                new Reference('lexik_workflow.model_storage'),
                 new Reference('event_dispatcher'),
             ));
 
             $definition->addMethodCall('setSecurityContext', array(new Reference('security.context')));
 
-            $container->setDefinition(sprintf('free_agent_workflow.handler.%s', $processName), $definition);
+            $container->setDefinition(sprintf('lexik_workflow.handler.%s', $processName), $definition);
         }
     }
 
@@ -103,9 +102,9 @@ class FreeAgentWorkflowExtension extends Extension
             ));
 
             $definition->setPublic(false)
-                       ->addTag('free_agent_workflow.process', array('alias' => $processName));
+                       ->addTag('lexik_workflow.process', array('alias' => $processName));
 
-            $processReference = sprintf('free_agent_workflow.process.%s', $processName);
+            $processReference = sprintf('lexik_workflow.process.%s', $processName);
             $container->setDefinition($processReference, $definition);
 
             $processReferences[$processName] = new Reference($processReference);
@@ -144,9 +143,9 @@ class FreeAgentWorkflowExtension extends Extension
             $this->addStepNextStates($definition, $stepConfig['next_states'], $processName);
 
             $definition->setPublic(false)
-                       ->addTag(sprintf('free_agent_workflow.process.%s.step', $processName), array('alias' => $stepName));
+                       ->addTag(sprintf('lexik_workflow.process.%s.step', $processName), array('alias' => $stepName));
 
-            $stepReference = sprintf('free_agent_workflow.process.%s.step.%s', $processName, $stepName);
+            $stepReference = sprintf('lexik_workflow.process.%s.step.%s', $processName, $stepName);
             $container->setDefinition($stepReference, $definition);
 
             $stepReferences[$stepName] = new Reference($stepReference);
@@ -169,10 +168,10 @@ class FreeAgentWorkflowExtension extends Extension
             $target = null;
 
             if (NextStateInterface::TARGET_TYPE_STEP === $data['type']) {
-                $target = new Reference(sprintf('free_agent_workflow.process.%s.step.%s', $processName, $data['target']));
+                $target = new Reference(sprintf('lexik_workflow.process.%s.step.%s', $processName, $data['target']));
 
             } else if (NextStateInterface::TARGET_TYPE_PROCESS === $data['type']) {
-                $target = new Reference(sprintf('free_agent_workflow.process.%s', $data['target']));
+                $target = new Reference(sprintf('lexik_workflow.process.%s', $data['target']));
 
             } else {
                 throw new \InvalidArgumentException(sprintf('Unknown type "%s", please use "step" or "process"', $data['type']));

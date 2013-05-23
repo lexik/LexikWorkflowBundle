@@ -1,6 +1,6 @@
 <?php
 
-namespace FreeAgent\WorkflowBundle\Entity;
+namespace Lexik\Bundle\WorkflowBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
@@ -230,7 +230,7 @@ class ModelState
     /**
      * Get previous
      *
-     * @return \FreeAgent\WorkflowBundle\Entity\ModelState
+     * @return \Lexik\Bundle\WorkflowBundle\Entity\ModelState
      */
     public function getPrevious()
     {

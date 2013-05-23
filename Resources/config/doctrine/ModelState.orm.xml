@@ -4,9 +4,9 @@
                   xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
                                       http://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
 
-    <entity name="FreeAgent\WorkflowBundle\Entity\ModelState"
-            table="free_agent_workflow_model_state"
-            repository-class="FreeAgent\WorkflowBundle\Model\ModelStateRepository">
+    <entity name="Lexik\Bundle\WorkflowBundle\Entity\ModelState"
+            table="lexik_workflow_model_state"
+            repository-class="Lexik\Bundle\WorkflowBundle\Model\ModelStateRepository">
 
         <indexes>
             <index name="identifier_idx" columns="workflow_identifier"/>
@@ -30,9 +30,9 @@
 
         <field name="errors" column="errors" type="text" nullable="true" />
 
-        <one-to-many field="next" target-entity="FreeAgent\WorkflowBundle\Entity\ModelState" mapped-by="previous" />
+        <one-to-many field="next" target-entity="Lexik\Bundle\WorkflowBundle\Entity\ModelState" mapped-by="previous" />
 
-        <many-to-one field="previous" target-entity="FreeAgent\WorkflowBundle\Entity\ModelState" inversed-by="next">
+        <many-to-one field="previous" target-entity="Lexik\Bundle\WorkflowBundle\Entity\ModelState" inversed-by="next">
             <join-column name="previous_id" referenced-column-name="id" on-delete="SET NULL" />
         </many-to-one>
 

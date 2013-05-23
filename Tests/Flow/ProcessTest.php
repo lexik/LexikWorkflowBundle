@@ -1,11 +1,11 @@
 <?php
 
-namespace FreeAgent\WorkflowBundle\Tests\Flow;
+namespace Lexik\Bundle\WorkflowBundle\Tests\Flow;
 
-use FreeAgent\WorkflowBundle\Tests\TestCase;
-use FreeAgent\WorkflowBundle\DependencyInjection\FreeAgentWorkflowExtension;
-use FreeAgent\WorkflowBundle\Flow\Process;
-use FreeAgent\WorkflowBundle\Flow\Step;
+use Lexik\Bundle\WorkflowBundle\Tests\TestCase;
+use Lexik\Bundle\WorkflowBundle\DependencyInjection\LexikWorkflowExtension;
+use Lexik\Bundle\WorkflowBundle\Flow\Process;
+use Lexik\Bundle\WorkflowBundle\Flow\Step;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
@@ -15,10 +15,10 @@ class ProcessTest extends TestCase
 {
     public function testProcessService()
     {
-        $extension = new FreeAgentWorkflowExtension();
+        $extension = new LexikWorkflowExtension();
         $extension->load(array($this->getConfig()), $container = new ContainerBuilder());
 
-        $process = $container->get('free_agent_workflow.process.document_proccess');
+        $process = $container->get('lexik_workflow.process.document_proccess');
         $this->assertTrue($process instanceof Process);
         $this->assertTrue($process->getSteps() instanceof ArrayCollection);
         $this->assertEquals(3, $process->getSteps()->count());

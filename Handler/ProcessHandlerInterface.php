@@ -1,9 +1,9 @@
 <?php
 
-namespace FreeAgent\WorkflowBundle\Handler;
+namespace Lexik\Bundle\WorkflowBundle\Handler;
 
-use FreeAgent\WorkflowBundle\Entity\ModelState;
-use FreeAgent\WorkflowBundle\Model\ModelInterface;
+use Lexik\Bundle\WorkflowBundle\Entity\ModelState;
+use Lexik\Bundle\WorkflowBundle\Model\ModelInterface;
 
 /**
  * Process handler interface.

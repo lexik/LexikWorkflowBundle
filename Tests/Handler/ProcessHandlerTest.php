@@ -1,22 +1,22 @@
 <?php
 
-namespace FreeAgent\WorkflowBundle\Tests\Handler;
+namespace Lexik\Bundle\WorkflowBundle\Tests\Handler;
 
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-use FreeAgent\WorkflowBundle\Flow\NextStateInterface;
-use FreeAgent\WorkflowBundle\Flow\Process;
-use FreeAgent\WorkflowBundle\Flow\Step;
-use FreeAgent\WorkflowBundle\Handler\ProcessHandler;
-use FreeAgent\WorkflowBundle\Model\ModelStorage;
-use FreeAgent\WorkflowBundle\Entity\ModelState;
-use FreeAgent\WorkflowBundle\Exception\ValidationException;
-use FreeAgent\WorkflowBundle\Tests\TestCase;
-use FreeAgent\WorkflowBundle\Tests\Fixtures\FakeProcessListener;
-Use FreeAgent\WorkflowBundle\Tests\Fixtures\FakeModel;
-use FreeAgent\WorkflowBundle\Tests\Fixtures\FakeSecurityContext;
-use FreeAgent\WorkflowBundle\Tests\Fixtures\FakeValidator;
-use FreeAgent\WorkflowBundle\Tests\Fixtures\FakeAction;
+use Lexik\Bundle\WorkflowBundle\Flow\NextStateInterface;
+use Lexik\Bundle\WorkflowBundle\Flow\Process;
+use Lexik\Bundle\WorkflowBundle\Flow\Step;
+use Lexik\Bundle\WorkflowBundle\Handler\ProcessHandler;
+use Lexik\Bundle\WorkflowBundle\Model\ModelStorage;
+use Lexik\Bundle\WorkflowBundle\Entity\ModelState;
+use Lexik\Bundle\WorkflowBundle\Exception\ValidationException;
+use Lexik\Bundle\WorkflowBundle\Tests\TestCase;
+use Lexik\Bundle\WorkflowBundle\Tests\Fixtures\FakeProcessListener;
+Use Lexik\Bundle\WorkflowBundle\Tests\Fixtures\FakeModel;
+use Lexik\Bundle\WorkflowBundle\Tests\Fixtures\FakeSecurityContext;
+use Lexik\Bundle\WorkflowBundle\Tests\Fixtures\FakeValidator;
+use Lexik\Bundle\WorkflowBundle\Tests\Fixtures\FakeAction;
 
 class ProcessHandlerTest extends TestCase
 {
@@ -26,7 +26,7 @@ class ProcessHandlerTest extends TestCase
     protected $em;
 
     /**
-     * @var FreeAgent\WorkflowBundle\Model\ModelStorage
+     * @var Lexik\Bundle\WorkflowBundle\Model\ModelStorage
      */
     protected $modelStorage;
 
@@ -37,7 +37,7 @@ class ProcessHandlerTest extends TestCase
         $this->em = $this->getMockSqliteEntityManager();
         $this->createSchema($this->em);
 
-        $this->modelStorage = new ModelStorage($this->em, 'FreeAgent\WorkflowBundle\Entity\ModelState');
+        $this->modelStorage = new ModelStorage($this->em, 'Lexik\Bundle\WorkflowBundle\Entity\ModelState');
     }
 
     public function testStart()
@@ -67,7 +67,7 @@ class ProcessHandlerTest extends TestCase
     }
 
     /**
-     * @expectedException        FreeAgent\WorkflowBundle\Exception\WorkflowException
+     * @expectedException        Lexik\Bundle\WorkflowBundle\Exception\WorkflowException
      * @expectedExceptionMessage The given model has already started the "document_proccess" process.
      */
     public function testStartAlreadyStarted()
@@ -79,7 +79,7 @@ class ProcessHandlerTest extends TestCase
     }
 
     /**
-     * @expectedException        FreeAgent\WorkflowBundle\Exception\WorkflowException
+     * @expectedException        Lexik\Bundle\WorkflowBundle\Exception\WorkflowException
      * @expectedExceptionMessage The given model has not started the "document_proccess" process.
      */
     public function testReachNextStateNotStarted()
@@ -105,7 +105,7 @@ class ProcessHandlerTest extends TestCase
     }
 
     /**
-     * @expectedException        FreeAgent\WorkflowBundle\Exception\WorkflowException
+     * @expectedException        Lexik\Bundle\WorkflowBundle\Exception\WorkflowException
      * @expectedExceptionMessage The step "step_create_doc" does not contain any next state named "step_fake".
      */
     public function testReachNextStateInvalidNextStep()
@@ -120,7 +120,7 @@ class ProcessHandlerTest extends TestCase
     {
         $this->assertEquals(0, FakeProcessListener::$call);
 
-        $reflectionClass = new \ReflectionClass('FreeAgent\WorkflowBundle\Handler\ProcessHandler');
+        $reflectionClass = new \ReflectionClass('Lexik\Bundle\WorkflowBundle\Handler\ProcessHandler');
         $method = $reflectionClass->getMethod('reachStep');
         $method->setAccessible(true);
         $method->invoke($this->getProcessHandler(), new FakeModel(), new Step('step_fake', 'Fake'));
@@ -143,14 +143,14 @@ class ProcessHandlerTest extends TestCase
         $processHandler = $this->getProcessHandler();
         $step = new Step('sample', 'Sample', array());
 
-        $reflectionClass = new \ReflectionClass('FreeAgent\WorkflowBundle\Flow\Step');
+        $reflectionClass = new \ReflectionClass('Lexik\Bundle\WorkflowBundle\Flow\Step');
         $property = $reflectionClass->getProperty('validations');
         $property->setAccessible(true);
         $property->setValue($step, array(
             array(new FakeValidator(), 'valid'),
         ));
 
-        $reflectionClass = new \ReflectionClass('FreeAgent\WorkflowBundle\Handler\ProcessHandler');
+        $reflectionClass = new \ReflectionClass('Lexik\Bundle\WorkflowBundle\Handler\ProcessHandler');
         $method = $reflectionClass->getMethod('executeValidations');
         $method->setAccessible(true);
         $validationViolations = $method->invoke($processHandler, new FakeModel(), $step->getValidations());
@@ -170,12 +170,12 @@ class ProcessHandlerTest extends TestCase
     }
 
     /**
-     * @expectedException        FreeAgent\WorkflowBundle\Exception\WorkflowException
+     * @expectedException        Lexik\Bundle\WorkflowBundle\Exception\WorkflowException
      * @expectedExceptionMessage Can't find step named "step_unknow" in process "document_proccess".
      */
     public function testGetProcessStepInvalidStepName()
     {
-        $reflectionClass = new \ReflectionClass('FreeAgent\WorkflowBundle\Handler\ProcessHandler');
+        $reflectionClass = new \ReflectionClass('Lexik\Bundle\WorkflowBundle\Handler\ProcessHandler');
         $method = $reflectionClass->getMethod('getProcessStep');
         $method->setAccessible(true);
         $method->invoke($this->getProcessHandler(), 'step_unknow');
@@ -188,7 +188,7 @@ class ProcessHandlerTest extends TestCase
             'Validate doc',
             array(),
             array(),
-            array('setStatus', 'FreeAgent\WorkflowBundle\Tests\Fixtures\FakeModel::STATUS_VALIDATE')
+            array('setStatus', 'Lexik\Bundle\WorkflowBundle\Tests\Fixtures\FakeModel::STATUS_VALIDATE')
         );
 
         $stepRemoveDoc = new Step(
@@ -196,7 +196,7 @@ class ProcessHandlerTest extends TestCase
             'Remove doc',
             array(),
             array(array(new FakeValidator(), 'invalid')),
-            array('setStatus', 'FreeAgent\WorkflowBundle\Tests\Fixtures\FakeModel::STATUS_REMOVE'),
+            array('setStatus', 'Lexik\Bundle\WorkflowBundle\Tests\Fixtures\FakeModel::STATUS_REMOVE'),
             array(),
             'step_fake'
         );
@@ -208,7 +208,7 @@ class ProcessHandlerTest extends TestCase
             'Create doc',
             array(),
             array(),
-            array('setStatus', 'FreeAgent\WorkflowBundle\Tests\Fixtures\FakeModel::STATUS_CREATE')
+            array('setStatus', 'Lexik\Bundle\WorkflowBundle\Tests\Fixtures\FakeModel::STATUS_CREATE')
         );
         $stepCreateDoc->addNextState('validate', NextStateInterface::TARGET_TYPE_STEP, $stepValidateDoc);
         $stepCreateDoc->addNextState('remove', NextStateInterface::TARGET_TYPE_STEP, $stepRemoveDoc);

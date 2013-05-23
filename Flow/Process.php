@@ -1,6 +1,6 @@
 <?php
 
-namespace FreeAgent\WorkflowBundle\Flow;
+namespace Lexik\Bundle\WorkflowBundle\Flow;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
@@ -66,7 +66,7 @@ class Process extends Node
      *
      * @param string $name
      *
-     * @return FreeAgent\WorkflowBundle\Flow\Step
+     * @return Lexik\Bundle\WorkflowBundle\Flow\Step
      */
     public function getStep($name)
     {
@@ -76,7 +76,7 @@ class Process extends Node
     /**
      * Returns the first step.
      *
-     * @return FreeAgent\WorkflowBundle\Flow\Step
+     * @return Lexik\Bundle\WorkflowBundle\Flow\Step
      */
     public function getStartStep()
     {

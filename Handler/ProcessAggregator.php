@@ -1,8 +1,8 @@
 <?php
 
-namespace FreeAgent\WorkflowBundle\Handler;
+namespace Lexik\Bundle\WorkflowBundle\Handler;
 
-use FreeAgent\WorkflowBundle\Exception\WorkflowException;
+use Lexik\Bundle\WorkflowBundle\Exception\WorkflowException;
 
 /**
  * Aggregate all processes.
@@ -30,7 +30,7 @@ class ProcessAggregator
      * Returns a process by its name.
      *
      * @param string $name
-     * @return FreeAgent\WorkflowBundle\Flow\Process
+     * @return Lexik\Bundle\WorkflowBundle\Flow\Process
      *
      * @throws WorkflowException
      */

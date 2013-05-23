@@ -1,9 +1,9 @@
 <?php
 
-namespace FreeAgent\WorkflowBundle\Tests\Model;
+namespace Lexik\Bundle\WorkflowBundle\Tests\Model;
 
-use FreeAgent\WorkflowBundle\Entity\ModelState;
-use FreeAgent\WorkflowBundle\Tests\TestCase;
+use Lexik\Bundle\WorkflowBundle\Entity\ModelState;
+use Lexik\Bundle\WorkflowBundle\Tests\TestCase;
 
 class ModelStateRepositoryTest extends TestCase
 {
@@ -53,9 +53,9 @@ class ModelStateRepositoryTest extends TestCase
     {
         $this->createData();
 
-        $repository = $this->em->getRepository('FreeAgent\WorkflowBundle\Entity\ModelState');
+        $repository = $this->em->getRepository('Lexik\Bundle\WorkflowBundle\Entity\ModelState');
 
-        $this->assertInstanceOf('FreeAgent\WorkflowBundle\Model\ModelStateRepository', $repository);
+        $this->assertInstanceOf('Lexik\Bundle\WorkflowBundle\Model\ModelStateRepository', $repository);
 
         $this->assertNull($repository->findLatestModelState('id', 'process'));
         $this->assertNull($repository->findLatestModelState('a1b2c3', 'process_?'));
