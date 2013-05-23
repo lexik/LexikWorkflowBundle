@@ -5,8 +5,9 @@ namespace FreeAgent\WorkflowBundle\Flow;
 /**
  * A State represent one of the available next element (step) a given step.
  *
+ * @author Cédric Girard <c.girard@lexik.fr>
  */
-class State implements StateInterface
+class NextState implements NextStateInterface
 {
     /**
      * @var string
@@ -16,7 +17,7 @@ class State implements StateInterface
     /**
      * @var string
      */
-    protected $type;
+    protected $targetType;
 
     /**
      * @var Step
@@ -32,24 +33,16 @@ class State implements StateInterface
      * Construct.
      *
      * @param string $name
-     * @param string $type
-     * @param Step $target
-     * @param array $validations
+     * @param string $targetType
+     * @param Node   $target
+     * @param array  $validations
      */
-    public function __construct($name, $type, $target, array $validations = array())
+    public function __construct($name, $targetType, Node $target, array $validations = array())
     {
         $this->name = $name;
-        $this->type = $type;
+        $this->targetType = $targetType;
         $this->target = $target;
         $this->validations = $validations;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getType()
-    {
-        return $this->type;
     }
 
     /**
@@ -58,6 +51,14 @@ class State implements StateInterface
     public function getName()
     {
         return $this->name;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getTargetType()
+    {
+        return $this->type;
     }
 
     /**

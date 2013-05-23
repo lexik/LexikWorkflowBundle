@@ -5,6 +5,11 @@ namespace FreeAgent\WorkflowBundle\Handler;
 use FreeAgent\WorkflowBundle\Entity\ModelState;
 use FreeAgent\WorkflowBundle\Model\ModelInterface;
 
+/**
+ * Process handler interface.
+ *
+ * @author Cédric Girard <c.girard@lexik.fr>
+ */
 interface ProcessHandlerInterface
 {
     /**
@@ -31,6 +36,15 @@ interface ProcessHandlerInterface
      * @return ModelState
      */
     public function getCurrentState(ModelInterface $model);
+
+    /**
+     * Returns all model state of the given model object.
+     *
+     * @param ModelInterface $model
+     * @param boolean $successOnly
+     * @return array
+     */
+    public function getAllStates(ModelInterface $model, $successOnly = true);
 
     /**
      * Returns true if the given model has completed the process.

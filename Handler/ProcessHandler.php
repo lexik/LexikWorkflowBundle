@@ -74,7 +74,7 @@ class ProcessHandler implements ProcessHandlerInterface
         $modelState = $this->storage->findCurrentModelState($model, $this->process->getName());
 
         if ($modelState instanceof ModelState) {
-            throw new WorkflowException('The given model as already started this process.');
+            throw new WorkflowException(sprintf('The given model has already started the "%s" process.', $this->process->getName()));
         }
 
         $step = $this->getProcessStep($this->process->getStartStep());
@@ -89,13 +89,13 @@ class ProcessHandler implements ProcessHandlerInterface
     {
         $currentModelState = $this->storage->findCurrentModelState($model, $this->process->getName());
 
-        if ( ! ($currentModelState instanceof ModelState)) {
-            throw new WorkflowException('The given model has not started this process.');
+        if ( ! ($currentModelState instanceof ModelState) ) {
+            throw new WorkflowException(sprintf('The given model has not started the "%s" process.', $this->process->getName()));
         }
 
         $currentStep = $this->getProcessStep($currentModelState->getStepName());
 
-        if (!$currentStep->hasNextState($stateName)) {
+        if ( !$currentStep->hasNextState($stateName) ) {
             throw new WorkflowException(sprintf('The step "%s" does not contain any next state named "%s".', $currentStep->getName(), $stateName));
         }
 
@@ -124,7 +124,7 @@ class ProcessHandler implements ProcessHandlerInterface
      * @param ModelInterface $model
      * @param Step           $step
      * @param ModelState     $currentModelState
-     * @return FreeAgent\WorkflowBundle\Entity\ModelState
+     * @return ModelState
      */
     protected function reachStep(ModelInterface $model, Step $step, ModelState $currentModelState = null)
     {
@@ -181,11 +181,7 @@ class ProcessHandler implements ProcessHandlerInterface
     }
 
     /**
-     * Returns all model state of the given model object.
-     *
-     * @param ModelInterface $model
-     * @param boolean $successOnly
-     * @return array
+     * {@inheritdoc}
      */
     public function getAllStates(ModelInterface $model, $successOnly = true)
     {
@@ -196,7 +192,7 @@ class ProcessHandler implements ProcessHandlerInterface
      * Returns a step by its name.
      *
      * @param string $stepName
-     * @return FreeAgent\WorkflowBundle\Flow\Step
+     * @return Step
      */
     protected function getProcessStep($stepName)
     {

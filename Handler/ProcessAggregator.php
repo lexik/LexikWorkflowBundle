@@ -4,6 +4,11 @@ namespace FreeAgent\WorkflowBundle\Handler;
 
 use FreeAgent\WorkflowBundle\Exception\WorkflowException;
 
+/**
+ * Aggregate all processes.
+ *
+ * @author Cédric Girard <c.girard@lexik.fr>
+ */
 class ProcessAggregator
 {
     /**
@@ -32,7 +37,7 @@ class ProcessAggregator
     public function getProcess($name)
     {
         if (!isset($this->processes[$name])) {
-            throw new WorkflowException(sprintf('Unknown process "%s"', $name));
+            throw new WorkflowException(sprintf('Unknown process "%s".', $name));
         }
 
         return $this->processes[$name];
