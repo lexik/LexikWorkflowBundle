@@ -138,7 +138,6 @@ class Configuration implements ConfigurationInterface
                         ->defaultNull()
                     ->end()
                 ->end()
-                ->append($this->createValidationsNodeDefinition())
                 ->append($this->createNextStatesNodeDefinition())
             ->end()
         ;
@@ -174,40 +173,9 @@ class Configuration implements ConfigurationInterface
                         ->cannotBeEmpty()
                     ->end()
                 ->end()
-                ->append($this->createValidationsNodeDefinition())
             ->end()
         ;
 
         return $nextStatesNode;
-    }
-
-    /**
-     * Create a configuration node to define validations for a step (or pre-validation on a next state).
-     *
-     * @return ArrayNodeDefinition
-     */
-    private function createValidationsNodeDefinition()
-    {
-        $validatorSyntax = function(array $values) {
-            foreach ($values as $value) {
-                if (2 !== count($parts = explode(':', $value))) {
-                    return true;
-                }
-            }
-        };
-
-        $validationsNode = new ArrayNodeDefinition('validations');
-
-        $validationsNode
-            ->validate()
-                ->ifTrue(function($value) use ($validatorSyntax) {
-                    return (is_array($value) && $validatorSyntax($value));
-                })
-                ->thenInvalid('You must specify valid validation name as serviceId:method string')
-            ->end()
-            ->prototype('scalar')->end()
-        ;
-
-        return $validationsNode;
     }
 }

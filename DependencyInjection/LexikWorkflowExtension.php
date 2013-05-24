@@ -128,13 +128,10 @@ class LexikWorkflowExtension extends Extension
         $stepReferences = array();
 
         foreach ($steps as $stepName => $stepConfig) {
-            $validations = $this->convertToServiceReferences($stepConfig['validations']);
-
             $definition = new Definition($stepClass, array(
                 $stepName,
                 $stepConfig['label'],
                 array(),
-                $validations,
                 $stepConfig['model_status'],
                 $stepConfig['roles'],
                 $stepConfig['on_invalid'],
@@ -180,27 +177,8 @@ class LexikWorkflowExtension extends Extension
             $step->addMethodCall('addNextState', array(
                 $stateName,
                 $data['type'],
-                $target,
-                $this->convertToServiceReferences($data['validations'])
+                $target
             ));
         }
-    }
-
-    /**
-     * Convert "service.id:method" string to service reference object.
-     *
-     * @param array $serviceMethods
-     * @return array
-     */
-    private function convertToServiceReferences(array $serviceMethods)
-    {
-        $references = array();
-
-        foreach ($serviceMethods as $serviceMethod) {
-            list($serviceId, $method) = explode(':', $serviceMethod);
-            $references[] = array(new Reference($serviceId), $method);
-        }
-
-        return $references;
     }
 }

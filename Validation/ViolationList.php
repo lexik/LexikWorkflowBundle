@@ -89,4 +89,19 @@ class ViolationList implements \IteratorAggregate, \Countable, \ArrayAccess
     {
         return count($this->violations);
     }
+
+    /**
+     * Cast violations to flat array.
+     *
+     * @return array
+     */
+    public function toArray()
+    {
+        $data = array();
+        foreach ($this->violations as $violation) {
+            $data[] = $violation->getMessage();
+        }
+
+        return $data;
+    }
 }

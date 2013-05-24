@@ -10,12 +10,11 @@ use Lexik\Bundle\WorkflowBundle\Flow\Step;
 use Lexik\Bundle\WorkflowBundle\Handler\ProcessHandler;
 use Lexik\Bundle\WorkflowBundle\Model\ModelStorage;
 use Lexik\Bundle\WorkflowBundle\Entity\ModelState;
-use Lexik\Bundle\WorkflowBundle\Exception\ValidationException;
 use Lexik\Bundle\WorkflowBundle\Tests\TestCase;
 use Lexik\Bundle\WorkflowBundle\Tests\Fixtures\FakeProcessListener;
 Use Lexik\Bundle\WorkflowBundle\Tests\Fixtures\FakeModel;
 use Lexik\Bundle\WorkflowBundle\Tests\Fixtures\FakeSecurityContext;
-use Lexik\Bundle\WorkflowBundle\Tests\Fixtures\FakeValidator;
+use Lexik\Bundle\WorkflowBundle\Tests\Fixtures\FakeValidatorListener;
 use Lexik\Bundle\WorkflowBundle\Tests\Fixtures\FakeAction;
 
 class ProcessHandlerTest extends TestCase
@@ -128,45 +127,25 @@ class ProcessHandlerTest extends TestCase
         $this->assertEquals(1, FakeProcessListener::$call);
     }
 
-    public function testReachNextStateError()
+    public function testReachNextStateOnInvalid()
     {
         $model = new FakeModel();
         $this->modelStorage->newModelStateSuccess($model, 'document_proccess', 'step_create_doc');
 
-        $modelState = $this->getProcessHandler()->reachNextState($model, 'remove');
+        $modelState = $this->getProcessHandler()->reachNextState($model, 'remove_on_invalid');
 
         $this->assertEquals('step_fake', $modelState->getStepName());
     }
 
     public function testExecuteValidations()
     {
-        $processHandler = $this->getProcessHandler();
-        $step = new Step('sample', 'Sample', array());
+        $model = new FakeModel();
+        $this->modelStorage->newModelStateSuccess($model, 'document_proccess', 'step_create_doc');
 
-        $reflectionClass = new \ReflectionClass('Lexik\Bundle\WorkflowBundle\Flow\Step');
-        $property = $reflectionClass->getProperty('validations');
-        $property->setAccessible(true);
-        $property->setValue($step, array(
-            array(new FakeValidator(), 'valid'),
-        ));
+        $modelState = $this->getProcessHandler()->reachNextState($model, 'remove');
 
-        $reflectionClass = new \ReflectionClass('Lexik\Bundle\WorkflowBundle\Handler\ProcessHandler');
-        $method = $reflectionClass->getMethod('executeValidations');
-        $method->setAccessible(true);
-        $validationViolations = $method->invoke($processHandler, new FakeModel(), $step->getValidations());
-
-        $this->assertTrue(is_array($validationViolations));
-        $this->assertEquals(0, count($validationViolations));
-
-        $property->setValue($step, array(
-            array(new FakeValidator(), 'invalid'),
-        ));
-
-        $validationViolations = $method->invoke($processHandler, new FakeModel(), $step->getValidations());
-
-        $this->assertEquals(1, count($validationViolations));
-        $this->assertTrue($validationViolations[0] instanceof ValidationException);
-        $this->assertEquals('Validator error!', $validationViolations[0]->getMessage());
+        $this->assertFalse($modelState->getSuccessful());
+        $this->assertEquals(array('Validation error!'), $modelState->getErrors());
     }
 
     /**
@@ -181,12 +160,35 @@ class ProcessHandlerTest extends TestCase
         $method->invoke($this->getProcessHandler(), 'step_unknow');
     }
 
+    public function testExecutePreValidations()
+    {
+        // reset fake calls
+        FakeProcessListener::$call = 0;
+
+        $model = new FakeModel();
+        $this->modelStorage->newModelStateSuccess($model, 'document_proccess', 'step_create_doc');
+        $modelState = $this->getProcessHandler()->reachNextState($model, 'validate_with_pre_validation');
+
+        $this->assertTrue($modelState->getSuccessful());
+        $this->assertEquals('step_validate_doc', $modelState->getStepName());
+
+        $this->assertEquals(0, FakeProcessListener::$call);
+
+        $model = new FakeModel();
+        $this->modelStorage->newModelStateSuccess($model, 'document_proccess', 'step_create_doc');
+        $modelState = $this->getProcessHandler()->reachNextState($model, 'validate_with_pre_validation_invalid');
+
+        $this->assertFalse($modelState->getSuccessful());
+        $this->assertEquals(array('Validation error!'), $modelState->getErrors());
+
+        $this->assertEquals(1, FakeProcessListener::$call);
+    }
+
     protected function getProcessHandler()
     {
         $stepValidateDoc = new Step(
             'step_validate_doc',
             'Validate doc',
-            array(),
             array(),
             array('setStatus', 'Lexik\Bundle\WorkflowBundle\Tests\Fixtures\FakeModel::STATUS_VALIDATE')
         );
@@ -195,7 +197,13 @@ class ProcessHandlerTest extends TestCase
             'step_remove_doc',
             'Remove doc',
             array(),
-            array(array(new FakeValidator(), 'invalid')),
+            array('setStatus', 'Lexik\Bundle\WorkflowBundle\Tests\Fixtures\FakeModel::STATUS_REMOVE')
+        );
+
+        $stepRemoveOnInvalidDoc = new Step(
+            'step_remove_on_invalid_doc',
+            'Remove doc',
+            array(),
             array('setStatus', 'Lexik\Bundle\WorkflowBundle\Tests\Fixtures\FakeModel::STATUS_REMOVE'),
             array(),
             'step_fake'
@@ -207,26 +215,49 @@ class ProcessHandlerTest extends TestCase
             'step_create_doc',
             'Create doc',
             array(),
-            array(),
             array('setStatus', 'Lexik\Bundle\WorkflowBundle\Tests\Fixtures\FakeModel::STATUS_CREATE')
         );
         $stepCreateDoc->addNextState('validate', NextStateInterface::TARGET_TYPE_STEP, $stepValidateDoc);
+        $stepCreateDoc->addNextState('validate_with_pre_validation', NextStateInterface::TARGET_TYPE_STEP, $stepValidateDoc);
+        $stepCreateDoc->addNextState('validate_with_pre_validation_invalid', NextStateInterface::TARGET_TYPE_STEP, $stepValidateDoc);
         $stepCreateDoc->addNextState('remove', NextStateInterface::TARGET_TYPE_STEP, $stepRemoveDoc);
+        $stepCreateDoc->addNextState('remove_on_invalid', NextStateInterface::TARGET_TYPE_STEP, $stepRemoveOnInvalidDoc);
 
         $process = new Process(
             'document_proccess',
             array(
-                'step_create_doc'   => $stepCreateDoc,
-                'step_validate_doc' => $stepValidateDoc,
-                'step_remove_doc'   => $stepRemoveDoc,
-                'step_fake'         => $stepFake,
+                'step_create_doc'            => $stepCreateDoc,
+                'step_validate_doc'          => $stepValidateDoc,
+                'step_remove_doc'            => $stepRemoveDoc,
+                'step_remove_on_invalid_doc' => $stepRemoveOnInvalidDoc,
+                'step_fake'                  => $stepFake,
             ),
             'step_create_doc',
             array('step_validate_doc')
         );
 
         $dispatcher = new EventDispatcher();
-        $dispatcher->addListener('document_proccess.step_fake.reached', array(new FakeProcessListener(), 'handleSucccess'));
+        $dispatcher->addListener('document_proccess.step_fake.reached', array(
+            new FakeProcessListener(), 'handleSucccess'
+        ));
+        $dispatcher->addListener('document_proccess.step_remove_doc.access_validation', array(
+            new FakeValidatorListener(), 'invalid'
+        ));
+        $dispatcher->addListener('document_proccess.step_remove_on_invalid_doc.access_validation', array(
+            new FakeValidatorListener(), 'invalid'
+        ));
+        $dispatcher->addListener('document_proccess.step_validate_doc.access_validation', array(
+            new FakeValidatorListener(), 'valid'
+        ));
+        $dispatcher->addListener('document_proccess.step_create_doc.validate_with_pre_validation.pre_validation', array(
+            new FakeValidatorListener(), 'valid'
+        ));
+        $dispatcher->addListener('document_proccess.step_create_doc.validate_with_pre_validation_invalid.pre_validation', array(
+            new FakeValidatorListener(), 'invalid'
+        ));
+        $dispatcher->addListener('document_proccess.step_create_doc.validate_with_pre_validation_invalid.pre_validation_fail', array(
+            new FakeProcessListener(), 'handleSucccess'
+        ));
 
         $processHandler = new ProcessHandler($process, $this->modelStorage, $dispatcher);
         $processHandler->setSecurityContext(new FakeSecurityContext());
