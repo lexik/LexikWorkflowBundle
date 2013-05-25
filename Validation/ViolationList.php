@@ -4,6 +4,12 @@ namespace Lexik\Bundle\WorkflowBundle\Validation;
 
 use Lexik\Bundle\WorkflowBundle\Validation\Violation;
 
+/**
+ * Violation list of step validations.
+ *
+ * @author Jeremy Barthe <j.barthe@lexik.fr>
+ * @author Gilles Gauthier <g.gauthier@lexik.fr>
+ */
 class ViolationList implements \IteratorAggregate, \Countable, \ArrayAccess
 {
     /**
