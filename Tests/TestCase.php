@@ -22,8 +22,6 @@ processes:
         steps:
             step_create_doc:
                 roles: [ ROLE_ADMIN, ROLE_USER ]
-#                validations:
-#                    - workflow.validator.check_wahtever_you_need
                 next_states:
                     validate:
                         target: step_validate_doc
@@ -31,12 +29,8 @@ processes:
                         target: step_remove_doc
             step_validate_doc:
                 roles: [ ROLE_ADMIN, ROLE_USER ]
-#                validations:
-#                    - workflow.validator.check_content_is_not_empty
             step_remove_doc:
                 roles: [ ROLE_ADMIN ]
-#                validations:
-#                    - workflow.validator.check_doc_not_published
 EOF;
         $parser = new Parser();
 

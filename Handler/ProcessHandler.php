@@ -2,13 +2,14 @@
 
 namespace Lexik\Bundle\WorkflowBundle\Handler;
 
+use Lexik\Bundle\WorkflowBundle\Event\ValidateStepEvent;
+use Lexik\Bundle\WorkflowBundle\Validation\ViolationList;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 
 use Lexik\Bundle\WorkflowBundle\Event\StepEvent;
 use Lexik\Bundle\WorkflowBundle\Exception\WorkflowException;
 use Lexik\Bundle\WorkflowBundle\Exception\AccessDeniedException;
-use Lexik\Bundle\WorkflowBundle\Exception\ValidationException;
 use Lexik\Bundle\WorkflowBundle\Flow\Step;
 use Lexik\Bundle\WorkflowBundle\Flow\Process;
 use Lexik\Bundle\WorkflowBundle\Entity\ModelState;
@@ -103,13 +104,16 @@ class ProcessHandler implements ProcessHandlerInterface
         $step = $state->getTarget();
 
         // pre validations
-        $errors = $this->executeValidations($model, $state->getAdditionalValidations());
+        $event = new ValidateStepEvent($step, $model, new ViolationList());
+        $eventName = sprintf('%s.%s.%s.pre_validation', $this->process->getName(), $currentStep->getName(), $stateName);
+        $this->dispatcher->dispatch($eventName, $event);
+
         $modelState = null;
 
-        if (count($errors) > 0) {
-            $modelState = $this->storage->newModelStateError($model, $this->process->getName(), $step->getName(), $errors, $currentModelState);
+        if (count($event->getViolationList()) > 0) {
+            $modelState = $this->storage->newModelStateError($model, $this->process->getName(), $step->getName(), $event->getViolationList(), $currentModelState);
 
-            $eventName = sprintf('%s.%s.pre_validation_fail', $this->process->getName() , $step->getName());
+            $eventName = sprintf('%s.%s.%s.pre_validation_fail', $this->process->getName(), $currentStep->getName(), $stateName);
             $this->dispatcher->dispatch($eventName, new StepEvent($step, $model, $modelState));
         } else {
             $modelState = $this->reachStep($model, $step, $currentModelState);
@@ -134,9 +138,11 @@ class ProcessHandler implements ProcessHandlerInterface
             return $this->storage->newModelStateError($model, $this->process->getName(), $step->getName(), array($e), $currentModelState);
         }
 
-        $errors = $this->executeValidations($model, $step->getValidations());
+        $event = new ValidateStepEvent($step, $model, new ViolationList());
+        $eventName = sprintf('%s.%s.validate', $this->process->getName(), $step->getName());
+        $this->dispatcher->dispatch($eventName, $event);
 
-        if (0 === count($errors)) {
+        if (0 === count($event->getViolationList())) {
             $modelState = $this->storage->newModelStateSuccess($model, $this->process->getName(), $step->getName(), $currentModelState);
 
             // update model status
@@ -145,12 +151,12 @@ class ProcessHandler implements ProcessHandlerInterface
                 $model->$method(constant($constant));
             }
 
-            $eventName = sprintf('%s.%s.reached', $this->process->getName() , $step->getName());
+            $eventName = sprintf('%s.%s.reached', $this->process->getName(), $step->getName());
             $this->dispatcher->dispatch($eventName, new StepEvent($step, $model, $modelState));
         } else {
-            $modelState = $this->storage->newModelStateError($model, $this->process->getName(), $step->getName(), $errors, $currentModelState);
+            $modelState = $this->storage->newModelStateError($model, $this->process->getName(), $step->getName(), $event->getViolationList(), $currentModelState);
 
-            $eventName = sprintf('%s.%s.validation_fail', $this->process->getName() , $step->getName());
+            $eventName = sprintf('%s.%s.validation_fail', $this->process->getName(), $step->getName());
             $this->dispatcher->dispatch($eventName, new StepEvent($step, $model, $modelState));
 
             if ($step->getOnInvalid()) {
@@ -203,31 +209,6 @@ class ProcessHandler implements ProcessHandlerInterface
         }
 
         return $step;
-    }
-
-    /**
-     * Execute validations of a given step.
-     *
-     * @param ModelInterface $model
-     * @param array          $validations
-     *
-     * @return array An array of validation exceptions
-     */
-    protected function executeValidations(ModelInterface $model, array $validations)
-    {
-        $validationViolations = array();
-
-        foreach ($validations as $validation) {
-            list($validator, $method) = $validation;
-
-            try {
-                $validator->$method($model);
-            } catch (ValidationException $e) {
-                $validationViolations[] = $e;
-            }
-        }
-
-        return $validationViolations;
     }
 
     /**

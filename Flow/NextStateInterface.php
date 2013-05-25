@@ -32,11 +32,4 @@ interface NextStateInterface
      * @return NodeInterface
      */
     public function getTarget();
-
-    /**
-     * Returns additional validation to execute before reaching the state target.
-     *
-     * @return array
-     */
-    public function getAdditionalValidations();
 }

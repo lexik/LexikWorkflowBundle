@@ -17,23 +17,18 @@ abstract class Node
     /**
      * @var array
      */
-    protected $validations;
-
-    /**
-     * @var array
-     */
     protected $nextStates;
 
     /**
      * Constructor.
      *
      * @param string $name
+     * @param array  $nextStates
      */
-    public function __construct($name, array $nextStates = array(), array $validations = array())
+    public function __construct($name, array $nextStates = array())
     {
-        $this->name        = $name;
-        $this->validations = $validations;
-        $this->nextStates  = $nextStates;
+        $this->name       = $name;
+        $this->nextStates = $nextStates;
     }
 
     /**
@@ -44,26 +39,6 @@ abstract class Node
     public function getName()
     {
         return $this->name;
-    }
-
-    /**
-     * Returns all validations to execute to check if the step is reachable.
-     *
-     * @return array
-     */
-    public function getValidations()
-    {
-        return $this->validations;
-    }
-
-    /**
-     * Returns true if the step requires some validations to be reached.
-     *
-     * @return boolean
-     */
-    public function hasValidations()
-    {
-        return !empty($this->validations);
     }
 
     /**
@@ -108,10 +83,9 @@ abstract class Node
      * @param string $name
      * @param string $targetType
      * @param Node   $state
-     * @param array  $validations
      */
-    public function addNextState($name, $targetType, Node $target, array $validations = array())
+    public function addNextState($name, $targetType, Node $target)
     {
-        $this->nextStates[$name] = new NextState($name, $targetType, $target, $validations);
+        $this->nextStates[$name] = new NextState($name, $targetType, $target);
     }
 }

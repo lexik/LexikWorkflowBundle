@@ -35,14 +35,13 @@ class Step extends Node
      * @param string $name
      * @param string $label
      * @param array  $nextStates
-     * @param array  $validations
      * @param array  $modelStatus
      * @param array  $roles
      * @param string $onInvalid
      */
-    public function __construct($name, $label, array $nextStates = array(), array $validations = array(), array $modelStatus = array(), array $roles = array(), $onInvalid = null)
+    public function __construct($name, $label, array $nextStates = array(), array $modelStatus = array(), array $roles = array(), $onInvalid = null)
     {
-        parent::__construct($name, $nextStates, $validations);
+        parent::__construct($name, $nextStates);
 
         $this->label       = $label;
         $this->modelStatus = $modelStatus;

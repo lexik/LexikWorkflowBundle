@@ -25,24 +25,17 @@ class NextState implements NextStateInterface
     protected $target;
 
     /**
-     * @var array
-     */
-    protected $validations;
-
-    /**
      * Construct.
      *
      * @param string $name
      * @param string $targetType
      * @param Node   $target
-     * @param array  $validations
      */
-    public function __construct($name, $targetType, Node $target, array $validations = array())
+    public function __construct($name, $targetType, Node $target)
     {
         $this->name = $name;
         $this->targetType = $targetType;
         $this->target = $target;
-        $this->validations = $validations;
     }
 
     /**
@@ -67,13 +60,5 @@ class NextState implements NextStateInterface
     public function getTarget()
     {
         return $this->target;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getAdditionalValidations()
-    {
-        return $this->validations;
     }
 }

@@ -5,6 +5,7 @@ namespace Lexik\Bundle\WorkflowBundle\Model;
 use Lexik\Bundle\WorkflowBundle\Entity\ModelState;
 
 use Doctrine\ORM\EntityManager;
+use Lexik\Bundle\WorkflowBundle\Validation\ViolationList;
 
 class ModelStorage
 {
@@ -63,6 +64,29 @@ class ModelStorage
     }
 
     /**
+     * Create a new invalid model state.
+     *
+     * @param ModelInterface $model
+     * @param string $processName
+     * @param string $stepName
+     * @param ViolationList $violationList
+     * @param null|ModelState $previous
+     *
+     * @return ModelState
+     */
+    public function newModelStateError(ModelInterface $model, $processName, $stepName, ViolationList $violationList, $previous = null)
+    {
+        $modelState = $this->createModelState($model, $processName, $stepName, $previous);
+        $modelState->setSuccessful(false);
+        $modelState->setErrors($violationList->toArray());
+
+        $this->om->persist($modelState);
+        $this->om->flush($modelState);
+
+        return $modelState;
+    }
+
+    /**
      * Delete all model states.
      *
      * @param ModelInterface $model
@@ -89,33 +113,6 @@ class ModelStorage
     {
         $modelState = $this->createModelState($model, $processName, $stepName, $previous);
         $modelState->setSuccessful(true);
-
-        $this->om->persist($modelState);
-        $this->om->flush($modelState);
-
-        return $modelState;
-    }
-
-    /**
-     * Create a new invalid model state.
-     *
-     * @param ModelInterface $model
-     * @param string $processName
-     * @param string $stepName
-     * @param ModelState $previous
-     * @param array $errors
-     * @return \Lexik\Bundle\WorkflowBundle\Entity\ModelState
-     */
-    public function newModelStateError(ModelInterface $model, $processName, $stepName, array $errors, $previous = null)
-    {
-        $messages = array();
-        foreach ($errors as $error) {
-            $messages[] = (string) $error;
-        }
-
-        $modelState = $this->createModelState($model, $processName, $stepName, $previous);
-        $modelState->setSuccessful(false);
-        $modelState->setErrors($messages);
 
         $this->om->persist($modelState);
         $this->om->flush($modelState);
