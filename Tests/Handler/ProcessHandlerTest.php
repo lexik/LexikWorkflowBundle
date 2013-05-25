@@ -15,7 +15,6 @@ use Lexik\Bundle\WorkflowBundle\Tests\Fixtures\FakeProcessListener;
 Use Lexik\Bundle\WorkflowBundle\Tests\Fixtures\FakeModel;
 use Lexik\Bundle\WorkflowBundle\Tests\Fixtures\FakeSecurityContext;
 use Lexik\Bundle\WorkflowBundle\Tests\Fixtures\FakeValidatorListener;
-use Lexik\Bundle\WorkflowBundle\Tests\Fixtures\FakeAction;
 
 class ProcessHandlerTest extends TestCase
 {

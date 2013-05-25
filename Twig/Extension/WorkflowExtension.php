@@ -45,7 +45,7 @@ class WorkflowExtension extends \Twig_Extension
     /**
      * Return the state's step label.
      *
-     * @param ModelState $state
+     * @param  ModelState $state
      * @return string
      */
     public function getStepLabel(ModelState $state)
@@ -60,7 +60,7 @@ class WorkflowExtension extends \Twig_Extension
     /**
      * Returns the state message.
      *
-     * @param ModelState $state
+     * @param  ModelState $state
      * @return string
      */
     public function getStateMessage(ModelState $state)

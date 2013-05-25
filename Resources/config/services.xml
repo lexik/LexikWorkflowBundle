@@ -19,7 +19,7 @@
             <argument type="service" id="doctrine.orm.entity_manager" />
             <argument>%lexik_workflow.model_state.class%</argument>
         </service>
-        
+
         <!-- Twig extension -->
         <service id="lexik_workflow.twig.workflow_extension" class="Lexik\Bundle\WorkflowBundle\Twig\Extension\WorkflowExtension" public="false">
             <argument type="service" id="lexik_workflow.process_aggregator" />

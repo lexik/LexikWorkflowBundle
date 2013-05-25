@@ -9,8 +9,8 @@ class ModelStateRepository extends EntityRepository
     /**
      * Returns the last ModelState for the given workflow identifier.
      *
-     * @param string $workflowIdentifier
-     * @param string $processName
+     * @param  string                                        $workflowIdentifier
+     * @param  string                                        $processName
      * @return Lexik\Bundle\WorkflowBundle\Entity\ModelState
      */
     public function findLatestModelState($workflowIdentifier, $processName)
@@ -32,9 +32,9 @@ class ModelStateRepository extends EntityRepository
     /**
      * Returns all model states for the given workflow identifier.
      *
-     * @param string $workflowIdentifier
-     * @param string $processName
-     * @param boolean $successOnly
+     * @param  string  $workflowIdentifier
+     * @param  string  $processName
+     * @param  boolean $successOnly
      * @return array
      */
     public function findModelStates($workflowIdentifier, $processName, $successOnly)
@@ -58,8 +58,8 @@ class ModelStateRepository extends EntityRepository
     /**
      * Delete all model states for the given workflowIndentifier (and process name if given).
      *
-     * @param string $workflowIdentifier
-     * @param string $processName
+     * @param  string $workflowIdentifier
+     * @param  string $processName
      * @return int
      */
     public function deleteModelStates($workflowIdentifier, $processName = null)

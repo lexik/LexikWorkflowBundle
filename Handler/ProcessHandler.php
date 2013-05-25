@@ -16,8 +16,6 @@ use Lexik\Bundle\WorkflowBundle\Entity\ModelState;
 use Lexik\Bundle\WorkflowBundle\Model\ModelStorage;
 use Lexik\Bundle\WorkflowBundle\Model\ModelInterface;
 
-use Doctrine\Common\Collections\ArrayCollection;
-
 /**
  * Contains all logic to handle a process and its steps.
  */
@@ -46,8 +44,8 @@ class ProcessHandler implements ProcessHandlerInterface
     /**
      * Construct.
      *
-     * @param Process      $process
-     * @param ModelStorage $storage
+     * @param Process                  $process
+     * @param ModelStorage             $storage
      * @param EventDispatcherInterface $dispatcher
      */
     public function __construct(Process $process, ModelStorage $storage, EventDispatcherInterface $dispatcher)
@@ -125,9 +123,9 @@ class ProcessHandler implements ProcessHandlerInterface
     /**
      * Reach the given step.
      *
-     * @param ModelInterface $model
-     * @param Step           $step
-     * @param ModelState     $currentModelState
+     * @param  ModelInterface $model
+     * @param  Step           $step
+     * @param  ModelState     $currentModelState
      * @return ModelState
      */
     protected function reachStep(ModelInterface $model, Step $step, ModelState $currentModelState = null)
@@ -197,7 +195,7 @@ class ProcessHandler implements ProcessHandlerInterface
     /**
      * Returns a step by its name.
      *
-     * @param string $stepName
+     * @param  string $stepName
      * @return Step
      */
     protected function getProcessStep($stepName)
@@ -214,7 +212,7 @@ class ProcessHandler implements ProcessHandlerInterface
     /**
      * Check if the user is allowed to reach the step.
      *
-     * @param Step $step
+     * @param  Step                  $step
      * @throws AccessDeniedException
      */
     protected function checkCredentials(Step $step)

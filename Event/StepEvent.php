@@ -33,9 +33,9 @@ class StepEvent extends Event
     /**
      * Construct.
      *
-     * @param Step $step
+     * @param Step           $step
      * @param ModelInterface $model
-     * @param ModelState $modelState
+     * @param ModelState     $modelState
      */
     public function __construct(Step $step, ModelInterface $model, ModelState $modelState)
     {

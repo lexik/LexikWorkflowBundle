@@ -54,7 +54,7 @@ abstract class Node
     /**
      * Returns true if the given step name is one of the next steps.
      *
-     * @param string $name
+     * @param  string  $name
      * @return boolean
      */
     public function hasNextState($name)
@@ -65,7 +65,7 @@ abstract class Node
     /**
      * Returns the target of the given state.
      *
-     * @param string $name
+     * @param  string             $name
      * @return NextStateInterface
      */
     public function getNextState($name)

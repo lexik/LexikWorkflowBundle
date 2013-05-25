@@ -3,7 +3,6 @@
 namespace Lexik\Bundle\WorkflowBundle\DependencyInjection;
 
 use Lexik\Bundle\WorkflowBundle\Flow\NextStateInterface;
-use Lexik\Bundle\WorkflowBundle\Flow\NextState;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\FileLocator;
@@ -11,7 +10,6 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\Yaml\Parser;
 
 /**
@@ -154,9 +152,9 @@ class LexikWorkflowExtension extends Extension
     /**
      * Add all next states to the step definition.
      *
-     * @param Definition $step
-     * @param array $stepsNextStates
-     * @param string $processName
+     * @param  Definition                $step
+     * @param  array                     $stepsNextStates
+     * @param  string                    $processName
      * @throws \InvalidArgumentException
      */
     protected function addStepNextStates(Definition $step, $stepsNextStates, $processName)
@@ -167,7 +165,7 @@ class LexikWorkflowExtension extends Extension
             if (NextStateInterface::TARGET_TYPE_STEP === $data['type']) {
                 $target = new Reference(sprintf('lexik_workflow.process.%s.step.%s', $processName, $data['target']));
 
-            } else if (NextStateInterface::TARGET_TYPE_PROCESS === $data['type']) {
+            } elseif (NextStateInterface::TARGET_TYPE_PROCESS === $data['type']) {
                 $target = new Reference(sprintf('lexik_workflow.process.%s', $data['target']));
 
             } else {

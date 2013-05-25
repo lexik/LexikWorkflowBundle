@@ -15,7 +15,7 @@ interface ProcessHandlerInterface
     /**
      * Start the current process for the given model.
      *
-     * @param ModelInterface $model
+     * @param  ModelInterface $model
      * @return ModelState
      */
     public function start(ModelInterface $model);
@@ -23,8 +23,8 @@ interface ProcessHandlerInterface
     /**
      * Tries to reach a step with the given model.
      *
-     * @param ModelInterface $model
-     * @param string $stateName
+     * @param  ModelInterface $model
+     * @param  string         $stateName
      * @return ModelState
      */
     public function reachNextState(ModelInterface $model, $stateName);
@@ -32,7 +32,7 @@ interface ProcessHandlerInterface
     /**
      * Returns the current model state.
      *
-     * @param ModelInterface $model
+     * @param  ModelInterface $model
      * @return ModelState
      */
     public function getCurrentState(ModelInterface $model);
@@ -40,8 +40,8 @@ interface ProcessHandlerInterface
     /**
      * Returns all model state of the given model object.
      *
-     * @param ModelInterface $model
-     * @param boolean $successOnly
+     * @param  ModelInterface $model
+     * @param  boolean        $successOnly
      * @return array
      */
     public function getAllStates(ModelInterface $model, $successOnly = true);
@@ -49,7 +49,7 @@ interface ProcessHandlerInterface
     /**
      * Returns true if the given model has completed the process.
      *
-     * @param ModelInterface $model
+     * @param  ModelInterface $model
      * @return boolean
      */
     public function isProcessComplete(ModelInterface $model);

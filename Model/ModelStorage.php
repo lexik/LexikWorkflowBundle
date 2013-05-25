@@ -3,9 +3,9 @@
 namespace Lexik\Bundle\WorkflowBundle\Model;
 
 use Lexik\Bundle\WorkflowBundle\Entity\ModelState;
+use Lexik\Bundle\WorkflowBundle\Validation\ViolationList;
 
 use Doctrine\ORM\EntityManager;
-use Lexik\Bundle\WorkflowBundle\Validation\ViolationList;
 
 class ModelStorage
 {
@@ -23,7 +23,7 @@ class ModelStorage
      * Construct.
      *
      * @param EntityManager $om
-     * @param string $entityClass
+     * @param string        $entityClass
      */
     public function __construct(EntityManager $om, $entityClass)
     {
@@ -34,8 +34,8 @@ class ModelStorage
     /**
      * Returns the current model state.
      *
-     * @param ModelInterface $model
-     * @param string $processName
+     * @param  ModelInterface                                $model
+     * @param  string                                        $processName
      * @return Lexik\Bundle\WorkflowBundle\Entity\ModelState
      */
     public function findCurrentModelState(ModelInterface $model, $processName)
@@ -49,9 +49,9 @@ class ModelStorage
     /**
      * Returns all model states.
      *
-     * @param ModelInterface $model
-     * @param string $processName
-     * @param string $successOnly
+     * @param  ModelInterface $model
+     * @param  string         $processName
+     * @param  string         $successOnly
      * @return array
      */
     public function findAllModelStates(ModelInterface $model, $processName, $successOnly = true)
@@ -66,10 +66,10 @@ class ModelStorage
     /**
      * Create a new invalid model state.
      *
-     * @param ModelInterface $model
-     * @param string $processName
-     * @param string $stepName
-     * @param ViolationList $violationList
+     * @param ModelInterface  $model
+     * @param string          $processName
+     * @param string          $stepName
+     * @param ViolationList   $violationList
      * @param null|ModelState $previous
      *
      * @return ModelState
@@ -90,7 +90,7 @@ class ModelStorage
      * Delete all model states.
      *
      * @param ModelInterface $model
-     * @param string $processName
+     * @param string         $processName
      */
     public function deleteAllModelStates(ModelInterface $model, $processName = null)
     {
@@ -103,10 +103,10 @@ class ModelStorage
     /**
      * Create a new successful model state.
      *
-     * @param ModelInterface $model
-     * @param string $processName
-     * @param string $stepName
-     * @param ModelState $previous
+     * @param  ModelInterface                                 $model
+     * @param  string                                         $processName
+     * @param  string                                         $stepName
+     * @param  ModelState                                     $previous
      * @return \Lexik\Bundle\WorkflowBundle\Entity\ModelState
      */
     public function newModelStateSuccess(ModelInterface $model, $processName, $stepName, $previous = null)
@@ -123,10 +123,10 @@ class ModelStorage
     /**
      * Create a new model state.
      *
-     * @param ModelInterface $model
-     * @param string $processName
-     * @param string $stepName
-     * @param ModelState $previous
+     * @param  ModelInterface                                 $model
+     * @param  string                                         $processName
+     * @param  string                                         $stepName
+     * @param  ModelState                                     $previous
      * @return \Lexik\Bundle\WorkflowBundle\Entity\ModelState
      */
     protected function createModelState(ModelInterface $model, $processName, $stepName, $previous = null)

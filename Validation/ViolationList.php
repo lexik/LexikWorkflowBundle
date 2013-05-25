@@ -65,7 +65,7 @@ class ViolationList implements \IteratorAggregate, \Countable, \ArrayAccess
      */
     public function offsetSet($offset, $violation)
     {
-        if ( ! $violation instanceof Violation) {
+        if (!$violation instanceof Violation) {
             throw new \InvalidArgumentException('You must pass a valid Violation object');
         }
 
