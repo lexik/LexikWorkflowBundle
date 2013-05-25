@@ -240,13 +240,13 @@ class ProcessHandlerTest extends TestCase
         $dispatcher->addListener('document_proccess.step_fake.reached', array(
             new FakeProcessListener(), 'handleSucccess'
         ));
-        $dispatcher->addListener('document_proccess.step_remove_doc.access_validation', array(
+        $dispatcher->addListener('document_proccess.step_remove_doc.validate', array(
             new FakeValidatorListener(), 'invalid'
         ));
-        $dispatcher->addListener('document_proccess.step_remove_on_invalid_doc.access_validation', array(
+        $dispatcher->addListener('document_proccess.step_remove_on_invalid_doc.validate', array(
             new FakeValidatorListener(), 'invalid'
         ));
-        $dispatcher->addListener('document_proccess.step_validate_doc.access_validation', array(
+        $dispatcher->addListener('document_proccess.step_validate_doc.validate', array(
             new FakeValidatorListener(), 'valid'
         ));
         $dispatcher->addListener('document_proccess.step_create_doc.validate_with_pre_validation.pre_validation', array(

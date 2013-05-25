@@ -2,15 +2,15 @@
 
 namespace Lexik\Bundle\WorkflowBundle\Tests\Fixtures;
 
-use Lexik\Bundle\WorkflowBundle\Event\StepAccessValidationEvent;
+use Lexik\Bundle\WorkflowBundle\Event\ValidateStepEvent;
 
 class FakeValidatorListener
 {
-    public function valid(StepAccessValidationEvent $event)
+    public function valid(ValidateStepEvent $event)
     {
     }
 
-    public function invalid(StepAccessValidationEvent $event)
+    public function invalid(ValidateStepEvent $event)
     {
         $event->addViolation('Validation error!');
     }

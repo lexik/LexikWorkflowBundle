@@ -2,7 +2,7 @@
 
 namespace Lexik\Bundle\WorkflowBundle\Handler;
 
-use Lexik\Bundle\WorkflowBundle\Event\StepAccessValidationEvent;
+use Lexik\Bundle\WorkflowBundle\Event\ValidateStepEvent;
 use Lexik\Bundle\WorkflowBundle\Validation\ViolationList;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Security\Core\SecurityContextInterface;
@@ -104,7 +104,7 @@ class ProcessHandler implements ProcessHandlerInterface
         $step = $state->getTarget();
 
         // pre validations
-        $event = new StepAccessValidationEvent($step, $model, new ViolationList());
+        $event = new ValidateStepEvent($step, $model, new ViolationList());
         $eventName = sprintf('%s.%s.%s.pre_validation', $this->process->getName(), $currentStep->getName(), $stateName);
         $this->dispatcher->dispatch($eventName, $event);
 
@@ -138,8 +138,8 @@ class ProcessHandler implements ProcessHandlerInterface
             return $this->storage->newModelStateError($model, $this->process->getName(), $step->getName(), array($e), $currentModelState);
         }
 
-        $event = new StepAccessValidationEvent($step, $model, new ViolationList());
-        $eventName = sprintf('%s.%s.access_validation', $this->process->getName(), $step->getName());
+        $event = new ValidateStepEvent($step, $model, new ViolationList());
+        $eventName = sprintf('%s.%s.validate', $this->process->getName(), $step->getName());
         $this->dispatcher->dispatch($eventName, $event);
 
         if (0 === count($event->getViolationList())) {

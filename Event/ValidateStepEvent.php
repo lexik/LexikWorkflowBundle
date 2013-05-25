@@ -10,12 +10,12 @@ use Lexik\Bundle\WorkflowBundle\Validation\ViolationList;
 use Lexik\Bundle\WorkflowBundle\Validation\Violation;
 
 /**
- * Step access validation event.
+ * Validate step access event.
  *
  * @author Jeremy Barthe <j.barthe@lexik.fr>
  * @author Gilles Gauthier <g.gauthier@lexik.fr>
  */
-class StepAccessValidationEvent extends Event
+class ValidateStepEvent extends Event
 {
     /**
      * @var Step

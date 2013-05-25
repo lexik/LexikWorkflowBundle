@@ -169,9 +169,9 @@ class PostModel implements ModelInterface
 Step validations
 ----------------
 
-As you just read on the bundle introduction, we use a lot event dispatcher for actions and validations. To validate a step can be reached, you just need to listen the `<process_name>.<step_name>.access_validation` event.
+As you just read on the bundle introduction, we use a lot event dispatcher for actions and validations. To validate a step can be reached, you just need to listen the `<process_name>.<step_name>.validate` event.
 
-You will get a `Lexik\Bundle\WorkflowBundle\Event\StepAccessValidationEvent` object on which you can get the step, the model and an object that manage step violations. You can add some violation to avoid access to the step.
+You will get a `Lexik\Bundle\WorkflowBundle\Event\ValidateStepEvent` object on which you can get the step, the model and an object that manage step violations. You can add some violation to avoid access to the step.
 
 In case of the step is not reached due to validation error you can listen the `<process_name>.<step_name>.validation_fail` event.
 
@@ -183,7 +183,7 @@ Let's see a simple example, here I listen events for the step `published` from t
 namespace Project\Bundle\SuperBundle\Workflow\Listener;
 
 use Lexik\Bundle\WorkflowBundle\Event\StepEvent;
-use Lexik\Bundle\WorkflowBundle\Event\StepAccessValidationEvent;
+use Lexik\Bundle\WorkflowBundle\Event\ValidateStepEvent;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -195,7 +195,7 @@ class PostPublicationProcessSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-            'post_publication.published.access_validation' => array(
+            'post_publication.published.validate' => array(
                 'handleAccessValidationPublished',
             ),
             'post_publication.published.validation_fail' => array(
@@ -204,7 +204,7 @@ class PostPublicationProcessSubscriber implements EventSubscriberInterface
         );
     }
 
-    public function handleAccessValidationPublished(StepAccessValidationEvent $event)
+    public function handleAccessValidationPublished(ValidateStepEvent $event)
     {
         if ( ! $event->getModel()->canBePublished()) {
             $event->addViolation('error message');
