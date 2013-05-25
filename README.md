@@ -3,7 +3,7 @@ LexikWorkflowBundle
 
 [![Build Status](https://secure.travis-ci.org/lexik/LexikWorkflowBundle.png)](http://travis-ci.org/lexik/LexikWorkflowBundle)
 
-This Symfony2 bundle allow to define and manage some simple workflow.
+This Symfony2 bundle allow to define and manage some simple workflow and use event dispatcher for actions and validations.
 
 Installation
 ------------
@@ -33,24 +33,23 @@ public function registerBundles()
 }
 ```
 
-How does it work ?
-==================
+How does it work?
+=================
 
-To define your workflow you will have to discribe some processes, a process consists of a sequence of connected steps.
-A step contains some validations, actions and roles. A step can't be reached if the current user in session does not have roles defined on this step.
-Validations are executed when you try to reach the step, if those validations are successful we consider the step has been reached and we run all actions defined on the reached step.
-If validations fail, you will stay on the current step except if the "on_invalid" step if defined, in this case you won't stay on the current step but we will try to reach the "on_invalid" step.
-The workflow work on a "model" object, a model is a class that implements `Lexik\Bundle\WorkflowBundle\Model\ModelInterface`.
-Each times a model try to reach a step we store a row in the database to keep the steps history.
+First of all, what's a workflow? According to wikipedia definition "a workflow consists of a sequence of connected steps". You can see below the workflow terms used by the bundle:
 
+* to define your workflow you will have to discribe some processes ;
+* a process is compound of steps, and you advance through the process step by step ;
+* a step contains some validations and actions, validations are executed when you try to reach the step, if those validations are successful the step has been reached and actions are executed.
+
+The workflow work on a "model" object, a model is a class that implements `Lexik\Bundle\WorkflowBundle\Model\ModelInterface`. Each times a model try to reach a step we store a row in the database to keep the steps history.
 
 Workflow definition
 -------------------
 
-Let's we need to define a simple workflow to create and publish a post.
-First we have to create a draft, then an admin must validate this draft and after that it can be published.
-Once the post is published any user can unpublish it, and if the post is not published an admin can delete it.
-And let's say that if the validation to reach the published step fail we will go back to the draft step (this is just to use the "on_invalid" option).
+Let's we need to define a simple workflow to create and publish a post. First we have to create a draft, then an admin must validate this draft and after that it can be published.
+
+Once the post is published any user can unpublish it, and if the post is not published an admin can delete it. And let's say that if the validation to reach the published step fail we will go back to the draft step.
 
 ```yaml
 # app/config/config.yml
@@ -63,9 +62,6 @@ lexik_workflow:
                 draft_created:
                     label: "Draft created"
                     roles: [ ROLE_USER ]
-                    validations:
-                        - my.validaion.service.id:methodName
-                        - ...
                     model_status: [ setStatus, Project\Bundle\SuperBundle\Entity\Post::STATUS_DRAFT ]
                     next_states:
                         validate: { type: step, target: validated_by_admin } # you can omit "type: step" as "step" is the default value of the "type" node. You can also use "type: process" (soon).
@@ -73,9 +69,6 @@ lexik_workflow:
                 validated_by_admin:
                     label: "Post validated"
                     roles: [ ROLE_ADMIN ]
-                    validations:
-                        - my.validaion.service.id:methodName
-                        - ...
                     model_status: [ setStatus, Project\Bundle\SuperBundle\Entity\Post::STATUS_VALIDATED ]
                     next_states:
                         publish: { target: published }
@@ -83,9 +76,6 @@ lexik_workflow:
                 published:
                     label: "Post published"
                     roles: [ ROLE_USER ]
-                    validations:
-                        - my.validaion.service.id:methodName
-                        - ...
                     model_status: [ setStatus, Project\Bundle\SuperBundle\Entity\Post::STATUS_PUBLISHED ]
                     on_invalid: draft_created # will try to reach the "draft_created" step in case validations to reach "published" fail.
                     next_states:
@@ -94,9 +84,6 @@ lexik_workflow:
                 unpublished:
                     label: "Post unpublished"
                     roles: [ ROLE_USER ]
-                    validations:
-                        - my.validaion.service.id:methodName
-                        - ...
                     model_status: [ setStatus, Project\Bundle\SuperBundle\Entity\Post::STATUS_UNPUBLISHED ]
                     next_states:
                         delete:  { target: deleted }
@@ -105,9 +92,6 @@ lexik_workflow:
                 deleted:
                     label: "Post deleted"
                     roles: [ ROLE_ADMIN ]
-                    validations:
-                        - my.validaion.service.id:methodName
-                        - ...
                     model_status: [ setStatus, Project\Bundle\SuperBundle\Entity\Post::STATUS_DELETED ]
                     next_states: ~
 ```
@@ -115,16 +99,16 @@ lexik_workflow:
 Model object
 ------------
 
-The workflow handle some "model" objects. A "model" object is basically an instance of `Lexik\Bundle\WorkflowBundle\Model\ModelInterface`.
-This interface provide 2 methods:
+The workflow handle some "model" objects. A "model" object is basically an instance of `Lexik\Bundle\WorkflowBundle\Model\ModelInterface`. This interface provide 2 methods:
 
-* getWorkflowIdentifier(): returns a unique identifier used to store model's state in the database.
-* getWorkflowData(): returns an array of data to store with a model state.
+* `getWorkflowIdentifier()` returns an unique identifier used to store model state in the database.
+* `getWorkflowData()` returns an array of data to store with a model state.
 
-Here an example of a `PostModel` class we could use in the `post_publication` process.
+Here's an example of a `PostModel` class we could use in the `post_publication` process:
 
 ```php
 <?php
+
 namespace Project\Bundle\SuperBundle\Workflow\Model;
 
 use Lexik\Bundle\WorkflowBundle\Model\ModelInterface;
@@ -183,34 +167,65 @@ class PostModel implements ModelInterface
 Step validations
 ----------------
 
-To validate a step, just create your own class with methods to check the model object and define this class as a servive.
-Each method used for validation will receive the model object the workflow is currently working on.
+As you just read on the bundle introduction, we use a lot event dispatcher for actions and validations. To validate a step can be reached, you just need to listen the `<process_name>.<step_name>.access_validation` event.
+
+You will get a `Lexik\Bundle\WorkflowBundle\Event\StepAccessValidationEvent` object on which you can get the step, the model and an object that manage step violations. You can add some violation to avoid access to the step.
+
+In case of the step is not reached due to validation error you can listen the `<process_name>.<step_name>.validation_fail` event.
+
+Let's see a simple example, here I listen events for the step `published` from the `post_publication` process.
 
 ```php
 <?php
-namespace Project\Bundle\SuperBundle\Workflow\Validators
 
-use Lexik\Bundle\WorkflowBundle\Model\ModelInterface;
+namespace Project\Bundle\SuperBundle\Workflow\Listener;
 
-class PostPublicationValidator
+use Lexik\Bundle\WorkflowBundle\Event\StepEvent;
+use Lexik\Bundle\WorkflowBundle\Event\StepAccessValidationEvent;
+
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+
+class PostPublicationProcessSubscriber implements EventSubscriberInterface
 {
-    public function checkDraft(ModelInterface $model)
+    /**
+     * {@inheritDoc}
+     */
+    public static function getSubscribedEvents()
     {
-        // check wahtever you need.
-        // if something goes wrong and $model is not valid just throw a ValidationException.
+        return array(
+            'post_publication.published.access_validation' => array(
+                'handleAccessValidationPublished',
+            ),
+            'post_publication.published.validation_fail' => array(
+                'handleValidationFail',
+            ),
+        );
+    }
 
-        if ( ! $model->getPost()->getContent() ) {
-            throw new Lexik\Bundle\WorkflowBundle\Exception\ValidationException('error message');
+    public function handleAccessValidationPublished(StepAccessValidationEvent $event)
+    {
+        if ( ! $event->getModel()->canBePublished()) {
+            $event->addViolation('error message');
         }
     }
+
+    public function handleValidationFail(StepEvent $event)
+    {
+        // ...
+    }
 }
+```
+
+```xml
+<service id="project.workflow.listener.post_publication" class="Project\Bundle\SuperBundle\Workflow\Listener\PostPublicationProcessSubscriber">
+    <tag name="kernel.event_subscriber" />
+</service>
 ```
 
 Step model status
 -----------------
 
-You can easily update the status of your model through `model_status` option.
-It's a shortcut action that call a method of your model with a constant as argument and flush it.
+You can easily update the status of your model through `model_status` option. It's a shortcut action that call a method of your model with a constant as argument and flush it.
 
 ```yaml
 model_status: [ setStatus, Project\Bundle\SuperBundle\Entity\Post::STATUS_PUBLISHED ]
@@ -220,8 +235,8 @@ Step actions
 ------------
 
 If you need to execute some logic once a step is successfuly reached, you just need to listen the `<process_name>.<step_name>.reached` event.
+
 You will get a `Lexik\Bundle\WorkflowBundle\Event\StepEvent` object on wich you can get the step, the model and the last model state.
-In case of the step is not reached due to validation error you can listen the `<process_name>.<step_name>.validation_fail` event.
 
 Let's see a simple example, here I listen events for the step `published` from the `post_publication` process.
 
@@ -245,20 +260,12 @@ class PostPublicationProcessSubscriber implements EventSubscriberInterface
             'post_publication.published.reached' => array(
                 'handleSuccessfulyPublished',
             ),
-            'post_publication.published.validation_fail' => array(
-                'handleValidationFail',
-            ),
         );
     }
-    
+
     public function handleSuccessfulyPublished(StepEvent $event)
     {
-    	// ... 
-    }
-    
-    public function handleValidationFail(StepEvent $event)
-    {
-    	// ...
+        // ...
     }
 }
 ```
@@ -273,7 +280,6 @@ Step roles
 ----------
 
 You can define the roles the current user must have to be able to reach a step. Roles are checked just before step validations.
-
 
 Usage
 -----
