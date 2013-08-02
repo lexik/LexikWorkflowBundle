@@ -12,6 +12,8 @@ class FakeModel implements ModelInterface
 
     protected $status;
 
+    protected $content;
+
     public $data = array();
 
     public function getWorkflowIdentifier()
@@ -32,5 +34,15 @@ class FakeModel implements ModelInterface
     public function getStatus()
     {
         return $this->status;
+    }
+
+    public function getContent()
+    {
+        return $this->content;
+    }
+
+    public function setContent($content)
+    {
+        $this->content = $content;
     }
 }
