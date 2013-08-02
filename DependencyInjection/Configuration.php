@@ -5,6 +5,7 @@ namespace Lexik\Bundle\WorkflowBundle\DependencyInjection;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Lexik\Bundle\WorkflowBundle\Flow\NextStateInterface;
 
 /**
  * This is the class that validates and merges configuration from your app/config files
@@ -152,7 +153,11 @@ class Configuration implements ConfigurationInterface
      */
     private function createNextStatesNodeDefinition()
     {
-        $flowTypes = array('step', 'process');
+        $flowTypes = array(
+            NextStateInterface::TYPE_STEP,
+            NextStateInterface::TYPE_STEP_OR,
+            NextStateInterface::TYPE_PROCESS,
+        );
 
         $nextStatesNode = new ArrayNodeDefinition('next_states');
 
@@ -169,7 +174,7 @@ class Configuration implements ConfigurationInterface
                         ->end()
                     ->end()
 
-                    ->scalarNode('target')
+                    ->variableNode('target')
                         ->cannotBeEmpty()
                     ->end()
                 ->end()
