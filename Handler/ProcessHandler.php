@@ -2,11 +2,11 @@
 
 namespace Lexik\Bundle\WorkflowBundle\Handler;
 
-use Lexik\Bundle\WorkflowBundle\Event\ValidateStepEvent;
-use Lexik\Bundle\WorkflowBundle\Validation\ViolationList;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 
+use Lexik\Bundle\WorkflowBundle\Validation\ViolationList;
+use Lexik\Bundle\WorkflowBundle\Event\ValidateStepEvent;
 use Lexik\Bundle\WorkflowBundle\Event\StepEvent;
 use Lexik\Bundle\WorkflowBundle\Exception\WorkflowException;
 use Lexik\Bundle\WorkflowBundle\Exception\AccessDeniedException;
@@ -99,7 +99,7 @@ class ProcessHandler implements ProcessHandlerInterface
         }
 
         $state = $currentStep->getNextState($stateName);
-        $step = $state->getTarget();
+        $step = $state->getTarget($model);
 
         // pre validations
         $event = new ValidateStepEvent($step, $model, new ViolationList());

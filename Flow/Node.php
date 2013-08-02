@@ -81,11 +81,23 @@ abstract class Node
      * Add a next state.
      *
      * @param string $name
-     * @param string $targetType
+     * @param string $type
      * @param Node   $state
      */
-    public function addNextState($name, $targetType, Node $target)
+    public function addNextState($name, $type, Node $target)
     {
-        $this->nextStates[$name] = new NextState($name, $targetType, $target);
+        $this->nextStates[$name] = new NextState($name, $type, $target);
+    }
+
+    /**
+     * Add a next state OR
+     *
+     * @param string $name
+     * @param string $type
+     * @param array  $targets
+     */
+    public function addNextStateOr($name, $type, array $targets)
+    {
+        $this->nextStates[$name] = new NextStateOr($name, $type, $targets);
     }
 }
