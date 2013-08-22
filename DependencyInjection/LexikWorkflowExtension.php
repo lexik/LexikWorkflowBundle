@@ -170,7 +170,7 @@ class LexikWorkflowExtension extends Extension
                 ));
 
             } elseif (NextStateInterface::TYPE_STEP_OR === $data['type']) {
-                $target = array();
+                $targets = array();
 
                 foreach ($data['target'] as $stepName => $condition) {
                     $serviceId = null;
@@ -182,12 +182,12 @@ class LexikWorkflowExtension extends Extension
 
                     $targets[] = array(
                         'target'           => new Reference(sprintf('lexik_workflow.process.%s.step.%s', $processName, $stepName)),
-                        'condition_object' => new Reference($serviceId),
+                        'condition_object' => null !== $serviceId ? new Reference($serviceId) : null,
                         'condition_method' => $method,
                     );
                 }
 
-                $step->addMethodCall('addNextStateOr', array($stateName, $data['type'], $target));
+                $step->addMethodCall('addNextStateOr', array($stateName, $data['type'], $targets));
 
             } elseif (NextStateInterface::TYPE_PROCESS === $data['type']) {
                 $step->addMethodCall('addNextState', array(
