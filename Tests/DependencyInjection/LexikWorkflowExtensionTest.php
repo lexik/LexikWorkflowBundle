@@ -24,11 +24,13 @@ class LexikWorkflowExtensionTest extends TestCase
         $container->set('event_dispatcher', new EventDispatcher());
         $container->set('next_state_condition', new \stdClass());
 
+        // simple config
         $extension = new LexikWorkflowExtension();
         $extension->load(array($this->getSimpleConfig()), $container);
 
         $this->assertTrue($container->getDefinition('lexik_workflow.process.document_proccess') instanceof Definition);
 
+        // config with a process
         $extension = new LexikWorkflowExtension();
         $extension->load(array($this->getConfig()), $container);
 

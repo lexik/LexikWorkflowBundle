@@ -113,8 +113,10 @@ EOF;
             ->will($this->returnValue('Doctrine\\ORM\\EntityRepository'));
         $config->expects($this->any())
             ->method('getQuoteStrategy')
-            ->will($this->returnValue(new \Doctrine\ORM\Mapping\DefaultQuoteStrategy()))
-        ;
+            ->will($this->returnValue(new \Doctrine\ORM\Mapping\DefaultQuoteStrategy()));
+        $config->expects($this->any())
+            ->method('getRepositoryFactory')
+            ->will($this->returnValue(new \Doctrine\ORM\Repository\DefaultRepositoryFactory()));
 
         $conn = array(
             'driver' => 'pdo_sqlite',
