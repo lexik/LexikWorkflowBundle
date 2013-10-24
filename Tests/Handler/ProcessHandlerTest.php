@@ -15,6 +15,7 @@ use Lexik\Bundle\WorkflowBundle\Tests\Fixtures\FakeProcessListener;
 Use Lexik\Bundle\WorkflowBundle\Tests\Fixtures\FakeModel;
 use Lexik\Bundle\WorkflowBundle\Tests\Fixtures\FakeSecurityContext;
 use Lexik\Bundle\WorkflowBundle\Tests\Fixtures\FakeValidatorListener;
+use Lexik\Bundle\WorkflowBundle\Tests\Fixtures\FakeModelChecker;
 
 class ProcessHandlerTest extends TestCase
 {
@@ -136,6 +137,42 @@ class ProcessHandlerTest extends TestCase
         $this->assertEquals('step_fake', $modelState->getStepName());
     }
 
+    public function testReachNextStateOrValide()
+    {
+        // content is clean so we should go to validate
+        $model = new FakeModel();
+        $modelState = $this->getProcessHandler()->start($model);
+
+        $this->assertTrue($modelState instanceof ModelState);
+        $this->assertEquals('document_proccess', $modelState->getProcessName());
+        $this->assertEquals('step_create_doc', $modelState->getStepName());
+
+        $model->setContent('blablabla');
+        $modelState = $this->getProcessHandler()->reachNextState($model, 'validate_or_remove');
+
+        $this->assertTrue($modelState instanceof ModelState);
+        $this->assertEquals('document_proccess', $modelState->getProcessName());
+        $this->assertEquals('step_validate_doc', $modelState->getStepName());
+    }
+
+    public function testReachNextStateOrRemove()
+    {
+        // content is NOT clean so we should go to remove
+        $model = new FakeModel();
+        $modelState = $this->getProcessHandler()->start($model);
+
+        $this->assertTrue($modelState instanceof ModelState);
+        $this->assertEquals('document_proccess', $modelState->getProcessName());
+        $this->assertEquals('step_create_doc', $modelState->getStepName());
+
+        $model->setContent('');
+        $modelState = $this->getProcessHandler()->reachNextState($model, 'validate_or_remove');
+
+        $this->assertTrue($modelState instanceof ModelState);
+        $this->assertEquals('document_proccess', $modelState->getProcessName());
+        $this->assertEquals('step_remove_doc', $modelState->getStepName());
+    }
+
     public function testExecuteValidations()
     {
         $model = new FakeModel();
@@ -216,11 +253,23 @@ class ProcessHandlerTest extends TestCase
             array(),
             array('setStatus', 'Lexik\Bundle\WorkflowBundle\Tests\Fixtures\FakeModel::STATUS_CREATE')
         );
-        $stepCreateDoc->addNextState('validate', NextStateInterface::TARGET_TYPE_STEP, $stepValidateDoc);
-        $stepCreateDoc->addNextState('validate_with_pre_validation', NextStateInterface::TARGET_TYPE_STEP, $stepValidateDoc);
-        $stepCreateDoc->addNextState('validate_with_pre_validation_invalid', NextStateInterface::TARGET_TYPE_STEP, $stepValidateDoc);
-        $stepCreateDoc->addNextState('remove', NextStateInterface::TARGET_TYPE_STEP, $stepRemoveDoc);
-        $stepCreateDoc->addNextState('remove_on_invalid', NextStateInterface::TARGET_TYPE_STEP, $stepRemoveOnInvalidDoc);
+        $stepCreateDoc->addNextState('validate', NextStateInterface::TYPE_STEP, $stepValidateDoc);
+        $stepCreateDoc->addNextState('validate_with_pre_validation', NextStateInterface::TYPE_STEP, $stepValidateDoc);
+        $stepCreateDoc->addNextState('validate_with_pre_validation_invalid', NextStateInterface::TYPE_STEP, $stepValidateDoc);
+        $stepCreateDoc->addNextState('remove', NextStateInterface::TYPE_STEP, $stepRemoveDoc);
+        $stepCreateDoc->addNextState('remove_on_invalid', NextStateInterface::TYPE_STEP, $stepRemoveOnInvalidDoc);
+        $stepCreateDoc->addNextStateOr('validate_or_remove', NextStateInterface::TYPE_STEP_OR, array(
+            array(
+                'target'           => $stepValidateDoc,
+                'condition_object' => new FakeModelChecker(),
+                'condition_method' => 'isClean',
+            ),
+            array(
+                'target'           => $stepRemoveDoc,
+                'condition_object' => null,
+                'condition_method' => null,
+            ),
+        ));
 
         $process = new Process(
             'document_proccess',

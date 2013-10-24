@@ -15,8 +15,11 @@ class ProcessTest extends TestCase
 {
     public function testProcessService()
     {
+        $container = new ContainerBuilder();
+        $container->set('next_state_condition', new \stdClass());
+
         $extension = new LexikWorkflowExtension();
-        $extension->load(array($this->getConfig()), $container = new ContainerBuilder());
+        $extension->load(array($this->getConfig()), $container);
 
         $process = $container->get('lexik_workflow.process.document_proccess');
         $this->assertTrue($process instanceof Process);

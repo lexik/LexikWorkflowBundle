@@ -27,6 +27,11 @@ processes:
                         target: step_validate_doc
                     remove:
                         target: step_remove_doc
+                    validate_or_remove:
+                        type: step_or
+                        target:
+                            step_validate_doc: "next_state_condition:isClean"
+                            step_remove_doc:   ~
             step_validate_doc:
                 roles: [ ROLE_ADMIN, ROLE_USER ]
             step_remove_doc:
@@ -106,8 +111,7 @@ EOF;
         $config->expects($this->any())
             ->method('getDefaultRepositoryClassName')
             ->will($this->returnValue('Doctrine\\ORM\\EntityRepository'));
-        $config
-            ->expects($this->any())
+        $config->expects($this->any())
             ->method('getQuoteStrategy')
             ->will($this->returnValue(new \Doctrine\ORM\Mapping\DefaultQuoteStrategy()))
         ;
@@ -122,6 +126,11 @@ EOF;
         return $em;
     }
 
+    /**
+     * Returns a mock instance of a SecurityContext.
+     *
+     * @return \Symfony\Component\Security\Core\SecurityContext
+     */
     protected function getMockSecurityContext()
     {
         $authManager = $this->getMock('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface');

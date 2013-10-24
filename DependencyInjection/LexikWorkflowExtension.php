@@ -11,6 +11,8 @@ use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Yaml\Parser;
+use Lexik\Bundle\WorkflowBundle\Flow\NextState;
+use Lexik\Bundle\WorkflowBundle\Flow\NextStateOr;
 
 /**
  * This is the class that loads and manages your bundle configuration
@@ -160,23 +162,43 @@ class LexikWorkflowExtension extends Extension
     protected function addStepNextStates(Definition $step, $stepsNextStates, $processName)
     {
         foreach ($stepsNextStates as $stateName => $data) {
-            $target = null;
+            if (NextStateInterface::TYPE_STEP === $data['type']) {
+                $step->addMethodCall('addNextState', array(
+                    $stateName,
+                    $data['type'],
+                    new Reference(sprintf('lexik_workflow.process.%s.step.%s', $processName, $data['target']))
+                ));
 
-            if (NextStateInterface::TARGET_TYPE_STEP === $data['type']) {
-                $target = new Reference(sprintf('lexik_workflow.process.%s.step.%s', $processName, $data['target']));
+            } elseif (NextStateInterface::TYPE_STEP_OR === $data['type']) {
+                $targets = array();
 
-            } elseif (NextStateInterface::TARGET_TYPE_PROCESS === $data['type']) {
-                $target = new Reference(sprintf('lexik_workflow.process.%s', $data['target']));
+                foreach ($data['target'] as $stepName => $condition) {
+                    $serviceId = null;
+                    $method = null;
+
+                    if (!empty($condition)) {
+                        list($serviceId, $method) = explode(':', $condition);
+                    }
+
+                    $targets[] = array(
+                        'target'           => new Reference(sprintf('lexik_workflow.process.%s.step.%s', $processName, $stepName)),
+                        'condition_object' => null !== $serviceId ? new Reference($serviceId) : null,
+                        'condition_method' => $method,
+                    );
+                }
+
+                $step->addMethodCall('addNextStateOr', array($stateName, $data['type'], $targets));
+
+            } elseif (NextStateInterface::TYPE_PROCESS === $data['type']) {
+                $step->addMethodCall('addNextState', array(
+                    $stateName,
+                    $data['type'],
+                    new Reference(sprintf('lexik_workflow.process.%s', $data['target']))
+                ));
 
             } else {
                 throw new \InvalidArgumentException(sprintf('Unknown type "%s", please use "step" or "process"', $data['type']));
             }
-
-            $step->addMethodCall('addNextState', array(
-                $stateName,
-                $data['type'],
-                $target
-            ));
         }
     }
 }

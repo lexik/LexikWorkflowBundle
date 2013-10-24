@@ -2,6 +2,8 @@
 
 namespace Lexik\Bundle\WorkflowBundle\Flow;
 
+use Lexik\Bundle\WorkflowBundle\Model\ModelInterface;
+
 /**
  * A State represent one of the available next element (step) a given step.
  *
@@ -17,7 +19,7 @@ class NextState implements NextStateInterface
     /**
      * @var string
      */
-    protected $targetType;
+    protected $type;
 
     /**
      * @var Step
@@ -28,13 +30,13 @@ class NextState implements NextStateInterface
      * Construct.
      *
      * @param string $name
-     * @param string $targetType
+     * @param string $type
      * @param Node   $target
      */
-    public function __construct($name, $targetType, Node $target)
+    public function __construct($name, $type, Node $target)
     {
         $this->name = $name;
-        $this->targetType = $targetType;
+        $this->type = $type;
         $this->target = $target;
     }
 
@@ -49,7 +51,7 @@ class NextState implements NextStateInterface
     /**
      * {@inheritdoc}
      */
-    public function getTargetType()
+    public function getType()
     {
         return $this->type;
     }
@@ -57,7 +59,7 @@ class NextState implements NextStateInterface
     /**
      * {@inheritdoc}
      */
-    public function getTarget()
+    public function getTarget(ModelInterface $model)
     {
         return $this->target;
     }

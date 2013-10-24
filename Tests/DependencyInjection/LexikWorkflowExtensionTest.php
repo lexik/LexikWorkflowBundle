@@ -22,6 +22,7 @@ class LexikWorkflowExtensionTest extends TestCase
         $container->set('doctrine.orm.entity_manager', $this->getMockSqliteEntityManager());
         $container->set('security.context', $this->getMockSecurityContext());
         $container->set('event_dispatcher', new EventDispatcher());
+        $container->set('next_state_condition', new \stdClass());
 
         $extension = new LexikWorkflowExtension();
         $extension->load(array($this->getSimpleConfig()), $container);
