@@ -66,5 +66,11 @@ class ModelStateRepositoryTest extends TestCase
         $this->assertEquals('2012-02-14', $model->getCreatedAt()->format('Y-m-d'));
         $this->assertEquals('process_1', $model->getProcessName());
         $this->assertEquals('step_B', $model->getStepName());
+
+        $model = $repository->findLatestModelState('a1b2c3', 'process_1', 'step_A');
+        $this->assertEquals('a1b2c3', $model->getWorkflowIdentifier());
+        $this->assertEquals('2012-02-12', $model->getCreatedAt()->format('Y-m-d'));
+        $this->assertEquals('process_1', $model->getProcessName());
+        $this->assertEquals('step_A', $model->getStepName());
     }
 }

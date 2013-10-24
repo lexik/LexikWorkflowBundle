@@ -9,22 +9,31 @@ class ModelStateRepository extends EntityRepository
     /**
      * Returns the last ModelState for the given workflow identifier.
      *
-     * @param  string                                        $workflowIdentifier
-     * @param  string                                        $processName
+     * @param string $workflowIdentifier
+     * @param string $processName
+     * @param string $stepName
+     *
      * @return Lexik\Bundle\WorkflowBundle\Entity\ModelState
      */
-    public function findLatestModelState($workflowIdentifier, $processName)
+    public function findLatestModelState($workflowIdentifier, $processName, $stepName = null)
     {
-        $results = $this->createQueryBuilder('ms')
+        $qb = $this->createQueryBuilder('ms');
+        $qb
             ->andWhere('ms.workflowIdentifier = :workflow_identifier')
             ->andWhere('ms.processName = :process')
             ->andWhere('ms.successful = :success')
             ->orderBy('ms.id', 'DESC')
             ->setParameter('workflow_identifier', $workflowIdentifier)
             ->setParameter('process', $processName)
-            ->setParameter('success', true)
-            ->getQuery()
-            ->getResult();
+            ->setParameter('success', true);
+
+        if (null !== $stepName) {
+            $qb
+                ->andWhere('ms.stepName = :stepName')
+                ->setParameter('stepName', $stepName);
+        }
+
+        $results = $qb->getQuery()->getResult();
 
         return isset($results[0]) ? $results[0] : null;
     }

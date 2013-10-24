@@ -34,15 +34,18 @@ class ModelStorage
     /**
      * Returns the current model state.
      *
-     * @param  ModelInterface                                $model
-     * @param  string                                        $processName
+     * @param ModelInterface $model
+     * @param string         $processName
+     * @param string         $stepName
+     *
      * @return Lexik\Bundle\WorkflowBundle\Entity\ModelState
      */
-    public function findCurrentModelState(ModelInterface $model, $processName)
+    public function findCurrentModelState(ModelInterface $model, $processName, $stepName = null)
     {
         return $this->repository->findLatestModelState(
             $model->getWorkflowIdentifier(),
-            $processName
+            $processName,
+            $stepName
         );
     }
 
