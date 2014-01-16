@@ -59,7 +59,7 @@ class NextState implements NextStateInterface
     /**
      * {@inheritdoc}
      */
-    public function getTarget(ModelInterface $model)
+    public function getTarget(ModelInterface $model = null)
     {
         return $this->target;
     }
