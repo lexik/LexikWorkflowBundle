@@ -2,10 +2,14 @@ language: php
 
 php:
     - 5.3
-    - 5.4
+
+env:
+  - SYMFONY_VERSION=2.3.* DOCTRINE_ORM_VERSION=2.4.*
+  - SYMFONY_VERSION=2.4.* DOCTRINE_ORM_VERSION=2.4.*
 
 before_script:
-    - curl -s http://getcomposer.org/installer | php
-    - php composer.phar --dev install
+  - composer require symfony/framework-bundle:${SYMFONY_VERSION} --no-update
+  - composer require doctrine/orm:${DOCTRINE_ORM_VERSION} --no-update
+  - composer update --dev
 
 script: phpunit
