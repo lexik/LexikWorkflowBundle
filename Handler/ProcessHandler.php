@@ -5,6 +5,7 @@ namespace Lexik\Bundle\WorkflowBundle\Handler;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 
+use Lexik\Bundle\WorkflowBundle\Validation\Violation;
 use Lexik\Bundle\WorkflowBundle\Validation\ViolationList;
 use Lexik\Bundle\WorkflowBundle\Event\ValidateStepEvent;
 use Lexik\Bundle\WorkflowBundle\Event\StepEvent;
@@ -133,7 +134,9 @@ class ProcessHandler implements ProcessHandlerInterface
         try {
             $this->checkCredentials($step);
         } catch (AccessDeniedException $e) {
-            return $this->storage->newModelStateError($model, $this->process->getName(), $step->getName(), array($e), $currentModelState);
+            $violations = new ViolationList();
+            $violations->add(new Violation($e->getMessage()));
+            return $this->storage->newModelStateError($model, $this->process->getName(), $step->getName(), $violations, $currentModelState);
         }
 
         $event = new ValidateStepEvent($step, $model, new ViolationList());
