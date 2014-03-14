@@ -136,7 +136,18 @@ class ProcessHandler implements ProcessHandlerInterface
         } catch (AccessDeniedException $e) {
             $violations = new ViolationList();
             $violations->add(new Violation($e->getMessage()));
-            return $this->storage->newModelStateError($model, $this->process->getName(), $step->getName(), $violations, $currentModelState);
+
+            $modelState = $this->storage->newModelStateError($model, $this->process->getName(), $step->getName(), $violations, $currentModelState);
+
+            $eventName = sprintf('%s.%s.bad_credentials', $this->process->getName(), $step->getName());
+            $this->dispatcher->dispatch($eventName, new StepEvent($step, $model, $modelState));
+
+            if ($step->getOnInvalid()) {
+                $step = $this->getProcessStep($step->getOnInvalid());
+                $modelState = $this->reachStep($model, $step);
+            }
+
+            return $modelState;
         }
 
         $event = new ValidateStepEvent($step, $model, new ViolationList());

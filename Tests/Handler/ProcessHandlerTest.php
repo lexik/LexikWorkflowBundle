@@ -54,6 +54,15 @@ class ProcessHandlerTest extends TestCase
         $this->assertEquals(FakeModel::STATUS_CREATE, $model->getStatus());
     }
 
+    public function testStartBadCredentials()
+    {
+        $model = new FakeModel();
+        $modelState = $this->getProcessHandler(false)->start($model);
+
+        $this->assertTrue($modelState instanceof ModelState);
+        $this->assertFalse($modelState->getSuccessful());
+    }
+
     public function testStartWithData()
     {
         $data = array('some', 'informations');
@@ -220,7 +229,7 @@ class ProcessHandlerTest extends TestCase
         $this->assertEquals(1, FakeProcessListener::$call);
     }
 
-    protected function getProcessHandler()
+    protected function getProcessHandler($authenticatedUser = true)
     {
         $stepValidateDoc = new Step(
             'step_validate_doc',
@@ -251,7 +260,8 @@ class ProcessHandlerTest extends TestCase
             'step_create_doc',
             'Create doc',
             array(),
-            array('setStatus', 'Lexik\Bundle\WorkflowBundle\Tests\Fixtures\FakeModel::STATUS_CREATE')
+            array('setStatus', 'Lexik\Bundle\WorkflowBundle\Tests\Fixtures\FakeModel::STATUS_CREATE'),
+            array('ROLE_ADMIN')
         );
         $stepCreateDoc->addNextState('validate', NextStateInterface::TYPE_STEP, $stepValidateDoc);
         $stepCreateDoc->addNextState('validate_with_pre_validation', NextStateInterface::TYPE_STEP, $stepValidateDoc);
@@ -308,7 +318,7 @@ class ProcessHandlerTest extends TestCase
         ));
 
         $processHandler = new ProcessHandler($process, $this->modelStorage, $dispatcher);
-        $processHandler->setSecurityContext(new FakeSecurityContext());
+        $processHandler->setSecurityContext(new FakeSecurityContext($authenticatedUser));
 
         return $processHandler;
     }

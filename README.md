@@ -297,6 +297,7 @@ steps:
         roles: [ ROLE_ADMIN ]
         ...
 ```
+An event `*.bad_credentials` is dispatched when user has not the roles.
 
 Usage
 -----

@@ -7,6 +7,13 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 class FakeSecurityContext implements SecurityContextInterface
 {
+    private $authenticatedUser;
+
+    public function __construct($authenticatedUser)
+    {
+        $this->authenticatedUser = $authenticatedUser;
+    }
+
     public function getToken()
     {
     }
@@ -17,6 +24,6 @@ class FakeSecurityContext implements SecurityContextInterface
 
     public function isGranted($attributes, $object = null)
     {
-        return true;
+        return $this->authenticatedUser;
     }
 }
