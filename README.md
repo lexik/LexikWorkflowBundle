@@ -2,6 +2,7 @@ LexikWorkflowBundle
 ===================
 
 [![Build Status](https://secure.travis-ci.org/lexik/LexikWorkflowBundle.png)](http://travis-ci.org/lexik/LexikWorkflowBundle)
+![Project Status](http://stillmaintained.com/lexik/LexikWorkflowBundle.png)
 
 This Symfony2 bundle allows to define and manage simple workflows using the event dispatcher for actions and validations.
 
