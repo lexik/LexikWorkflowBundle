@@ -11,8 +11,6 @@ use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Yaml\Parser;
-use Lexik\Bundle\WorkflowBundle\Flow\NextState;
-use Lexik\Bundle\WorkflowBundle\Flow\NextStateOr;
 
 /**
  * This is the class that loads and manages your bundle configuration

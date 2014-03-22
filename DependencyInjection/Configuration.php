@@ -5,6 +5,7 @@ namespace Lexik\Bundle\WorkflowBundle\DependencyInjection;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
+
 use Lexik\Bundle\WorkflowBundle\Flow\NextStateInterface;
 
 /**
@@ -91,7 +92,6 @@ class Configuration implements ConfigurationInterface
                     ->end()
                 ->end()
                 ->append($this->createStepsNodeDefinition())
-                //->append($this->createNextStatesNodeDefinition()) // @todo allow a process to have sub processes
             ->end()
         ;
 
