@@ -4,6 +4,8 @@ LexikWorkflowBundle
 [![Build Status](https://secure.travis-ci.org/lexik/LexikWorkflowBundle.png)](http://travis-ci.org/lexik/LexikWorkflowBundle)
 ![Project Status](http://stillmaintained.com/lexik/LexikWorkflowBundle.png)
 
+[![SensioLabsInsight](https://insight.sensiolabs.com/projects/7209d542-4448-4844-838c-4e53151ec769/big.png)](https://insight.sensiolabs.com/projects/7209d542-4448-4844-838c-4e53151ec769)
+
 This Symfony2 bundle allows to define and manage simple workflows using the event dispatcher for actions and validations.
 
 This bundle was originally a fork of [FreeAgentWorkflowBundle](https://github.com/jeremyFreeAgent/FreeAgentWorkflowBundle). The implementation differs in the way that we use event dispatcher and we store steps history for each model object.
