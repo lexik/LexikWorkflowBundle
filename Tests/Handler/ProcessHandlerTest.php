@@ -57,7 +57,7 @@ class ProcessHandlerTest extends TestCase
         $this->assertTrue(is_array($modelState->getData()));
         $this->assertEquals(0, count($modelState->getData()));
         $this->assertEquals(FakeModel::STATUS_CREATE, $model->getStatus());
-        $this->assertEquals(["ROLE_ADMIN"], $this->securityContext->testedAttributes);
+        $this->assertEquals(array("ROLE_ADMIN"), $this->securityContext->testedAttributes);
         $this->assertSame($model->getWorkflowObject(), $this->securityContext->testedObject);
     }
 
@@ -68,7 +68,7 @@ class ProcessHandlerTest extends TestCase
 
         $this->assertTrue($modelState instanceof ModelState);
         $this->assertFalse($modelState->getSuccessful());
-        $this->assertEquals(["ROLE_ADMIN"], $this->securityContext->testedAttributes);
+        $this->assertEquals(array("ROLE_ADMIN"), $this->securityContext->testedAttributes);
         $this->assertSame($model->getWorkflowObject(), $this->securityContext->testedObject);
     }
 
@@ -81,7 +81,7 @@ class ProcessHandlerTest extends TestCase
         $modelState = $this->getProcessHandler()->start($model);
 
         $this->assertEquals($data, $modelState->getData());
-        $this->assertEquals(["ROLE_ADMIN"], $this->securityContext->testedAttributes);
+        $this->assertEquals(array("ROLE_ADMIN"), $this->securityContext->testedAttributes);
         $this->assertSame($model->getWorkflowObject(), $this->securityContext->testedObject);
     }
 
