@@ -234,7 +234,7 @@ class ProcessHandler implements ProcessHandlerInterface
     {
         $roles = $step->getRoles();
 
-        if (!empty($roles) && !$this->security->isGranted($roles, $model)) {
+        if (!empty($roles) && !$this->security->isGranted($roles, $model->getWorkflowObject())) {
             throw new AccessDeniedException($step->getName());
         }
     }

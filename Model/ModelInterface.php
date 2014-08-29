@@ -17,4 +17,11 @@ interface ModelInterface
      * @return array
      */
     public function getWorkflowData();
+
+    /**
+     * Returns the object of the workflow.
+     *
+     * @return mixed
+     */
+    public function getWorkflowObject();
 }
