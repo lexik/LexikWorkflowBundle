@@ -2,6 +2,7 @@
 
 namespace Lexik\Bundle\WorkflowBundle\Tests\Fixtures;
 
+use Lexik\Bundle\WorkflowBundle\Entity\ModelState;
 use Lexik\Bundle\WorkflowBundle\Model\ModelInterface;
 
 class FakeModel implements ModelInterface
@@ -16,6 +17,8 @@ class FakeModel implements ModelInterface
 
     public $data = array();
 
+    public $states = array();
+
     public function getWorkflowIdentifier()
     {
         return 'sample_identifier';
@@ -24,6 +27,16 @@ class FakeModel implements ModelInterface
     public function getWorkflowData()
     {
         return $this->data;
+    }
+
+    public function addState(ModelState $modelState)
+    {
+        $this->states[] = $modelState;
+    }
+
+    public function getStates()
+    {
+        return $this->states;
     }
 
     public function setStatus($status)

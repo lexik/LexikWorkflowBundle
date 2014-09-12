@@ -2,6 +2,8 @@
 
 namespace Lexik\Bundle\WorkflowBundle\Model;
 
+use Lexik\Bundle\WorkflowBundle\Entity\ModelState;
+
 interface ModelInterface
 {
     /**
@@ -17,4 +19,18 @@ interface ModelInterface
      * @return array
      */
     public function getWorkflowData();
+
+    /**
+     * Add modelState
+     *
+     * @param ModelState $modelState
+     */
+    public function addState(ModelState $modelState);
+
+    /**
+     * Get states
+     *
+     * @return array
+     */
+    public function getStates();
 }

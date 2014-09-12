@@ -38,7 +38,7 @@ class ModelStorage
      * @param string         $processName
      * @param string         $stepName
      *
-     * @return Lexik\Bundle\WorkflowBundle\Entity\ModelState
+     * @return ModelState
      */
     public function findCurrentModelState(ModelInterface $model, $processName, $stepName = null)
     {
@@ -52,10 +52,11 @@ class ModelStorage
     /**
      * Returns all model states.
      *
-     * @param  ModelInterface $model
-     * @param  string         $processName
-     * @param  string         $successOnly
-     * @return array
+     * @param ModelInterface $model
+     * @param string         $processName
+     * @param bool           $successOnly
+     *
+     * @return mixed
      */
     public function findAllModelStates(ModelInterface $model, $processName, $successOnly = true)
     {
@@ -106,10 +107,11 @@ class ModelStorage
     /**
      * Create a new successful model state.
      *
-     * @param  ModelInterface                                 $model
-     * @param  string                                         $processName
-     * @param  string                                         $stepName
-     * @param  ModelState                                     $previous
+     * @param ModelInterface $model
+     * @param string         $processName
+     * @param string         $stepName
+     * @param ModelState     $previous
+     *
      * @return \Lexik\Bundle\WorkflowBundle\Entity\ModelState
      */
     public function newModelStateSuccess(ModelInterface $model, $processName, $stepName, $previous = null)
@@ -121,6 +123,18 @@ class ModelStorage
         $this->om->flush($modelState);
 
         return $modelState;
+    }
+
+    /**
+     * Normalize by fetching workflow states of each $objects.
+     *
+     * @param ModelState|array $objects
+     * @param array            $processes
+     * @param bool             $onlySuccess
+     */
+    public function normalizeWorkflowStates($objects, $processes = array(), $onlySuccess = false)
+    {
+        $this->repository->normalizeWorkflowStates($objects, $processes, $onlySuccess);
     }
 
     /**

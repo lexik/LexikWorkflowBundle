@@ -4,6 +4,8 @@ namespace Lexik\Bundle\WorkflowBundle\Model;
 
 use Doctrine\ORM\EntityRepository;
 
+use Lexik\Bundle\WorkflowBundle\Entity\ModelState;
+
 class ModelStateRepository extends EntityRepository
 {
     /**
@@ -84,5 +86,46 @@ class ModelStateRepository extends EntityRepository
         }
 
         return $qb->getQuery()->getResult();
+    }
+
+    /**
+     * Normalize by fetching workflow states of each $objects.
+     *
+     * @param ModelState|array $objects
+     * @param array            $processes
+     * @param bool             $onlySuccess
+     */
+    public function normalizeWorkflowStates($objects, $processes, $onlySuccess)
+    {
+        $objects = ( ! is_array($objects) && ! $objects instanceof \ArrayAccess) ? array($objects) : $objects;
+
+        if (0 === count($objects)) {
+            return;
+        }
+
+        $ordersIndexedByWorkflowIdentifier = array();
+        foreach ($objects as $object) {
+            $ordersIndexedByWorkflowIdentifier[$object->getWorkflowIdentifier()] = $object;
+        }
+
+        $qb = $this->getEntityManager()->createQueryBuilder();
+        $qb->select('ms')
+            ->from('Lexik\Bundle\WorkflowBundle\Entity\ModelState', 'ms')
+            ->andWhere($qb->expr()->in('ms.workflowIdentifier', array_keys($ordersIndexedByWorkflowIdentifier)))
+            ->orderBy('ms.id');
+
+        if (count($processes)) {
+            $qb->andWhere($qb->expr()->in('ms.processName', $processes));
+        }
+
+        if ($onlySuccess) {
+            $qb->andWhere('ms.successful = 1');
+        }
+
+        $states = $qb->getQuery()->getResult();
+
+        foreach ($states as $state) {
+            $ordersIndexedByWorkflowIdentifier[$state->getWorkflowIdentifier()]->addState($state);
+        }
     }
 }
