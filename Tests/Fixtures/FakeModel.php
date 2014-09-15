@@ -14,7 +14,14 @@ class FakeModel implements ModelInterface
 
     protected $content;
 
+    protected $object;
+
     public $data = array();
+
+    public function __construct()
+    {
+        $this->object = new \stdClass();
+    }
 
     public function getWorkflowIdentifier()
     {
@@ -24,6 +31,11 @@ class FakeModel implements ModelInterface
     public function getWorkflowData()
     {
         return $this->data;
+    }
+
+    public function getWorkflowObject()
+    {
+        return $this->object;
     }
 
     public function setStatus($status)
