@@ -132,7 +132,7 @@ class ProcessHandler implements ProcessHandlerInterface
     protected function reachStep(ModelInterface $model, Step $step, ModelState $currentModelState = null)
     {
         try {
-            $this->checkCredentials($step);
+            $this->checkCredentials($model, $step);
         } catch (AccessDeniedException $e) {
             $violations = new ViolationList();
             $violations->add(new Violation($e->getMessage()));
@@ -226,14 +226,15 @@ class ProcessHandler implements ProcessHandlerInterface
     /**
      * Check if the user is allowed to reach the step.
      *
+     * @param  ModelInterface        $model
      * @param  Step                  $step
      * @throws AccessDeniedException
      */
-    protected function checkCredentials(Step $step)
+    protected function checkCredentials(ModelInterface $model, Step $step)
     {
         $roles = $step->getRoles();
 
-        if (!empty($roles) && !$this->security->isGranted($roles)) {
+        if (!empty($roles) && !$this->security->isGranted($roles, $model->getWorkflowObject())) {
             throw new AccessDeniedException($step->getName());
         }
     }

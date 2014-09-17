@@ -9,6 +9,10 @@ class FakeSecurityContext implements SecurityContextInterface
 {
     private $authenticatedUser;
 
+    public $testedAttributes = null;
+
+    public $testedObject = null;
+
     public function __construct($authenticatedUser)
     {
         $this->authenticatedUser = $authenticatedUser;
@@ -24,6 +28,8 @@ class FakeSecurityContext implements SecurityContextInterface
 
     public function isGranted($attributes, $object = null)
     {
+        $this->testedAttributes = $attributes;
+        $this->testedObject = $object;
         return $this->authenticatedUser;
     }
 }

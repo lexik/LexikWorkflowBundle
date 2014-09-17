@@ -29,6 +29,11 @@ class ProcessHandlerTest extends TestCase
      */
     protected $modelStorage;
 
+    /**
+     * @var Lexik\Bundle\WorkflowBundle\Tests\Fixtures\FakeSecurityContext
+     */
+    protected $securityContext;
+
     protected function setUp()
     {
         parent::setUp();
@@ -52,6 +57,8 @@ class ProcessHandlerTest extends TestCase
         $this->assertTrue(is_array($modelState->getData()));
         $this->assertEquals(0, count($modelState->getData()));
         $this->assertEquals(FakeModel::STATUS_CREATE, $model->getStatus());
+        $this->assertEquals(array("ROLE_ADMIN"), $this->securityContext->testedAttributes);
+        $this->assertSame($model->getWorkflowObject(), $this->securityContext->testedObject);
     }
 
     public function testStartBadCredentials()
@@ -61,6 +68,8 @@ class ProcessHandlerTest extends TestCase
 
         $this->assertTrue($modelState instanceof ModelState);
         $this->assertFalse($modelState->getSuccessful());
+        $this->assertEquals(array("ROLE_ADMIN"), $this->securityContext->testedAttributes);
+        $this->assertSame($model->getWorkflowObject(), $this->securityContext->testedObject);
     }
 
     public function testStartWithData()
@@ -72,6 +81,8 @@ class ProcessHandlerTest extends TestCase
         $modelState = $this->getProcessHandler()->start($model);
 
         $this->assertEquals($data, $modelState->getData());
+        $this->assertEquals(array("ROLE_ADMIN"), $this->securityContext->testedAttributes);
+        $this->assertSame($model->getWorkflowObject(), $this->securityContext->testedObject);
     }
 
     /**
@@ -110,6 +121,8 @@ class ProcessHandlerTest extends TestCase
         $this->assertTrue($modelState->getPrevious() instanceof ModelState);
         $this->assertEquals($previous->getId(), $modelState->getPrevious()->getId());
         $this->assertEquals(FakeModel::STATUS_VALIDATE, $model->getStatus());
+        $this->assertNull($this->securityContext->testedAttributes);
+        $this->assertNull($this->securityContext->testedObject);
     }
 
     /**
@@ -318,7 +331,9 @@ class ProcessHandlerTest extends TestCase
         ));
 
         $processHandler = new ProcessHandler($process, $this->modelStorage, $dispatcher);
-        $processHandler->setSecurityContext(new FakeSecurityContext($authenticatedUser));
+
+        $this->securityContext = new FakeSecurityContext($authenticatedUser);
+        $processHandler->setSecurityContext($this->securityContext);
 
         return $processHandler;
     }
