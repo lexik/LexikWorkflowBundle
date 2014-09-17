@@ -94,8 +94,10 @@ class ModelStateRepository extends EntityRepository
      * @param ModelState|array $objects
      * @param array            $processes
      * @param bool             $onlySuccess
+     *
+     * @throws \InvalidArgumentException
      */
-    public function normalizeWorkflowStates($objects, $processes, $onlySuccess)
+    public function getStates($objects, $processes, $onlySuccess)
     {
         $objects = ( ! is_array($objects) && ! $objects instanceof \ArrayAccess) ? array($objects) : $objects;
 
@@ -105,6 +107,10 @@ class ModelStateRepository extends EntityRepository
 
         $ordersIndexedByWorkflowIdentifier = array();
         foreach ($objects as $object) {
+            if (!$object instanceof ModelStateInterface) {
+                throw new \InvalidArgumentException();
+            }
+
             $ordersIndexedByWorkflowIdentifier[$object->getWorkflowIdentifier()] = $object;
         }
 

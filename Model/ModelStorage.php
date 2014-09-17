@@ -132,9 +132,9 @@ class ModelStorage
      * @param array            $processes
      * @param bool             $onlySuccess
      */
-    public function normalizeWorkflowStates($objects, $processes = array(), $onlySuccess = false)
+    public function getStates($objects, $processes = array(), $onlySuccess = false)
     {
-        $this->repository->normalizeWorkflowStates($objects, $processes, $onlySuccess);
+        $this->repository->getStates($objects, $processes, $onlySuccess);
     }
 
     /**
