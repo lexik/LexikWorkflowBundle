@@ -97,7 +97,7 @@ class ModelStateRepository extends EntityRepository
      *
      * @throws \InvalidArgumentException
      */
-    public function getStates($objects, $processes, $onlySuccess)
+    public function setStates($objects, $processes, $onlySuccess)
     {
         $objects = ( ! is_array($objects) && ! $objects instanceof \ArrayAccess) ? array($objects) : $objects;
 

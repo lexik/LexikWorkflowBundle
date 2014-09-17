@@ -132,9 +132,9 @@ class ModelStorage
      * @param array            $processes
      * @param bool             $onlySuccess
      */
-    public function getStates($objects, $processes = array(), $onlySuccess = false)
+    public function setStates($objects, $processes = array(), $onlySuccess = false)
     {
-        $this->repository->getStates($objects, $processes, $onlySuccess);
+        $this->repository->setStates($objects, $processes, $onlySuccess);
     }
 
     /**
