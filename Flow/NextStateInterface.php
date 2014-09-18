@@ -32,8 +32,9 @@ interface NextStateInterface
     /**
      * Returns the state target.
      *
-     * @param ModelInterface $model
-     * @return NodeInterface
+     * @param  ModelInterface $model
+     *
+     * @return Node
      */
     public function getTarget(ModelInterface $model);
 }

@@ -72,7 +72,7 @@ class Configuration implements ConfigurationInterface
             ->useAttributeAsKey('name')
             ->prototype('array')
                 ->validate()
-                    ->ifTrue(function($value) {
+                    ->ifTrue(function ($value) {
                         return !empty($value['import']) && !empty($value['steps']);
                     })
                     ->thenInvalid('You can\'t use "import" and "steps" keys at the same time.')
@@ -123,11 +123,11 @@ class Configuration implements ConfigurationInterface
 
                     ->arrayNode('model_status')
                         ->validate()
-                            ->ifTrue(function($value) {
+                            ->ifTrue(function ($value) {
                                 return (is_array($value) && count($value) < 2);
                             })
                             ->thenInvalid('You must specify an array with [ method, constant ]')
-                            ->ifTrue(function($value) {
+                            ->ifTrue(function ($value) {
                                 return ( ! defined($value[1]));
                             })
                             ->thenInvalid('You must specify a valid constant name as second parameter')

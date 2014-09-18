@@ -2,8 +2,6 @@
 
 namespace Lexik\Bundle\WorkflowBundle\Validation;
 
-use Lexik\Bundle\WorkflowBundle\Validation\Violation;
-
 /**
  * Violation list of step validations.
  *

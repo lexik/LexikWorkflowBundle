@@ -12,7 +12,7 @@ use Lexik\Bundle\WorkflowBundle\Model\ModelStorage;
 use Lexik\Bundle\WorkflowBundle\Entity\ModelState;
 use Lexik\Bundle\WorkflowBundle\Tests\TestCase;
 use Lexik\Bundle\WorkflowBundle\Tests\Fixtures\FakeProcessListener;
-Use Lexik\Bundle\WorkflowBundle\Tests\Fixtures\FakeModel;
+use Lexik\Bundle\WorkflowBundle\Tests\Fixtures\FakeModel;
 use Lexik\Bundle\WorkflowBundle\Tests\Fixtures\FakeSecurityContext;
 use Lexik\Bundle\WorkflowBundle\Tests\Fixtures\FakeValidatorListener;
 use Lexik\Bundle\WorkflowBundle\Tests\Fixtures\FakeModelChecker;

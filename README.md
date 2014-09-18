@@ -302,6 +302,46 @@ steps:
 ```
 An event `*.bad_credentials` is dispatched when user has not the roles.
 
+Set modelStates on your ModelInterface
+-----------------------------------
+
+If you want to retrieve all modelState created for your ModelInterface object, you need to implement the ModelStateInterface:
+
+```php
+<?php
+
+class FakeModel implements ModelInterface, ModelStateInterface
+{
+    //...
+
+    protected $states = array();
+
+    public function addState(ModelState $modelState)
+    {
+        $this->states[] = $modelState;
+    }
+
+    public function getStates()
+    {
+        return $this->states;
+    }
+```
+
+You can after call the method `getStates($objects, $processes = array(), $onlySuccess = false)` define in `ModelStorage`.
+
+```php
+<?php
+
+    // get your object
+
+    // Set states on your object
+    $this->get('lexik_workflow.model_storage')->setStates($post);
+
+    // get alls your objects and set your process and only state successful
+    $this->get('lexik_workflow.model_storage')->setStates($posts, ['process'], true);
+```
+
+
 Usage
 -----
 
