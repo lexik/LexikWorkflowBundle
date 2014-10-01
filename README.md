@@ -110,7 +110,8 @@ Model object
 The workflow handles "model" objects. A "model" object is basically an instance of `Lexik\Bundle\WorkflowBundle\Model\ModelInterface`. This interface provides 2 methods:
 
 * `getWorkflowIdentifier()` returns an unique identifier used to store a model state in the database ;
-* `getWorkflowData()` returns an array of data to store with a model state.
+* `getWorkflowData()` returns an array of data to store with a model state ;
+* `getWorkflowObject()` returns the actual model object, it will be passed to the security context by the default ProcessHandler.
 
 Here's an example of a `PostModel` class we could use in the `post_publication` process:
 
@@ -168,6 +169,17 @@ class PostModel implements ModelInterface
             'content' => $this->post->getContent(),
             // ...
         );
+    }
+    
+    /**
+     * Returns the object of this ModelInterface.
+     *
+     * @return object
+     */
+    public function getWorkflowObject()
+    {
+        // Since this object is this own ModelInterface, return it.
+        return $this;
     }
 }
 ```
