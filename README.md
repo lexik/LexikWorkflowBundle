@@ -111,7 +111,7 @@ The workflow handles "model" objects. A "model" object is basically an instance 
 
 * `getWorkflowIdentifier()` returns an unique identifier used to store a model state in the database ;
 * `getWorkflowData()` returns an array of data to store with a model state ;
-* `getWorkflowObject()` returns the actual model object, it will be passed to the security context by the default ProcessHandler.
+* `getWorkflowObject()` returns the final object, it will be passed to the security context by the default ProcessHandler.
 
 Here's an example of a `PostModel` class we could use in the `post_publication` process:
 
@@ -123,6 +123,10 @@ namespace Project\Bundle\SuperBundle\Workflow\Model;
 use Lexik\Bundle\WorkflowBundle\Model\ModelInterface;
 use Project\Bundle\SuperBundle\Entity\Post;
 
+/**
+ * This class is used to wrap a Post entity.
+ * It's not required to do like that, we could also make the Post entity implements ModelInterface.
+ */
 class PostModel implements ModelInterface
 {
     private $post;
@@ -172,14 +176,14 @@ class PostModel implements ModelInterface
     }
     
     /**
-     * Returns the object of this ModelInterface.
+     * Returns the final object.
+     * If your entity implements ModelInterface itself just return $this.
      *
      * @return object
      */
     public function getWorkflowObject()
     {
-        // Since this object is this own ModelInterface, return it.
-        return $this;
+        return $this->post;
     }
 }
 ```
