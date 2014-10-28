@@ -174,7 +174,7 @@ class PostModel implements ModelInterface
             // ...
         );
     }
-    
+
     /**
      * Returns the final object.
      * If your entity implements ModelInterface itself just return $this.
@@ -191,7 +191,7 @@ class PostModel implements ModelInterface
 Step validations
 ----------------
 
-As you just read on the bundle introduction, we use the event dispatcher a lot for actions and validations. To validate that a step can be reached, you just need to listen to the `<process_name>.<step_name>.validate` event.
+As you just read on the bundle introduction, we use the event dispatcher for actions and validations. To validate that a step can be reached, you just need to listen to the `<process_name>.<step_name>.validate` event.
 
 You will get a `Lexik\Bundle\WorkflowBundle\Event\ValidateStepEvent` object with which you can get the step, the model and an object that manages the step violations. You can add violations to block the access to the step.
 
@@ -291,6 +291,125 @@ class PostPublicationProcessSubscriber implements EventSubscriberInterface
 </service>
 ```
 
+Step Pre-validations
+--------------------
+
+In addition to step validations you can also process some pre-validations.
+A pre-validation will be executed just before step validations and only for the current step.
+
+E.g.: let's say we have a post which is currently on step `published` and I want to reach the step `unpublished`.
+
+```yaml
+# app/config/config.yml
+lexik_workflow:
+    processes:
+        post_publication:
+            start: draft_created
+            end:   [ deleted ]
+            steps:
+                # ...
+
+                published:
+                    label: "Post published"
+                    roles: [ ROLE_USER ]
+                    model_status: [ setStatus, Project\Bundle\SuperBundle\Entity\Post::STATUS_PUBLISHED ]
+                    on_invalid: draft_created # will try to reach the "draft_created" step in case validations to reach "published" fail.
+                    next_states:
+                        unpublish: { target: unpublished }
+
+                unpublished:
+                    label: "Post unpublished"
+                    roles: [ ROLE_USER ]
+                    model_status: [ setStatus, Project\Bundle\SuperBundle\Entity\Post::STATUS_UNPUBLISHED ]
+                    next_states:
+                        delete:  { target: deleted }
+                        publish: { target: published }
+
+                # ...
+```
+
+When you will try to reach the `unpublished` step the process handler will trigger a pre-validation event named:
+
+`post_publication.published.unpublish.pre_validation`
+
+So by listening this event you will be able to do some validations before the process handler execute default validations defined on the `unpublished` step.
+And these pre-validations are only executed when you try to reach `unpublished` from `published`.
+
+Pre-validation events patterns:
+
+* To process some pre-validations: `<process_name>.<current_step_name>.<next_state_name>.pre_validation`.
+* To process some code in case pre-validations fail: `<process_name>.<current_step_name>.<next_state_name>.pre_validation_fail`.
+
+Here a simple example for pre-validation listener:
+
+```php
+namespace Project\Bundle\SuperBundle\Workflow\Listener;
+
+use Lexik\Bundle\WorkflowBundle\Event\StepEvent;
+use Lexik\Bundle\WorkflowBundle\Event\ValidateStepEvent;
+
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+
+class PostPublicationProcessSubscriber implements EventSubscriberInterface
+{
+    /**
+     * {@inheritDoc}
+     */
+    public static function getSubscribedEvents()
+    {
+        return array(
+            'post_publication.published.unpublish.pre_validation' => array(
+                'preValidate',
+            ),
+            'post_publication.published.unpublish.pre_validation_fail' => array(
+                'preValidationFail',
+            ),
+        );
+    }
+
+    public function preValidate(ValidateStepEvent $event)
+    {
+        // do your checks
+    }
+
+    public function preValidationFail(StepEvent $event)
+    {
+        // process code in case the pre validation fail
+    }
+}
+```
+
+Conditional next step (OR)
+--------------------------
+
+To define a conditional next state you have to define the `target` key as usual plus the `type` key to notify the process handler this next state is conditional.
+
+Here an example of conditional next state:
+
+```yaml
+lexik_workflow:
+    processes:
+        my_process:
+            steps:
+                my_step_xxx:
+                    label: "Step xxx"
+                    next_states:
+                        go_to_next_step:
+                            type: step_or
+                            target:
+                                my_step_A: "service_id:method_name"
+                                my_step_B: "service_id:other_method_name"
+                                my_step_C: ~  # default choice
+```
+
+Let's say we have a model state currently on the step named `my_step_xxx`.
+If we try to reach the next state named `go_to_next_step` by calling `$processHandler->reachNextState($model, 'go_to_next_step')`, the workflow will call each method defined for each target.
+The first method that returns true will make the work go to the related step.
+
+So if `service_id:method_name` returns true the next step will be `my_step_A`.
+If `service_id:method_name` returns false and then `service_id:other_method_name` returns true the next step will be `my_step_B`.
+If both of `service_id:method_name` and `service_id:other_method_name` return false, the next step will be `my_step_C`.
+
 Model status update
 -------------------
 
@@ -319,7 +438,7 @@ steps:
 An event `*.bad_credentials` is dispatched when user has not the roles.
 
 Set modelStates on your ModelInterface
------------------------------------
+--------------------------------------
 
 If you want to retrieve all modelState created for your ModelInterface object, you need to implement the ModelStateInterface:
 
