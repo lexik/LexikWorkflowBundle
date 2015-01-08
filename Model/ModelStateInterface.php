@@ -19,4 +19,4 @@ interface ModelStateInterface
      * @return array
      */
     public function getStates();
-} 
+}
