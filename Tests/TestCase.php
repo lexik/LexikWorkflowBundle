@@ -71,12 +71,12 @@ EOF;
     }
 
     /**
-     * EntityManager mock object together with annotation mapping driver and
+     * EntityManager object together with annotation mapping driver and
      * pdo_sqlite database in memory
      *
      * @return EntityManager
      */
-    protected function getMockSqliteEntityManager()
+    protected function getSqliteEntityManager()
     {
         $cache = new \Doctrine\Common\Cache\ArrayCache();
 
@@ -86,37 +86,17 @@ EOF;
         ));
 
         // configuration mock
-        $config = $this->getMock('Doctrine\ORM\Configuration');
-        $config->expects($this->any())
-            ->method('getMetadataCacheImpl')
-            ->will($this->returnValue($cache));
-        $config->expects($this->any())
-            ->method('getQueryCacheImpl')
-            ->will($this->returnValue($cache));
-        $config->expects($this->once())
-            ->method('getProxyDir')
-            ->will($this->returnValue(sys_get_temp_dir()));
-        $config->expects($this->once())
-            ->method('getProxyNamespace')
-            ->will($this->returnValue('Proxy'));
-        $config->expects($this->once())
-            ->method('getAutoGenerateProxyClasses')
-            ->will($this->returnValue(true));
-        $config->expects($this->any())
-            ->method('getMetadataDriverImpl')
-            ->will($this->returnValue($xmlDriver));
-        $config->expects($this->any())
-            ->method('getClassMetadataFactoryName')
-            ->will($this->returnValue('Doctrine\ORM\Mapping\ClassMetadataFactory'));
-        $config->expects($this->any())
-            ->method('getDefaultRepositoryClassName')
-            ->will($this->returnValue('Doctrine\\ORM\\EntityRepository'));
-        $config->expects($this->any())
-            ->method('getQuoteStrategy')
-            ->will($this->returnValue(new \Doctrine\ORM\Mapping\DefaultQuoteStrategy()));
-        $config->expects($this->any())
-            ->method('getRepositoryFactory')
-            ->will($this->returnValue(new \Doctrine\ORM\Repository\DefaultRepositoryFactory()));
+        $config = \Doctrine\ORM\Tools\Setup::createAnnotationMetadataConfiguration(array(
+            __DIR__.'/../Entity',
+        ), false, null, null, false);
+        $config->setMetadataDriverImpl($xmlDriver);
+        $config->setMetadataCacheImpl($cache);
+        $config->setQueryCacheImpl($cache);
+        $config->setProxyDir(sys_get_temp_dir());
+        $config->setProxyNamespace('Proxy');
+        $config->setAutoGenerateProxyClasses(true);
+        $config->setClassMetadataFactoryName('Doctrine\ORM\Mapping\ClassMetadataFactory');
+        $config->setDefaultRepositoryClassName('Doctrine\ORM\EntityRepository');
 
         $conn = array(
             'driver' => 'pdo_sqlite',
@@ -129,18 +109,16 @@ EOF;
     }
 
     /**
-     * Returns a mock instance of a SecurityContext.
+     * Returns a mock instance of a AuthorizationChecker.
      *
-     * @return \Symfony\Component\Security\Core\SecurityContext
+     * @return \Symfony\Component\Security\Core\Authorization\AuthorizationChecker
      */
-    protected function getMockSecurityContext()
+    public function getMockAuthorizationChecker()
     {
-        $authManager = $this->getMock('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface');
-        $decisionManager = $this->getMock('Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface');
+        $checker = $this->getMockBuilder('Symfony\Component\Security\Core\Authorization\AuthorizationChecker')
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $context = new SecurityContext($authManager, $decisionManager);
-        $context->setToken($token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface'));
-
-        return $context;
+        return $checker;
     }
 }

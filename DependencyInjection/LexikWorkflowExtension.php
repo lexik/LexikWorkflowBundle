@@ -58,7 +58,7 @@ class LexikWorkflowExtension extends Extension
                 new Reference('event_dispatcher'),
             ));
 
-            $definition->addMethodCall('setSecurityContext', array(new Reference('security.context')));
+            $definition->addMethodCall('setAuthorizationChecker', array(new Reference('security.authorization_checker')));
 
             $container->setDefinition(sprintf('lexik_workflow.handler.%s', $processName), $definition);
         }
