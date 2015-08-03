@@ -11,10 +11,6 @@
             "email": "c.girard@lexik.fr"
         },
         {
-            "name": "Jeremy Barthe",
-            "email": "j.barthe@lexik.fr"
-        },
-        {
             "name": "Dev Lexik",
             "email": "dev@lexik.fr"
         },
@@ -25,16 +21,15 @@
     ],
     "require": {
         "php": ">=5.3.3",
-        "symfony/framework-bundle": "~2.3",
+        "symfony/framework-bundle": "~2.7",
         "doctrine/orm": "~2.2"
     },
     "autoload": {
-        "psr-0": { "Lexik\\Bundle\\WorkflowBundle": "" }
+        "psr-4": { "Lexik\\Bundle\\WorkflowBundle\\": "" }
     },
-    "target-dir": "Lexik/Bundle/WorkflowBundle",
     "extra": {
         "branch-alias": {
-            "dev-master": "0.4.x-dev"
+            "dev-master": "0.5.x-dev"
         }
     }
 }
