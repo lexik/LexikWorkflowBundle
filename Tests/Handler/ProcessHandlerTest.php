@@ -2,6 +2,7 @@
 
 namespace Lexik\Bundle\WorkflowBundle\Tests\Handler;
 
+use Lexik\Bundle\WorkflowBundle\Tests\Fixtures\FakeAuthorizationChecker;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 use Lexik\Bundle\WorkflowBundle\Flow\NextStateInterface;
@@ -13,7 +14,6 @@ use Lexik\Bundle\WorkflowBundle\Entity\ModelState;
 use Lexik\Bundle\WorkflowBundle\Tests\TestCase;
 use Lexik\Bundle\WorkflowBundle\Tests\Fixtures\FakeProcessListener;
 use Lexik\Bundle\WorkflowBundle\Tests\Fixtures\FakeModel;
-use Lexik\Bundle\WorkflowBundle\Tests\Fixtures\FakeSecurityContext;
 use Lexik\Bundle\WorkflowBundle\Tests\Fixtures\FakeValidatorListener;
 use Lexik\Bundle\WorkflowBundle\Tests\Fixtures\FakeModelChecker;
 
@@ -32,13 +32,13 @@ class ProcessHandlerTest extends TestCase
     /**
      * @var Lexik\Bundle\WorkflowBundle\Tests\Fixtures\FakeSecurityContext
      */
-    protected $securityContext;
+    protected $authorizationChecker;
 
     protected function setUp()
     {
         parent::setUp();
 
-        $this->em = $this->getMockSqliteEntityManager();
+        $this->em = $this->getSqliteEntityManager();
         $this->createSchema($this->em);
 
         $this->modelStorage = new ModelStorage($this->em, 'Lexik\Bundle\WorkflowBundle\Entity\ModelState');
@@ -57,8 +57,8 @@ class ProcessHandlerTest extends TestCase
         $this->assertTrue(is_array($modelState->getData()));
         $this->assertEquals(0, count($modelState->getData()));
         $this->assertEquals(FakeModel::STATUS_CREATE, $model->getStatus());
-        $this->assertEquals(array("ROLE_ADMIN"), $this->securityContext->testedAttributes);
-        $this->assertSame($model->getWorkflowObject(), $this->securityContext->testedObject);
+        $this->assertEquals(array("ROLE_ADMIN"), $this->authorizationChecker->testedAttributes);
+        $this->assertSame($model->getWorkflowObject(), $this->authorizationChecker->testedObject);
     }
 
     public function testStartBadCredentials()
@@ -68,8 +68,8 @@ class ProcessHandlerTest extends TestCase
 
         $this->assertTrue($modelState instanceof ModelState);
         $this->assertFalse($modelState->getSuccessful());
-        $this->assertEquals(array("ROLE_ADMIN"), $this->securityContext->testedAttributes);
-        $this->assertSame($model->getWorkflowObject(), $this->securityContext->testedObject);
+        $this->assertEquals(array("ROLE_ADMIN"), $this->authorizationChecker->testedAttributes);
+        $this->assertSame($model->getWorkflowObject(), $this->authorizationChecker->testedObject);
     }
 
     public function testStartWithData()
@@ -81,8 +81,8 @@ class ProcessHandlerTest extends TestCase
         $modelState = $this->getProcessHandler()->start($model);
 
         $this->assertEquals($data, $modelState->getData());
-        $this->assertEquals(array("ROLE_ADMIN"), $this->securityContext->testedAttributes);
-        $this->assertSame($model->getWorkflowObject(), $this->securityContext->testedObject);
+        $this->assertEquals(array("ROLE_ADMIN"), $this->authorizationChecker->testedAttributes);
+        $this->assertSame($model->getWorkflowObject(), $this->authorizationChecker->testedObject);
     }
 
     /**
@@ -121,8 +121,8 @@ class ProcessHandlerTest extends TestCase
         $this->assertTrue($modelState->getPrevious() instanceof ModelState);
         $this->assertEquals($previous->getId(), $modelState->getPrevious()->getId());
         $this->assertEquals(FakeModel::STATUS_VALIDATE, $model->getStatus());
-        $this->assertNull($this->securityContext->testedAttributes);
-        $this->assertNull($this->securityContext->testedObject);
+        $this->assertNull($this->authorizationChecker->testedAttributes);
+        $this->assertNull($this->authorizationChecker->testedObject);
     }
 
     /**
@@ -332,8 +332,8 @@ class ProcessHandlerTest extends TestCase
 
         $processHandler = new ProcessHandler($process, $this->modelStorage, $dispatcher);
 
-        $this->securityContext = new FakeSecurityContext($authenticatedUser);
-        $processHandler->setSecurityContext($this->securityContext);
+        $this->authorizationChecker = new FakeAuthorizationChecker($authenticatedUser);
+        $processHandler->setAuthorizationChecker($this->authorizationChecker);
 
         return $processHandler;
     }

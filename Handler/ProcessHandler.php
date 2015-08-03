@@ -3,8 +3,7 @@
 namespace Lexik\Bundle\WorkflowBundle\Handler;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Security\Core\SecurityContextInterface;
-
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Lexik\Bundle\WorkflowBundle\Validation\Violation;
 use Lexik\Bundle\WorkflowBundle\Validation\ViolationList;
 use Lexik\Bundle\WorkflowBundle\Event\ValidateStepEvent;
@@ -33,9 +32,9 @@ class ProcessHandler implements ProcessHandlerInterface
     protected $storage;
 
     /**
-     * @var SecurityContextInterface
+     * @var AuthorizationCheckerInterface
      */
-    protected $security;
+    protected $authorizationChecker;
 
     /**
      * @var EventDispatcherInterface
@@ -57,13 +56,11 @@ class ProcessHandler implements ProcessHandlerInterface
     }
 
     /**
-     * Set security context.
-     *
-     * @param SecurityContextInterface $security
+     * @param AuthorizationCheckerInterface $authorizationChecker
      */
-    public function setSecurityContext(SecurityContextInterface $security)
+    public function setAuthorizationChecker(AuthorizationCheckerInterface $authorizationChecker)
     {
-        $this->security = $security;
+        $this->authorizationChecker = $authorizationChecker;
     }
 
     /**
@@ -211,6 +208,7 @@ class ProcessHandler implements ProcessHandlerInterface
      *
      * @param  string $stepName
      * @return Step
+     * @throws WorkflowException
      */
     protected function getProcessStep($stepName)
     {
@@ -234,7 +232,7 @@ class ProcessHandler implements ProcessHandlerInterface
     {
         $roles = $step->getRoles();
 
-        if (!empty($roles) && !$this->security->isGranted($roles, $model->getWorkflowObject())) {
+        if (!empty($roles) && !$this->authorizationChecker->isGranted($roles, $model->getWorkflowObject())) {
             throw new AccessDeniedException($step->getName());
         }
     }

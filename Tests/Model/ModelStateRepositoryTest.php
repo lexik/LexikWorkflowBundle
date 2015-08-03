@@ -15,7 +15,7 @@ class ModelStateRepositoryTest extends TestCase
     {
         parent::setUp();
 
-        $this->em = $this->getMockSqliteEntityManager();
+        $this->em = $this->getSqliteEntityManager();
         $this->createSchema($this->em);
     }
 

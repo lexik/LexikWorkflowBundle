@@ -2,10 +2,9 @@
 
 namespace Lexik\Bundle\WorkflowBundle\Tests\Fixtures;
 
-use Symfony\Component\Security\Core\SecurityContextInterface;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-class FakeSecurityContext implements SecurityContextInterface
+class FakeAuthorizationChecker implements AuthorizationCheckerInterface
 {
     private $authenticatedUser;
 
@@ -18,18 +17,11 @@ class FakeSecurityContext implements SecurityContextInterface
         $this->authenticatedUser = $authenticatedUser;
     }
 
-    public function getToken()
-    {
-    }
-
-    public function setToken(TokenInterface $token = null)
-    {
-    }
-
     public function isGranted($attributes, $object = null)
     {
         $this->testedAttributes = $attributes;
         $this->testedObject = $object;
+
         return $this->authenticatedUser;
     }
 }
