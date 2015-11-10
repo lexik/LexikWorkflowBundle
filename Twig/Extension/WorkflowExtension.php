@@ -30,7 +30,8 @@ class WorkflowExtension extends \Twig_Extension
     {
         return array(
             'get_step_label'     => new \Twig_Function_Method($this, 'getStepLabel'),
-            'get_state_messsage' => new \Twig_Function_Method($this, 'getStateMessage'),
+            'get_state_message' => new \Twig_Function_Method($this, 'getStateMessage'),
+            'get_state_messsage' => new \Twig_Function_Method($this, 'getStateMessage') // For BC
         );
     }
 
