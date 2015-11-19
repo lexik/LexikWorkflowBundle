@@ -15,7 +15,7 @@ class ModelStateRepository extends EntityRepository
      * @param string $processName
      * @param string $stepName
      *
-     * @return Lexik\Bundle\WorkflowBundle\Entity\ModelState
+     * @return \Lexik\Bundle\WorkflowBundle\Entity\ModelState
      */
     public function findLatestModelState($workflowIdentifier, $processName, $stepName = null)
     {

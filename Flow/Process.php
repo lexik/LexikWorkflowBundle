@@ -66,7 +66,7 @@ class Process extends Node
      *
      * @param string $name
      *
-     * @return Lexik\Bundle\WorkflowBundle\Flow\Step
+     * @return \Lexik\Bundle\WorkflowBundle\Flow\Step
      */
     public function getStep($name)
     {
@@ -76,7 +76,7 @@ class Process extends Node
     /**
      * Returns the first step.
      *
-     * @return Lexik\Bundle\WorkflowBundle\Flow\Step
+     * @return \Lexik\Bundle\WorkflowBundle\Flow\Step
      */
     public function getStartStep()
     {
