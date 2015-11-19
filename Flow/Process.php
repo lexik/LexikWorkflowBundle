@@ -76,7 +76,7 @@ class Process extends Node
     /**
      * Returns the first step.
      *
-     * @return \Lexik\Bundle\WorkflowBundle\Flow\Step
+     * @return string
      */
     public function getStartStep()
     {
