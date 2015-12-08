@@ -192,7 +192,7 @@ class ProcessHandler implements ProcessHandlerInterface
     {
         $state = $this->getCurrentState($model);
 
-        return ( $state->getSuccessful() && in_array($state->getStepName(), $this->process->getEndSteps()) );
+        return ( $state !== null && $state->getSuccessful() && in_array($state->getStepName(), $this->process->getEndSteps()) );
     }
 
     /**
