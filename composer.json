@@ -28,8 +28,8 @@
         }
     ],
     "require": {
-        "php": ">=5.3.3",
-        "symfony/framework-bundle": "~2.7",
+        "php": ">=5.5.9",
+        "symfony/framework-bundle": "~2.7|~3.0",
         "doctrine/orm": "~2.2"
     },
     "autoload": {
