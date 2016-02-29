@@ -2,7 +2,6 @@ LexikWorkflowBundle
 ===================
 
 [![Build Status](https://secure.travis-ci.org/lexik/LexikWorkflowBundle.png)](http://travis-ci.org/lexik/LexikWorkflowBundle)
-![Project Status](http://stillmaintained.com/lexik/LexikWorkflowBundle.png)
 [![Latest Stable Version](https://poser.pugx.org/lexik/workflow-bundle/v/stable)](https://packagist.org/packages/lexik/workflow-bundle)
 [![SensioLabsInsight](https://insight.sensiolabs.com/projects/7209d542-4448-4844-838c-4e53151ec769/mini.png)](https://insight.sensiolabs.com/projects/7209d542-4448-4844-838c-4e53151ec769)
 
