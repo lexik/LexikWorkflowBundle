@@ -29,9 +29,9 @@ class WorkflowExtension extends \Twig_Extension
     public function getFunctions()
     {
         return array(
-            'get_step_label'     => new \Twig_Function_Method($this, 'getStepLabel'),
-            'get_state_message' => new \Twig_Function_Method($this, 'getStateMessage'),
-            'get_state_messsage' => new \Twig_Function_Method($this, 'getStateMessage') // For BC
+            new \Twig_SimpleFunction('get_step_label', array($this, 'getStepLabel')),
+            new \Twig_SimpleFunction('get_state_message', array($this, 'getStateMessage')),
+            new \Twig_SimpleFunction('get_state_messsage', array($this, 'getStateMessage')) // For BC
         );
     }
 
