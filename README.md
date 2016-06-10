@@ -24,7 +24,7 @@ Installation with composer:
     ...
 ```
 
-Next, be sure to enable these bundles in your `app/AppKernel.php` file:
+Next, be sure to enable the bundle in your `app/AppKernel.php` file:
 
 ``` php
 public function registerBundles()
@@ -40,22 +40,22 @@ public function registerBundles()
 How it works
 ============
 
-First of all, what's a workflow? According to wikipedia definition "a workflow consists of a sequence of connected steps". You can see below the workflow terms used by the bundle:
+First of all, what's a workflow? According to wikipedia definition, "a workflow consists of a sequence of connected steps". You can see below the workflow terms used by the bundle:
 
-* to define your workflow you will have to discribe some processes ;
+* to define your workflow you will have to describe some processes ;
 * a process is defined by a series of steps, and you advance through the process step by step ;
 * a step contains validations and actions, validations are executed when you try to reach the step, if those validations are successful the step has been reached and actions are executed.
 
-The workflow works on a "model" object, a model is a class that implements `Lexik\Bundle\WorkflowBundle\Model\ModelInterface`. Each time a model tries to reach a step we log it in the database to keep the steps history.
+The workflow works on a "model" object, a model is a class that implements `Lexik\Bundle\WorkflowBundle\Model\ModelInterface`. Each time a model tries to reach a step, we log it in the database to keep the steps history.
 
 Workflow example
 ----------------
 
 Let's define a simple workflow around a post from its creation to its publication:
 
-* first we have to create a draft, then an admin must validate this draft before it can be published ;
-* once a post is published any user can unpublish it ;
-* if a post is not published an admin can delete it ;
+* first, we have to create a draft, then an admin must validate this draft before it can be published ;
+* once a post is published, any user can unpublish it ;
+* if a post is not published, an admin can delete it ;
 * if the publication step fails, we go back to the draft step.
 
 ```yaml
@@ -106,10 +106,10 @@ lexik_workflow:
 Model object
 ------------
 
-The workflow handles "model" objects. A "model" object is basically an instance of `Lexik\Bundle\WorkflowBundle\Model\ModelInterface`. This interface provides 2 methods:
+The workflow handles "model" objects. A "model" object is basically an instance of `Lexik\Bundle\WorkflowBundle\Model\ModelInterface`. This interface has 3 methods to implement:
 
 * `getWorkflowIdentifier()` returns an unique identifier used to store a model state in the database ;
-* `getWorkflowData()` returns an array of data to store with a model state ;
+* `getWorkflowData()` returns an array of data to store with the model state ;
 * `getWorkflowObject()` returns the final object, it will be passed to the security context by the default ProcessHandler.
 
 Here's an example of a `PostModel` class we could use in the `post_publication` process:
@@ -124,7 +124,7 @@ use Project\Bundle\SuperBundle\Entity\Post;
 
 /**
  * This class is used to wrap a Post entity.
- * It's not required to do like that, we could also make the Post entity implements ModelInterface.
+ * It's not required to do it like that, we could also implement ModelInterface in the Post entity .
  */
 class PostModel implements ModelInterface
 {
@@ -192,7 +192,7 @@ Step validations
 
 As you just read on the bundle introduction, we use the event dispatcher for actions and validations. To validate that a step can be reached, you just need to listen to the `<process_name>.<step_name>.validate` event.
 
-You will get a `Lexik\Bundle\WorkflowBundle\Event\ValidateStepEvent` object with which you can get the step, the model and an object that manages the step violations. You can add violations to block the access to the step.
+The listener will receive an instance of `Lexik\Bundle\WorkflowBundle\Event\ValidateStepEvent`, which will allow you to get the step, the model and an object that manages the step violations. You can add violations to block the access to the step.
 
 In the case the step is not reached due to a validation error, a `<process_name>.<step_name>.validation_fail` event is dispatched.
 
@@ -250,7 +250,7 @@ Step actions
 
 If you need to execute some logic once a step is successfully reached, you can listen to the `<process_name>.<step_name>.reached` event.
 
-You will get a `Lexik\Bundle\WorkflowBundle\Event\StepEvent` object with which you can get the step, the model and the last model state.
+The listener will receive a `Lexik\Bundle\WorkflowBundle\Event\StepEvent` object with which you can get the step, the model and the last model state.
 
 Let's see a simple example, here I listen to `*.reached` event for the step `published` from the `post_publication` process.
 
@@ -293,7 +293,7 @@ class PostPublicationProcessSubscriber implements EventSubscriberInterface
 Step Pre-validations
 --------------------
 
-In addition to step validations you can also process some pre-validations.
+In addition to step validations, you can also process some pre-validations.
 A pre-validation will be executed just before step validations and only for the current step.
 
 E.g.: let's say we have a post which is currently on step `published` and I want to reach the step `unpublished`.
@@ -327,11 +327,11 @@ lexik_workflow:
                 # ...
 ```
 
-When you will try to reach the `unpublished` step the process handler will trigger a pre-validation event named:
+When you will try to reach the `unpublished` step, the process handler will trigger a pre-validation event named:
 
 `post_publication.published.unpublish.pre_validation`
 
-So by listening this event you will be able to do some validations before the process handler execute default validations defined on the `unpublished` step.
+So by listening this event you will be able to do some validations before the process handler executes default validations defined on the `unpublished` step.
 And these pre-validations are only executed when you try to reach `unpublished` from `published`.
 
 Pre-validation events patterns:
@@ -339,7 +339,7 @@ Pre-validation events patterns:
 * To process some pre-validations: `<process_name>.<current_step_name>.<next_state_name>.pre_validation`.
 * To process some code in case pre-validations fail: `<process_name>.<current_step_name>.<next_state_name>.pre_validation_fail`.
 
-Here a simple example for pre-validation listener:
+Here a simple example for a pre-validation listener:
 
 ```php
 namespace Project\Bundle\SuperBundle\Workflow\Listener;
@@ -381,7 +381,7 @@ class PostPublicationProcessSubscriber implements EventSubscriberInterface
 Conditional next step (OR)
 --------------------------
 
-To define a conditional next state you have to define the `target` key as usual plus the `type` key to notify the process handler this next state is conditional.
+To define a conditional next state, you have to define the `target` key as usual, plus the `type` key to notify the process handler that this next state is conditional.
 
 Here an example of conditional next state:
 
@@ -403,16 +403,16 @@ lexik_workflow:
 
 Let's say we have a model state currently on the step named `my_step_xxx`.
 If we try to reach the next state named `go_to_next_step` by calling `$processHandler->reachNextState($model, 'go_to_next_step')`, the workflow will call each method defined for each target.
-The first method that returns true will make the work go to the related step.
+The first method that returns true will make the workflow proceed to the related step.
 
-So if `service_id:method_name` returns true the next step will be `my_step_A`.
-If `service_id:method_name` returns false and then `service_id:other_method_name` returns true the next step will be `my_step_B`.
-If both of `service_id:method_name` and `service_id:other_method_name` return false, the next step will be `my_step_C`.
+So, if `service_id:method_name` returns `true`, the next step will be `my_step_A`.
+If `service_id:method_name` returns `false` and then `service_id:other_method_name` returns `true`, the next step will be `my_step_B`.
+If both `service_id:method_name` and `service_id:other_method_name` return `false`, the next step will be `my_step_C`.
 
 Model status update
 -------------------
 
-You can easily assign a status to your model through the `model_status` option. The first argument is the method that will be called on the model when the step is reached. The second argument is a value passed to this method. This allows you to automatically update the status at each step of the process.
+You can easily assign a status to your model using the `model_status` option. The first argument is the method that will be called on the model when the step is reached. The second argument is the value that will be passed to this method. This allows you to automatically update the status at each step of the process.
 
 ```yaml
 steps:
@@ -439,7 +439,7 @@ An event `*.bad_credentials` is dispatched when user has not the roles.
 Set modelStates on your ModelInterface
 --------------------------------------
 
-If you want to retrieve all modelState created for your ModelInterface object, you need to implement the ModelStateInterface:
+If you want to retrieve all modelStates created for your ModelInterface object, you need to implement the ModelStateInterface:
 
 ```php
 <?php
@@ -461,7 +461,7 @@ class FakeModel implements ModelInterface, ModelStateInterface
     }
 ```
 
-You can after call the method `getStates($objects, $processes = array(), $onlySuccess = false)` define in `ModelStorage`.
+This will allow you to call the method `getStates($objects, $processes = array(), $onlySuccess = false)` defined in the `lexik_workflow.model_storage` service.
 
 ```php
 <?php
@@ -471,7 +471,7 @@ You can after call the method `getStates($objects, $processes = array(), $onlySu
     // Set states on your object
     $this->get('lexik_workflow.model_storage')->setStates($post);
 
-    // get alls your objects and set your process and only state successful
+    // Get all your objects and set your process and only state successful
     $this->get('lexik_workflow.model_storage')->setStates($posts, ['process'], true);
 ```
 
@@ -495,7 +495,7 @@ $modelState = $processHandler->start($model);
 
 // $model->getStatus() === Project\Bundle\SuperBundle\Entity\Post::STATUS_DRAFT
 
-// reach a next state
+// reach the next state
 $modelState = $processHandler->reachNextState($model, 'validate'); // here 'validate' is the key defined in the draft_created next states.
 
 // $model->getStatus() === Project\Bundle\SuperBundle\Entity\Post::STATUS_VALIDATED
